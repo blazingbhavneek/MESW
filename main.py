@@ -33,7 +33,7 @@ try:
     print("✅ Local embedding model loaded")
 except:
     try:
-        EMBED_MODEL = SentenceTransformer("all-MiniLM-L6-v2")
+        EMBED_MODEL = SentenceTransformer("Qwen/Qwen3-Embedding-0.6B")
         print("✅ Fallback embedding model loaded")
     except Exception as e:
         print(f"❌ Failed to load embedding model: {e}")

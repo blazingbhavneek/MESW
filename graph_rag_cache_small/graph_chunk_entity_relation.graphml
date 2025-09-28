@@ -1,0 +1,635 @@
+<?xml version='1.0' encoding='utf-8'?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd"><key id="d7" for="edge" attr.name="order" attr.type="long"/>
+<key id="d6" for="edge" attr.name="source_id" attr.type="string"/>
+<key id="d5" for="edge" attr.name="description" attr.type="string"/>
+<key id="d4" for="edge" attr.name="weight" attr.type="double"/>
+<key id="d3" for="node" attr.name="clusters" attr.type="string"/>
+<key id="d2" for="node" attr.name="source_id" attr.type="string"/>
+<key id="d1" for="node" attr.name="description" attr.type="string"/>
+<key id="d0" for="node" attr.name="entity_type" attr.type="string"/>
+<graph edgedefault="undirected"><node id="&quot;ONE-SIXTH&quot;">
+  <data key="d0">"CONCEPT"</data>
+  <data key="d1">"One-Sixth refers to a cycle of an alternating current that completes six full cycles per second.")&lt;SEP&gt;"One-Sixth refers to the fraction of a cycle in an alternating current (AC</data>
+  <data key="d2">chunk-8b0b91602a342b5cb9be53f574cc84fc&lt;SEP&gt;chunk-b2e59daf0c77729c4f0f4b60bef0afda</data>
+</node>
+<node id="&quot;ALTERNATING-CURRENT&quot;">
+  <data key="d0">"EVENT"</data>
+  <data key="d1">"Alternating current is an electrical current that periodically reverses direction, characterized by a frequency of 60 cycles per second.")&lt;SEP&gt;"Alternating-Current is a type of current that alternates direction periodically."</data>
+  <data key="d2">chunk-0d082e263e91177cd738d9e292b3cc6f&lt;SEP&gt;chunk-41b9292416f4a275f255b1bcbdc5d03c</data>
+</node>
+<node id="&quot;RESISTIVE&quot;">
+  <data key="d0">"ORGANIZATION"</data>
+  <data key="d1">"Resistive refers to materials or components that exhibit resistance, which affects power consumption."&lt;SEP&gt;"Resistive refers to the opposition to electric current flow, defined by Ohm's law as V=IR."&gt;</data>
+  <data key="d2">chunk-aaff289e448acf37775e52b79af3cbcb&lt;SEP&gt;chunk-31fe67ae758ea3cb51acccd6053232f2</data>
+</node>
+<node id="&quot;ELECTRIC&quot;">
+  <data key="d0">"EVENT"</data>
+  <data key="d1">"Electric refers to the properties of electric fields and energy transfer, as described in the context of electrical phenomena."&lt;SEP&gt;"Electric refers to the properties of electric fields and energy transfer, as described in the context of electrical phenomena.")&lt;SEP&gt;"Electric refers to the properties of electricity, such as conduction and energy transfer, described by the movement of charges in conductive materials."</data>
+  <data key="d2">chunk-e643ed9ce131bc337895fb91f41a0d21&lt;SEP&gt;chunk-ccaa4de4caf2800d0df50fbdcb7a4022</data>
+</node>
+<node id="&quot;YTTRIUM-BARIUM-COPPER&quot;">
+  <data key="d0">"MATERIAL"</data>
+  <data key="d1">"This material exhibits superconductivity at extremely low temperatures, allowing electrons to move freely without energy loss."&lt;SEP&gt;"Yttrium-Barium-Copper is a material known for superconductivity at extremely low temperatures."</data>
+  <data key="d2">chunk-b4166a9d70501f228175df95bf592837&lt;SEP&gt;chunk-d7c638931db6729f882dac879fdf8dea</data>
+</node>
+<node id="&quot;RESISTANCE&quot;">
+  <data key="d0">"EVENT"</data>
+  <data key="d1">"Resistance refers to the opposition to current flow, measured in ohms, and is influenced by factors such as material properties and circuit design."&lt;SEP&gt;"Resistance refers to the physical property of materials that opposes the flow of electric current, which minimizes power loss during transmission."</data>
+  <data key="d2">chunk-a74f6e9c2488e86a2874dfae4b22a17f&lt;SEP&gt;chunk-72beb1e5cdffd9a47fbb93bd3ef86459</data>
+</node>
+<node id="&quot;UNIT OF CONDUCTIVITY&quot;">
+  <data key="d0">"CONCEPT"</data>
+  <data key="d1">"The unit of conductance measures how efficiently a material conducts electricity, defined by the SI unit S (siemens</data>
+  <data key="d2">chunk-a74f6e9c2488e86a2874dfae4b22a17f</data>
+</node>
+<node id="&quot;LENGTH OF CORD&quot;">
+  <data key="d0">"MEASURE"</data>
+  <data key="d1">"The length of a cord affects resistance, as doubling its length results in double the resistance due to increased resistance in resistive materials."</data>
+  <data key="d2">chunk-a74f6e9c2488e86a2874dfae4b22a17f</data>
+</node>
+<node id="&quot;HEATING&quot;">
+  <data key="d0">"EVENT"</data>
+  <data key="d1">"Heating refers to the process of increasing the temperature of a substance due to heat transfer, which can involve ionization or electromagnetic effects."</data>
+  <data key="d2">chunk-ebf8f039e135b7bf93995a735e92279c</data>
+</node>
+<node id="&quot;VOLTAGE-DROP&quot;">
+  <data key="d0">"EVENT"</data>
+  <data key="d1">"Voltage-Drop refers to the difference in potential across an object, which contributes to the current flow."&lt;SEP&gt;"Voltage-Drop refers to the voltage loss across a resistor, calculated using Ohm's law.")&lt;SEP&gt;"Voltage-Drop refers to the voltage loss across a resistor, calculated using Ohm’s law."</data>
+  <data key="d2">chunk-35a6231ec9db79b66d01af71b3e847a3&lt;SEP&gt;chunk-0bdf8431a0af21724d820cb5908959b6</data>
+</node>
+<node id="&quot;WATT-SECOND&quot;">
+  <data key="d0">"ORGANIZATION"</data>
+  <data key="d1">"Watt-Second is a unit of energy equal to a joule multiplied by time."</data>
+  <data key="d2">chunk-84a0ceb312ee91114a89b560ef670d91</data>
+</node>
+<node id="&quot;KILOWATT-HOUR&quot;">
+  <data key="d0">"ORGANIZATION"</data>
+  <data key="d1">"Kilowatt-hour is a unit of energy equal to 3.6 × 10⁶ joules. It represents the amount of energy stored in a battery or consumed during operation."&lt;SEP&gt;description: 1 kilowatt-hour equals 3.6 × 10^6 joules.&lt;SEP&gt;description: 1 kilowatt-hour equals 3.6 × 10⁶ joules.</data>
+  <data key="d2">chunk-3c85bd4e14115d807d01534976eb46c0&lt;SEP&gt;chunk-9dc02527610525feaaef2bfe66b03026</data>
+</node>
+<node id="&quot;GROUND&quot;">
+  <data key="d0">"GEO"</data>
+  <data key="d1">"Ground is an electrically neutral place with zero voltage or potential.")&lt;SEP&gt;"ground is an electrically neutral place, meaning it has zero voltage or potential in the context of electric circuits"</data>
+  <data key="d2">chunk-2600b9ccbd058afcf5b6e9f8bf27d7bc&lt;SEP&gt;chunk-6817a02e964a2ba4d8112232d6e1e97d</data>
+</node>
+<node id="&quot;PHYSICS&quot;">
+  <data key="d0">"CONCEPT"</data>
+  <data key="d1">"Physics is the study of fundamental principles governing the natural world, including forces, energy, and matter."&lt;SEP&gt;"Physics is the study of fundamental principles governing the natural world."</data>
+  <data key="d2">chunk-3bb9ad0d90a22f37b6fd2dd66179a75d&lt;SEP&gt;chunk-c8804c6867e80cb9ca668250b20fe18c</data>
+</node>
+<node id="&quot;ELECTRICITY&quot;">
+  <data key="d0">"CONCEPT"</data>
+  <data key="d1">"Electricity is a form of energy associated with electric charges"&lt;SEP&gt;"Electricity is the study of the movement of charged particles in conductive materials."</data>
+  <data key="d2">chunk-e2ad4a5fad810b1fb7f3ca05eefb5a1f&lt;SEP&gt;chunk-c85306179260b9047d0d605990e9f153</data>
+</node>
+<node id="&quot;POWER-FLOW&quot;">
+  <data key="d0">"EVENT"</data>
+  <data key="d1">"Power Flow refers to the movement of energy in a circuit, typically analyzed using power balance equations"</data>
+  <data key="d2">chunk-60a0d4d4106a245160b2ae1a78ee6336</data>
+</node>
+<node id="&quot;SECTION&quot;">
+  <data key="d0">"EVENT"</data>
+  <data key="d1">"Section refers to a part of the circuit analyzed for current behavior"&lt;SEP&gt;"Section refers to a specific part of the formula discussed in the context of power calculations."</data>
+  <data key="d2">chunk-a44e182a911da16b3e73a55dd9ea210f&lt;SEP&gt;chunk-c55c3d7835b96bbcbf0529965eb61f49</data>
+</node>
+<node id="&quot;ELECTRIC-SHOCK&quot;">
+  <data key="d0">"EVENT"</data>
+  <data key="d1">"Electric-Shock is a situation involving high voltage causing a shock hazard."&lt;SEP&gt;"Electric-Shock is an event resulting in an injury due to a high voltage current."</data>
+  <data key="d2">chunk-29c19c82969cf2706d31e5c6eb990491&lt;SEP&gt;chunk-fae3eb47082c2a5ea7139810cc800dac</data>
+</node>
+<node id="&quot;CALCULATING RESISTIVE&quot;">
+  <data key="d0">"EVENT"</data>
+  <data key="d1">"Calculating Resistive is an event that involves calculating power dissipation in a resistor, which relates to heat generation due to resistance."&lt;SEP&gt;"Calculating Resistive is the process of determining heat dissipation using formulas."</data>
+  <data key="d2">chunk-f12bd163c6af4dfa2d30170f4bb60ce9&lt;SEP&gt;chunk-1709f8bcb80a2c804936dd1cd482d4c7</data>
+</node>
+<node id="&quot;ELECTROMAGNETIC FIELDS&quot;">
+  <data key="d0">"EVENT"</data>
+  <data key="d1">"Electromagnetic Fields are defined as electric and magnetic fields that propagate energy through space."&lt;SEP&gt;"Electromagnetic Fields are defined as fields created by electric and magnetic forces."</data>
+  <data key="d2">chunk-bf9ef9a438dcf0005046e3d4957ec7f4&lt;SEP&gt;chunk-e104ca9185345f85afd8aa47a8cc4d18</data>
+</node>
+<node id="&quot;RESISTOR&quot;">
+  <data key="d0">"ORGANIZATION"</data>
+  <data key="d1">"A resistor is a component in a circuit where voltage drop is calculated using Ohm's Law (V=IR</data>
+  <data key="d2">chunk-7239ce0786f11a310224c60388ade242</data>
+</node>
+<node id="&quot;ELECTRIC SHOCK&quot;">
+  <data key="d0">"EVENT"</data>
+  <data key="d1">"Electric Shock is defined as a situation where a high voltage is sustained by an electromotive force (or a very large accumulation of charge)."</data>
+  <data key="d2">chunk-f941012a4cdcaf6cd045a4d6303a601c</data>
+</node>
+<node id="&quot;MAGNETIC FIELDS&quot;">
+  <data key="d0">"EVENT"</data>
+  <data key="d1">"Magnetic Fields are defined as regions with directionality..."&lt;SEP&gt;"Magnetic Fields are regions with directionality, where north is meaningless without south, indicating the orientation of a test magnet."&lt;SEP&gt;the description of electromagnetic fields</data>
+  <data key="d2">chunk-51063a4e756e5fed1edc0005b0531ab0&lt;SEP&gt;chunk-c6d46abee881acaebdf611c409021021</data>
+</node>
+<node id="&quot;ELECTRIC FIELD&quot;">
+  <data key="d0">"EVENT"</data>
+  <data key="d1">"An electric field is a region around a charged particle where a force acts on other charges."&lt;SEP&gt;"The electric field represents a spatial distribution of electric potential in a given region."</data>
+  <data key="d2">chunk-dce758bdb67c0fb7114b64029edecb31&lt;SEP&gt;chunk-b4fef35eb6337f4a5886c1b727c6d63a</data>
+</node>
+<node id="&quot;MAGNETIC FIELD&quot;">
+  <data key="d0">"EVENT"</data>
+  <data key="d1">"Magnetic Field is defined as a region around a magnet or a moving charge where a force acts on other charges"</data>
+  <data key="d2">chunk-0c74fbd6ad05e94afbe72061ab5f570c</data>
+</node>
+<node id="&quot;DOORKNOB&quot;">
+  <data key="d0">"PERSON"</data>
+  <data key="d1">"doorknob is a person who experiences static electricity transfer when touching a doorknob"</data>
+  <data key="d2">chunk-eaf4f19a48bb7224af87f28436fef2e9</data>
+</node>
+<node id="&quot;STATIC-ELECTRICITY&quot;">
+  <data key="d0">"TECHNOLOGY"</data>
+  <data key="d1">"static-electricity is a process involving the transfer of static electricity through friction, as seen when touching a doorknob"</data>
+  <data key="d2">chunk-eaf4f19a48bb7224af87f28436fef2e9</data>
+</node>
+<node id="&quot;DOORKNOB-OUR&quot;">
+  <data key="d0">"ORGANIZATION"</data>
+  <data key="d1">"A doorknob that provides a pathway for static electricity, allowing it to transfer from the body to the ground."&lt;SEP&gt;"Doorknob-Our refers to a doorknob that acts as a conductor in static electricity scenarios."</data>
+  <data key="d2">chunk-ef461728701b5214486e36a982aab9ab&lt;SEP&gt;chunk-1063a06827d7c073aef63766383570cf</data>
+</node>
+<node id="&quot;FUNDAMENTALS&quot;">
+  <data key="d0">"ORGANIZATION"</data>
+  <data key="d1">"Fundamentals is the core principles governing electricity behavior in circuits."&lt;SEP&gt;"Fundamentals refer to the core principles discussed in the context, including static charge and electric circuits."</data>
+  <data key="d2">chunk-fb5881129dbb0e196e1da0b147d5fad9&lt;SEP&gt;chunk-93c51c07dde5e7202cbc26987bea4ffb</data>
+</node>
+<node id="&quot;ION-NAMELY&quot;">
+  <data key="d0">"ORGANIZATION"</data>
+  <data key="d1">"Ion-Namely is a scientific term referring to ions formed due to the imbalance of protons and electrons in atoms or molecules."&lt;SEP&gt;"Ion-Namely refers to atoms or molecules with a net charge (electrons lost/gained) due to peculiarities in the geometry."</data>
+  <data key="d2">chunk-3d25d17ad5af621fbb079d7acb294c7e&lt;SEP&gt;chunk-e943393a1d31995ea366d1912b231297</data>
+</node>
+<node id="&quot;CHARGE&quot;">
+  <data key="d0">"CONCEPT"</data>
+  <data key="d1">"Charge is a fundamental concept in physics, representing the magnitude of electric charge."&lt;SEP&gt;"Charge is a measurable property describing physical phenomena, including charge, voltage, current, and resistance."&lt;SEP&gt;"Charges are produced when electrons transfer, explaining phenomena like static electricity and electric currents."&lt;SEP&gt;"Charge is defined as the amount of positive or negative electrical charge on an object."</data>
+  <data key="d2">chunk-9c7159c8951339119693f4923e872eaf&lt;SEP&gt;chunk-46b360e3a963fe5676e9ac633c5b63e1&lt;SEP&gt;chunk-26b15c83d7f82c054d7f9f926a4929d6&lt;SEP&gt;chunk-6dd1a3874f2b8dc5b194a2ca16812eb5</data>
+</node>
+<node id="&quot;CHARGES&quot;">
+  <data key="d0">"ORGANIZATION"</data>
+  <data key="d1">"Charges are produced when electrons transfer, explaining phenomena like static electricity and electric currents."&lt;SEP&gt;"Charges specifically refer to the electric and magnetic fields that drive the movement of electrons in electromagnetic radiation."&lt;SEP&gt;"Charges specifically refer to the charge of electrons in electromagnetic systems."&lt;SEP&gt;"charges are the entities that move due to electromagnetic forces, as described in the context."&lt;SEP&gt;"charges are the entities that move due to electromagnetic forces, as described in the context.")</data>
+  <data key="d2">chunk-067fe6c099b99898bace1a2fc6133cd2&lt;SEP&gt;chunk-bccaf9f68ffe38fd4fdaa58e6773e832&lt;SEP&gt;chunk-729cdc0d6d889d8b2d4983afc121c5aa&lt;SEP&gt;chunk-9c7159c8951339119693f4923e872eaf</data>
+</node>
+<node id="&quot;JOHN WILEY &amp; SONS, INC.&quot;">
+  <data key="d0">"ORGANIZATION"</data>
+  <data key="d1">"John Wiley &amp; Sons, Inc. is the publisher of the book 'Electricity: A Conceptual Introduction'."</data>
+  <data key="d2">chunk-7b67271c0d4651353ffd58a0b84c064f</data>
+</node>
+<node id="&quot;BASIC&quot;">
+  <data key="d0">"BASIC"</data>
+  <data key="d1">"Basic refers to the fundamental principles and concepts used in physics, such as charge, voltage, and current."</data>
+  <data key="d2">chunk-c4828a288e2d658b0857626383eebd59</data>
+</node>
+<node id="&quot;ORGANIZATION&quot;">
+  <data key="d0">"ORGANIZATION"</data>
+  <data key="d1">"No entity found in the text"&lt;SEP&gt;[1-2 Sentence]&lt;SEP&gt;"Organization is a reference to a company, institution, or group described in the text."</data>
+  <data key="d2">chunk-47aceab6f3cb2d1ae13abd9e65c1f10b&lt;SEP&gt;chunk-a1206f6ebb6abe8893eee956dac19ec8&lt;SEP&gt;chunk-70dbd0b5ec5f8bb941a2d038852f75c0</data>
+</node>
+<node id="&quot;PERSON&quot;">
+  <data key="d0">"PERSON"</data>
+  <data key="d1">"No entity found in the text"&lt;SEP&gt;"Person is a reference to a person whose identity is not explicitly stated in the text."</data>
+  <data key="d2">chunk-47aceab6f3cb2d1ae13abd9e65c1f10b&lt;SEP&gt;chunk-70dbd0b5ec5f8bb941a2d038852f75c0</data>
+</node>
+<node id="&quot;GEO&quot;">
+  <data key="d0">"GEO"</data>
+  <data key="d1">"Geo is a reference to geographic locations or regions described in the text."&lt;SEP&gt;"No entity found in the text"</data>
+  <data key="d2">chunk-47aceab6f3cb2d1ae13abd9e65c1f10b&lt;SEP&gt;chunk-70dbd0b5ec5f8bb941a2d038852f75c0</data>
+</node>
+<node id="&quot;EVENT&quot;">
+  <data key="d0">"EVENT"</data>
+  <data key="d1">"Event is a reference to an occurrence or event described in the text."&lt;SEP&gt;"No entity found in the text"</data>
+  <data key="d2">chunk-47aceab6f3cb2d1ae13abd9e65c1f10b&lt;SEP&gt;chunk-70dbd0b5ec5f8bb941a2d038852f75c0</data>
+  <data key="d3">[{"level": 0, "cluster": 0}]</data>
+</node>
+<node id="&quot;ACTION-AT-A-DISTANCE&quot;">
+  <data key="d0">"EVENT"</data>
+  <data key="d1">"Action-At-A-Distance refers to the phenomenon where forces act over a vast spatial range without requiring direct contact between interacting objects."&lt;SEP&gt;"Action-at-a-distance is a phenomenon describing forces acting instantaneously across space without requiring direct contact"</data>
+  <data key="d2">chunk-331dc936d13e80270bd9c5424b2e8f02&lt;SEP&gt;chunk-fb609179aa7827e7dc1328d160636c64</data>
+</node>
+<node id="&quot;TIME-WERE&quot;">
+  <data key="d0">"EVENT"</data>
+  <data key="d1">"Time-Were describes the idea that time is not fixed..."&lt;SEP&gt;"Time-Were refers to the relativistic nature of time, where events occur at different rates depending on spatial and temporal conditions."</data>
+  <data key="d2">chunk-87cfc3b5e91c13d1e2b2a454fbfb4c1a&lt;SEP&gt;chunk-0ace1e9e17d65ed176cbb26b547032ed</data>
+</node>
+<node id="&quot;ELECTRIC FIELDS&quot;">
+  <data key="d0">"CONCEPT"</data>
+  <data key="d1">"Electric Fields refer to the concept of electric potential and field in physics."&lt;SEP&gt;"Electric fields are regions around charged particles that exert forces on other charges."</data>
+  <data key="d2">chunk-b6a5116c2f46fa1e653bdd6ce3f7ba87&lt;SEP&gt;chunk-6dd1a3874f2b8dc5b194a2ca16812eb5</data>
+</node>
+<node id="&quot;ELECTRONS-THAT&quot;">
+  <data key="d0">"PERSON"</data>
+  <data key="d1">"Electrons-That are individuals who can escape atoms and move due to electromagnetic fields."</data>
+  <data key="d2">chunk-1eebef9c133e62ac68cc0db357832464</data>
+</node>
+<node id="&quot;ENERGY-CLOSER&quot;">
+  <data key="d0">"EVENT"</data>
+  <data key="d1">"Energy-Closer is a state where charges are closer together, analogous to a rubber band stretching to relieve imbalance."</data>
+  <data key="d2">chunk-60caede737d61183d148f3f51158c56d</data>
+</node>
+<node id="&quot;CONCEPTUAL PHYSICS&quot;">
+  <data key="d0">"PERSON"</data>
+  <data key="d1">"Conceptual Physics is a book titled 'Conceptual Physics', defined as a textbook covering fundamental physics concepts."&lt;SEP&gt;"Conceptual Physics is a textbook published by Menlo Park, CA: Addison Wesley."</data>
+  <data key="d2">chunk-4c88b79ed46569ba382918ac41f7cb80&lt;SEP&gt;chunk-8680f23f1fb5d8192b46594d907a8538</data>
+</node>
+<node id="&quot;TENTH EDITION&quot;">
+  <data key="d0">"ORGANIZATION"</data>
+  <data key="d1">"Tenth Edition is a version number of Conceptual Physics, Tenth Edition."&lt;SEP&gt;"The Tenth Edition of *Conceptual Physics* is the revised version published by Menlo Park, CA: Addison Wesley."</data>
+  <data key="d2">chunk-4c88b79ed46569ba382918ac41f7cb80&lt;SEP&gt;chunk-57f4844ada941367b4759ad8cc6e8f74</data>
+</node>
+<node id="&quot;CALCULATING-RESISTIVE&quot;">
+  <data key="d0">"ORGANIZATION"</data>
+  <data key="d1">"Calculating-Resistive is an organization responsible for applying formulas related to resistance to determine power dissipation in circuits."</data>
+  <data key="d2">chunk-ead85cfa31b4c27c6ba11b19385665d2</data>
+</node>
+<node id="&quot;RESISTIVE-LOSSES&quot;">
+  <data key="d0">"EVENT"</data>
+  <data key="d1">"Resistive-Losses is a phenomenon occurring due to resistive heating in transmission lines."&lt;SEP&gt;"Resistive-Losses refers to energy loss due to resistive heating in transmission lines, causing thermal expansion and potential wire melting."</data>
+  <data key="d2">chunk-6df51b7a3303002cefcde727c0ec791b&lt;SEP&gt;chunk-26541d0d04a7ea836f98c4b349d8cbd0</data>
+</node>
+<node id="&quot;IN-SECTION&quot;">
+  <data key="d0">"EVENT"</data>
+  <data key="d1">"In-Section refers to the section in the text where formulas for calculating resistive heating are discussed."</data>
+  <data key="d2">chunk-9ab39fa094a74d541766f20fac2df097</data>
+</node>
+<node id="&quot;TRANSMISSION VOLTAGE&quot;">
+  <data key="d0">"TECHNOLOGY"</data>
+  <data key="d1">"Transmission Voltage is defined as the voltage level used to transmit power over long distances, typically higher than line voltage to minimize losses."&lt;SEP&gt;"Transmission Voltage is the voltage level used to transmit power over long distances, typically higher than line voltage to minimize losses."</data>
+  <data key="d2">chunk-72beb1e5cdffd9a47fbb93bd3ef86459</data>
+</node>
+<node id="&quot;ECULAR&quot;">
+  <data key="d0">"ORGANIZATION"</data>
+  <data key="d1">"Ecular is an energetic form of electricity used to power devices or systems."</data>
+  <data key="d2">chunk-941e9418ecfd849e41a7d8d9f4c9c0b9</data>
+</node>
+<node id="&quot;FIELD&quot;">
+  <data key="d0">"GEO"</data>
+  <data key="d1">"Field describes the influence of a source (like Earth) on surrounding spaces, even without an actual object present, and quantifies the effect of that influence"&lt;SEP&gt;"Field is an abstract concept representing the hypothetical impact of an object's presence"&lt;SEP&gt;"Field is defined as a location or geographical area with specific characteristics."&lt;SEP&gt;"The Field represents the influence of the Earth’s gravity throughout space, abstractly mapping potential energy and force distributions."</data>
+  <data key="d2">chunk-a5e640fb2d4e61ccaa462db06251a74c&lt;SEP&gt;chunk-47aceab6f3cb2d1ae13abd9e65c1f10b&lt;SEP&gt;chunk-c867c65c51a352d26da51b2e9345f9a6&lt;SEP&gt;chunk-225307ba42399f33c5caa2d5e3303a2f</data>
+</node>
+<node id="&quot;EXPERIMENT-WHICH&quot;">
+  <data key="d0">"EVENT"</data>
+  <data key="d1">"Experiment-Which refers to the process or method described in the text."</data>
+  <data key="d2">chunk-e94bc72bc70746042c9bd9bfa9460c8f</data>
+</node>
+<node id="&quot;MAGNET-DO&quot;">
+  <data key="d0">"ORGANIZATION"</data>
+  <data key="d1">"The Magnet-Do refers to the magnet itself."&lt;SEP&gt;"The magnet itself is referred to as the Magnet-Do."</data>
+  <data key="d2">chunk-d9cc980c427ac2a82cd3bf3682558eb4</data>
+</node>
+<node id="&quot;ELECTROMAGNETIC RADIATION&quot;">
+  <data key="d0">"EVENT"</data>
+  <data key="d1">"Electromagnetic Radiation is a phenomenon defined as energy carried by electromagnetic waves, which can interact with matter."&lt;SEP&gt;"Electromagnetic radiation interacts with matter through charges specifically, electrons that are accelerated and moved by the field."&lt;SEP&gt;"Electromagnetic Radiation is a phenomenon occurring in space, interacting with matter through charged particles like electrons."</data>
+  <data key="d2">chunk-22180817a22b5177685d009c980e2b16&lt;SEP&gt;chunk-da99fe9b8eb2f1bdf776b43cca787257&lt;SEP&gt;chunk-067fe6c099b99898bace1a2fc6133cd2</data>
+</node>
+<node id="&quot;ELECTRONIC FIELDS&quot;">
+  <data key="d0">"EVENT"</data>
+  <data key="d1">"Electronic Fields refer to the phenomenon where electronic fields in materials determine energy transitions and interact with radiation only when the available transitions match precisely the energy of the photon."</data>
+  <data key="d2">chunk-26778d1df554a8ab539eacdbf35e815c</data>
+</node>
+<node id="&quot;LARGE-SCALE&quot;">
+  <data key="d0">"EVENT"</data>
+  <data key="d1">"The large-scale motion of electrons in electromagnetic systems, such as those in radio antennas."</data>
+  <data key="d2">chunk-5e6bac728c0902c18dda48082810cce0</data>
+  <data key="d3">[{"level": 0, "cluster": 0}]</data>
+</node>
+<node id="&quot;WAVELENGTH-GIVE&quot;">
+  <data key="d0">"ORGANIZATION"</data>
+  <data key="d1">"Wavelength-Give is a phenomenon that results in electromagnetic radiation phenomena such as refraction, absorption, and transmission."&lt;SEP&gt;"Wavelength-Give is an organization that uses wavelengths to produce optical phenomena like refraction and absorption in materials."</data>
+  <data key="d2">chunk-9f9d87614c7ccd2d5b5c24e17d9f8f3d&lt;SEP&gt;chunk-7442175b420c53b7d6e37b8e671b3643</data>
+</node>
+<node id="&quot;PHOTONS&quot;">
+  <data key="d0">"EVENT"</data>
+  <data key="d1">"Photons are quantized packets of electromagnetic radiation carrying energy, resulting from electron transitions in atoms or molecules."&lt;SEP&gt;"Photons are quantized packets of electromagnetic radiation that carry energy and are emitted or absorbed when electrons transition between energy levels in atoms or molecules."</data>
+  <data key="d2">chunk-384a62cb3601ffc7e4725590d095cb32&lt;SEP&gt;chunk-7557054949d53ee4538be64cf2f777f5</data>
+</node>
+<node id="&quot;RIGHT-HAND&quot;">
+  <data key="d0">"CONCEPT"</data>
+  <data key="d1">"The right-hand rule determines the direction of magnetic field lines around a current-carrying wire."</data>
+  <data key="d2">chunk-9f0fbc263d9c559446788dba34b3c851</data>
+</node>
+<node id="&quot;PARALLEL-THAT&quot;">
+  <data key="d0">"EVENT"</data>
+  <data key="d1">"Parallel-That is a physical phenomenon where a charge moves across the field in a direction perpendicular to the field's direction, generating a force."&lt;SEP&gt;"Parallel-That is a physical phenomenon where a charge moves across the field in a direction perpendicular to the field's direction, generating a force.")&lt;SEP&gt;"Parallel-That is an event where the direction of velocity and magnetic field determines the direction of the force."</data>
+  <data key="d2">chunk-3fa42bbff2d648733abcae259b7b7d5b&lt;SEP&gt;chunk-ce397675f3b37fc240270c2514521b68</data>
+</node>
+<node id="&quot;THEM-THE&quot;">
+  <data key="d0">"GEO"</data>
+  <data key="d1">"Them-The is a person describing the direction of the magnetic field."&lt;SEP&gt;"Them-The refers to the direction of the magnetic field, as described in the text."&lt;SEP&gt;"Them-The refers to a location where charges move along magnetic field lines, resulting in zero force."</data>
+  <data key="d2">chunk-2b920f79b6e68136e60f3b965c8dfa3e&lt;SEP&gt;chunk-18c55db95ef55b1643339462b70641c7</data>
+</node>
+<node id="&quot;EFFECTS-MOVEMENT&quot;">
+  <data key="d0">"EVENT"</data>
+  <data key="d1">"Effects-Movement refers to the change in the direction of the force on a charge due to its relative motion with respect to a magnetic field."</data>
+  <data key="d2">chunk-2548d38212f8ca857aecd4537df42cc2</data>
+</node>
+<node id="&quot;LOW-FREQUENCY&quot;">
+  <data key="d0">"EVENT"</data>
+  <data key="d1">"Low-Frequency is a phenomenon defined by its low-frequency electromagnetic properties"&lt;SEP&gt;"Low-Frequency is a type of electromagnetic radiation with frequencies below 100 MHz"&lt;SEP&gt;"Low-Frequency is defined as electromagnetic radiation with frequencies below 100 MHz"&lt;SEP&gt;"Low-Frequency refers to electromagnetic radiation with frequencies below 100 MHz"&lt;SEP&gt;"Low-Frequency refers to the frequency of the magnetic field's variation, specifically 60 Hz, as mentioned in the context."</data>
+  <data key="d2">chunk-34988b0a5f12d76518d9d8e41eed546b&lt;SEP&gt;chunk-ce25a6016a5c61b8c3638337f77fa20b</data>
+</node>
+<node id="&quot;WORLD HEALTH ORGANISATION&quot;">
+  <data key="d0">"ORGANIZATION"</data>
+  <data key="d1">"The World Health Organization is the global effort to address public health challenges, as highlighted by organizations like the World Health Organization."&lt;SEP&gt;"The organization responsible for global health initiatives."</data>
+  <data key="d2">chunk-97613c16c5d563ac94129034ac871684&lt;SEP&gt;chunk-02568499506ce0fb5ffc13b1d7b6b055</data>
+</node>
+<node id="&quot;LINE FREQUENCY&quot;">
+  <data key="d0">"EVENT"</data>
+  <data key="d1">"Line Frequency is defined as alternating current frequency in electrical systems."&lt;SEP&gt;"Line Frequency refers to the frequency of electromagnetic waves interacting with matter"</data>
+  <data key="d2">chunk-931b6a8152e624c501ecb67cd93c2d89&lt;SEP&gt;chunk-63cc9d03d4b7810761e14f387a642b3e</data>
+</node>
+<node id="&quot;WORKING GROUP&quot;">
+  <data key="d0">"ORGANIZATION"</data>
+  <data key="d1">"A collaborative team of experts focused on specific research objectives."&lt;SEP&gt;"A collaborative team or body responsible for specific research initiatives, often reported in scientific reports."</data>
+  <data key="d2">chunk-bea9ddefa39b5ea7382732bf1db50ae2&lt;SEP&gt;chunk-be2580fb044c2e40dad1053da0759655</data>
+</node>
+<node id="&quot;NATIONAL INSTITUTE&quot;">
+  <data key="d0">"ORGANIZATION"</data>
+  <data key="d1">"The National Institutes of Health (NIH) are research organizations dedicated to advancing scientific knowledge."&lt;SEP&gt;"The National Institutes of Health (NIH) are responsible for funding and promoting research in various scientific areas."</data>
+  <data key="d2">chunk-b256671e85f666414dfa65dfbf3fa120&lt;SEP&gt;chunk-6d6c30cf828e15a4b397729d1229c459</data>
+</node>
+<node id="&quot;ENVIRONMENTAL HEALTH&quot;">
+  <data key="d0">"CONCEPT"</data>
+  <data key="d1">"Environmental Health focuses on the impact of environmental factors on public health."</data>
+  <data key="d2">chunk-851a864c782c595a0ea274acd533b9ef</data>
+</node>
+<node id="&quot;NIEHS&quot;">
+  <data key="d0">"ORGANIZATION"</data>
+  <data key="d1">"A report from the National Institutes of Health (NIH) detailing health effects of exposure to power-line frequency electric and magnetic fields"</data>
+  <data key="d2">chunk-b34960019351428c8ce805e0fe976f82</data>
+</node>
+<node id="&quot;MAGNETIC FLUX&quot;">
+  <data key="d0">"EVENT"</data>
+  <data key="d1">"Magnetic Flux is a measure of how much magnetic field passes through a surface."</data>
+  <data key="d2">chunk-e50a3282641ea1d2064d3bad1aaeaf5a</data>
+</node>
+<node id="&quot;INTERACTS WITH MATTER&quot;">
+  <data key="d2">chunk-da99fe9b8eb2f1bdf776b43cca787257</data>
+  <data key="d1">"Electromagnetic Radiation interacts with matter through charges."</data>
+  <data key="d0">"UNKNOWN"</data>
+</node>
+<node id="&quot;TECHNOLOGY&quot;">
+  <data key="d2">chunk-5e6bac728c0902c18dda48082810cce0&lt;SEP&gt;chunk-47aceab6f3cb2d1ae13abd9e65c1f10b</data>
+  <data key="d1">"Technology is a reference to a technological innovation or system described in the text."&lt;SEP&gt;"The large-scale motion of electrons in electromagnetic systems is a characteristic of technology, specifically radio antenna systems."</data>
+  <data key="d0">"TECHNOLOGY"</data>
+  <data key="d3">[{"level": 0, "cluster": 0}]</data>
+</node>
+<node id="&quot;AREA&quot;">
+  <data key="d0">"GEO"</data>
+  <data key="d1">"Area is a geographic feature defined by the utility's provision of the area and regulation of voltage."</data>
+  <data key="d2">chunk-a44e182a911da16b3e73a55dd9ea210f</data>
+</node>
+<node id="&quot;DIAMETER&quot;">
+  <data key="d0">"GEO"</data>
+  <data key="d1">"Diameter is a geometric property affecting the resistance of the cord."</data>
+  <data key="d2">chunk-a44e182a911da16b3e73a55dd9ea210f</data>
+</node>
+<node id="&quot;RADIUS&quot;">
+  <data key="d0">"GEO"</data>
+  <data key="d1">"Radius is a geometric attribute influencing the resistance of the cord."</data>
+  <data key="d2">chunk-a44e182a911da16b3e73a55dd9ea210f</data>
+</node>
+<node id="&quot;LENGTH&quot;">
+  <data key="d0">"GEO"</data>
+  <data key="d1">"Length is a dimension affecting the resistance of the cord."</data>
+  <data key="d2">chunk-a44e182a911da16b3e73a55dd9ea210f</data>
+</node>
+<node id="&quot;CONDUCTANCE&quot;">
+  <data key="d0">"CONCEPT"</data>
+  <data key="d1">"Conductance relates to the ability of a material to conduct electricity and is measured in Siemens (S</data>
+  <data key="d2">chunk-2ec4c0eee11f72d3b7d10e66af79e35d</data>
+</node>
+<node id="&quot;CROSS-SECTIONAL&quot;">
+  <data key="d0">"CONCEPT"</data>
+  <data key="d1">"Cross-sectional refers to the area perpendicular to the length of a conductor, such as the cross-section of a wire."</data>
+  <data key="d2">chunk-ab2a48a90ab6af6975523bd014f5a18d</data>
+</node>
+<node id="&quot;HIGH-VOLTAGE&quot;">
+  <data key="d0">"ORGANIZATION"</data>
+  <data key="d1">"A high voltage sustained by an electromotive force (or a very large accumulation of charge</data>
+  <data key="d2">chunk-9020ebdf6a3c07ff5feb1d05ec8d5de2</data>
+</node>
+<node id="&quot;YBA2CU3O7&quot;">
+  <data key="d0">"MATERIAL"</data>
+  <data key="d1">"The first such material to be discovered was yttrium-barium-copper oxide, YBa2Cu3O7."</data>
+  <data key="d2">chunk-d7c638931db6729f882dac879fdf8dea</data>
+</node>
+<node id="&quot;TRANSMISSION VOLTAGE LEVELS&quot;">
+  <data key="d0">"LOCATION"</data>
+  <data key="d1">"Transmission Voltage Levels have grown steadily in conjunction with the geographic expansion of electric power systems, up to about 1000 kilovolts (kV</data>
+  <data key="d2">chunk-fb6aa8be61cc59a872e7a6cac6c8b890</data>
+</node>
+<node id="&quot;GRAVITATIONAL FIELD&quot;">
+  <data key="d0">"EVENT"</data>
+  <data key="d1">"The gravitational field describes a spatial distribution of gravitational force in a given region."</data>
+  <data key="d2">chunk-b4fef35eb6337f4a5886c1b727c6d63a</data>
+</node>
+<node id="&quot;QUANTITIES&quot;">
+  <data key="d0">"QUANTITY"</data>
+  <data key="d1">"Quantities refer to measurable properties or variables used in physics experiments, such as mass, distance, or potential energy."</data>
+  <data key="d2">chunk-446c955927896495da42c328263e5c0a</data>
+</node>
+<node id="&quot;ELECTRIC_FIELD&quot;">
+  <data key="d0">"ORGANIZATION"</data>
+  <data key="d1">"ELECTRIC_FIELD denotes the electric field's influence on particles and objects, contributing to potential energy and force distributions."&lt;SEP&gt;"Electric_Field is a region surrounding a charge where its influence can be felt by other charges, quantitatively describing the force experienced by test charges."</data>
+  <data key="d2">chunk-70a4a4baa0b71c369ab530febe0c85b7&lt;SEP&gt;chunk-2e709bfa384081a5596f6577e224ba9e</data>
+</node>
+<node id="&quot;MAGNETIC_FIELD&quot;">
+  <data key="d0">"ORGANIZATION"</data>
+  <data key="d1">"MAGNETIC_FIELD describes the magnetic field's effect on forces and particle interactions, highlighting its role in distributing energy and creating force patterns."&lt;SEP&gt;"Magnetic Field is defined as a region where magnetic forces act on moving charges"</data>
+  <data key="d2">chunk-1743e76254d6529efc617cacc5f316b9&lt;SEP&gt;chunk-2e709bfa384081a5596f6577e224ba9e</data>
+</node>
+<node id="&quot;TOASTER&quot;">
+  <data key="d0">"ORGANIZATION"</data>
+  <data key="d1">"Toaster is an appliance used for resistive heating."</data>
+  <data key="d2">chunk-e580c15422246893e1f740a7b45ce2e1</data>
+</node>
+<node id="&quot;STATIC CHARGE&quot;">
+  <data key="d0">"EVENT"</data>
+  <data key="d1">"Static Charge is a state or condition characterized by accumulated charge that remains unmovable due to lack of a conducting pathway."</data>
+  <data key="d2">chunk-ecacbf708e2bd6da9e704a2b3954e8ad</data>
+</node>
+<node id="&quot;INSULATION&quot;">
+  <data key="d0">"ORGANIZATION"</data>
+  <data key="d1">"Insulation is an organization used to prevent current flow in electrical systems."</data>
+  <data key="d2">chunk-e5184895f43424677eb8777c293e1821</data>
+</node>
+<node id="&quot;REPRESENTATIONS-AIDED&quot;">
+  <data key="d0">"ORGANIZATION"</data>
+  <data key="d1">"Representations-Aided uses analogies from other areas of physics to represent abstract concepts."</data>
+  <data key="d2">chunk-b0cf74098ee46c49e22bd3f1b752c92f</data>
+</node>
+<node id="&quot;WORLD-TO&quot;">
+  <data key="d0">"EVENT"</data>
+  <data key="d1">"World-To is an event that connects physical experiences with the conceptual framework of electricity."</data>
+  <data key="d2">chunk-89004272df30d4fce94073c548e084b3</data>
+</node>
+<node id="&quot;ONES-RESULTS&quot;">
+  <data key="d0">"EVENT"</data>
+  <data key="d1">"ones-Results is a phenomenon where individual particles contribute to the flow of electric current"</data>
+  <data key="d2">chunk-9449778a39d6414a69c759fa22fb620a</data>
+</node>
+<node id="&quot;SPEED OF LIGHT&quot;">
+  <data key="d0">"CONCEPT"</data>
+  <data key="d1">"Speed of light is the speed at which electromagnetic radiation travels in a vacuum, as defined by the speed of light constant."</data>
+  <data key="d2">chunk-278bd3a8ec0aef93162f6b94cde49325</data>
+</node>
+<node id="&quot;VOLTAGE&quot;">
+  <data key="d0">"CONCEPT"</data>
+  <data key="d1">"Voltage is defined as the potential difference between two points in an electric field."</data>
+  <data key="d2">chunk-6dd1a3874f2b8dc5b194a2ca16812eb5</data>
+</node>
+<node id="&quot;ELECTRICITY: THE PHYSICS OF ELECTRICITY&quot;">
+  <data key="d0">"ORGANIZATION"</data>
+  <data key="d1">description of the book as a copyright held by Alexandra von Meier</data>
+  <data key="d2">chunk-beec6823852ad25f5a161eec81bb13fd</data>
+</node>
+<node id="&quot;JOHN WILEY&quot;">
+  <data key="d0">"ORGANIZATION"</data>
+  <data key="d1">"John Wiley is the publisher of the book 'Electricity: The Physics of Electricity' by John Wiley &amp; Sons, Inc."</data>
+  <data key="d2">chunk-6ba97525ba246671ac5e6378478345ab</data>
+</node>
+<node id="&quot;BENJAMIN FRANKLIN&quot;">
+  <data key="d0">"PERSON"</data>
+  <data key="d1">"Benjamin Franklin contributed to the understanding of static electricity by describing the concept of positive and negative charges."</data>
+  <data key="d2">chunk-2659f970bedc7f0bc521d9e8784dac55</data>
+</node>
+<node id="&quot;EVENT: MAGNETIC RESONANCE&quot;">
+  <data key="d0">"EVENT"</data>
+  <data key="d1">"Magnetic Resonance is a phenomenon where magnetic fields interact with hydrogen nuclei to produce resonance, enabling MRI imaging."</data>
+  <data key="d2">chunk-0050b6a8f1248eafc213b1c97d70f161</data>
+</node>
+<node id="&quot;ELECTROMAGNETIC INDUCTION&quot;">
+  <data key="d0">"EVENT"</data>
+  <data key="d1">"Electromagnetic Induction is the process of converting changing magnetic fields into electric currents, as demonstrated by Hans Christian Oersted's experiment."</data>
+  <data key="d2">chunk-8578f9f551b5b37811af472c02a83a2d</data>
+</node>
+<node id="&quot;MENLO PARK, CA: ADDISON WESLEY&quot;">
+  <data key="d0">"GEO"</data>
+  <data key="d1">"Location of the publisher, Menlo Park, CA, Addison Wesley."</data>
+  <data key="d2">chunk-4c88b79ed46569ba382918ac41f7cb80</data>
+</node>
+<node id="&quot;MENLO PARK&quot;">
+  <data key="d0">"ORGANIZATION"</data>
+  <data key="d1">"Menlo Park is the publisher of the Tenth Edition of *Conceptual Physics*"</data>
+  <data key="d2">chunk-0cc71dbca09c01d6dec34b0cda9606f8</data>
+</node>
+<node id="&quot;ADDISON WESLEY&quot;">
+  <data key="d0">"ORGANIZATION"</data>
+  <data key="d1">"The Addison Wesley series refers to the textbook used in introductory physics courses."</data>
+  <data key="d2">chunk-7d21a629ef8b5be5b64b94e89242de32</data>
+</node>
+<node id="&quot;LIGHT-BOTH&quot;">
+  <data key="d0">"EVENT"</data>
+  <data key="d1">"Light-Both is a phenomenon where both light's speed and wavelength determine its energy and behavior in matter, leading to optical phenomena caused by material interactions."</data>
+  <data key="d2">chunk-fba46b18f0cd558d426da6ca14c18882</data>
+</node>
+<node id="&quot;WAVE-AN&quot;">
+  <data key="d0">"WAVE"</data>
+  <data key="d1">"An electromagnetic wave characterized by rapid changes in electric and magnetic fields propagating at the speed of light."</data>
+  <data key="d2">chunk-f1df9e185b5059a54edd6a0b963e6fb0</data>
+</node>
+<node id="&quot;SPACE&quot;">
+  <data key="d0">"GEO"</data>
+  <data key="d1">"space is a location where radio waves are present, indicating a spatial context in the text."</data>
+  <data key="d2">chunk-11d7876517ef68558d1e06982ee5a03d</data>
+</node>
+<node id="&quot;[TERM NAME]&quot;">
+  <data key="d0">"ORGANIZATION"</data>
+  <data key="d1">"[Term Name] is defined as [Definition]"</data>
+  <data key="d2">chunk-1b0c211e0138020b50c19df9a0d0ec35</data>
+</node>
+<node id="&quot;[DEFINITION]&quot;">
+  <data key="d0">"DEFINITION"</data>
+  <data key="d1">"[Definition]"</data>
+  <data key="d2">chunk-1b0c211e0138020b50c19df9a0d0ec35</data>
+</node>
+<node id="&quot;NATIONAL INSTITUTES&quot;">
+  <data key="d0">"ORGANIZATION"</data>
+  <data key="d1">"Institutions dedicated to advancing scientific knowledge and public health research.")</data>
+  <data key="d2">chunk-e0aa93634397c3ca3f43fb32444d86c4</data>
+</node>
+<node id="&quot;RESEARCH TRIANGLE&quot;">
+  <data key="d0">"ORGANIZATION"</data>
+  <data key="d1">"A model representing interdisciplinary collaboration between scientists, policymakers, and stakeholders."</data>
+  <data key="d2">chunk-89dd8675afe1080791f6256906d6ac61</data>
+</node>
+<node id="&quot;NIH&quot;">
+  <data key="d0">"ORGANIZATION"</data>
+  <data key="d1">"National Institutes of Health"</data>
+  <data key="d2">chunk-149171778d9a16b6f5b5fc7457f326a9</data>
+</node>
+<node id="&quot;EXPOSED-AND&quot;">
+  <data key="d0">"EVENT"</data>
+  <data key="d1">"Exposed-And refers to the movement of the charge across the magnetic field to experience the force."</data>
+  <data key="d2">chunk-9788ebb5b6df420a0c1378a044c8feb4</data>
+</node>
+<node id="&quot;DECADES-TO&quot;">
+  <data key="d0">"EVENT"</data>
+  <data key="d1">"Decades-To refers to the long-term exposure to significantly stronger magnetic fields compared to everyday exposure."</data>
+  <data key="d2">chunk-a75a2b59a3e6ac8b74dff8b7d289f8c8</data>
+</node>
+<node id="&quot;CONCEPT&quot;">
+  <data key="d0">"CONCEPT"</data>
+  <data key="d1">"Concept is a reference to a theoretical idea or idea expressed in the text."</data>
+  <data key="d2">chunk-47aceab6f3cb2d1ae13abd9e65c1f10b</data>
+</node>
+<node id="&quot;MISSION&quot;">
+  <data key="d0">"MISSION"</data>
+  <data key="d1">"Mission is a reference to a planned objective or purpose described in the text."</data>
+  <data key="d2">chunk-47aceab6f3cb2d1ae13abd9e65c1f10b</data>
+</node>
+<node id="&quot;ROLE&quot;">
+  <data key="d0">"ROLE"</data>
+  <data key="d1">"Role is a reference to a position or function described in the text."</data>
+  <data key="d2">chunk-47aceab6f3cb2d1ae13abd9e65c1f10b</data>
+</node>
+<node id="&quot;CORD&quot;">
+  <data key="d2">chunk-f941012a4cdcaf6cd045a4d6303a601c</data>
+  <data key="d1">"The cord is a location where the described scenario occurs, contributing to the electric shock hazard."&lt;SEP&gt;"The cord is directly linked to the occurrence of electric shock due to the voltage conditions."</data>
+  <data key="d0">"UNKNOWN"</data>
+</node>
+<node id="&quot;ELECTRIC CURRENT&quot;">
+  <data key="d2">chunk-9449778a39d6414a69c759fa22fb620a</data>
+  <data key="d1">"ones-Results describes the contribution of individual particles to electric current flow".</data>
+  <data key="d0">"UNKNOWN"</data>
+</node>
+<edge source="&quot;ELECTRIC SHOCK&quot;" target="&quot;CORD&quot;">
+  <data key="d4">2.0</data>
+  <data key="d5">"The cord is a location where the described scenario occurs, contributing to the electric shock hazard."&lt;SEP&gt;"The cord is directly linked to the occurrence of electric shock due to the voltage conditions."</data>
+  <data key="d6">chunk-f941012a4cdcaf6cd045a4d6303a601c</data>
+  <data key="d7">1</data>
+</edge>
+<edge source="&quot;PERSON&quot;" target="&quot;ENERGY-CLOSER&quot;">
+  <data key="d4">7.0</data>
+  <data key="d5">"The person's charge configuration is in the Energy-Closer state, indicating comfort."</data>
+  <data key="d6">chunk-f72ac22d8ab781957fcdd9efc05c4db6</data>
+  <data key="d7">1</data>
+</edge>
+<edge source="&quot;EVENT&quot;" target="&quot;LARGE-SCALE&quot;">
+  <data key="d4">3.0</data>
+  <data key="d5">"The large-scale motion of electrons in electromagnetic systems is an event occurring during the process of transmitting signals."&lt;SEP&gt;"The large-scale motion of electrons in electromagnetic systems is an event occurring during the transmission of signals."</data>
+  <data key="d6">chunk-5e6bac728c0902c18dda48082810cce0</data>
+  <data key="d7">1</data>
+</edge>
+<edge source="&quot;CONCEPTUAL PHYSICS&quot;" target="&quot;TENTH EDITION&quot;">
+  <data key="d4">1.0</data>
+  <data key="d5">"The Tenth Edition of *Conceptual Physics* is a revised version published by Menlo Park, CA: Addison Wesley."</data>
+  <data key="d6">chunk-4c88b79ed46569ba382918ac41f7cb80</data>
+  <data key="d7">1</data>
+</edge>
+<edge source="&quot;ELECTROMAGNETIC RADIATION&quot;" target="&quot;INTERACTS WITH MATTER&quot;">
+  <data key="d4">1.0</data>
+  <data key="d5">"Electromagnetic Radiation interacts with matter through charges."</data>
+  <data key="d6">chunk-da99fe9b8eb2f1bdf776b43cca787257</data>
+  <data key="d7">1</data>
+</edge>
+<edge source="&quot;LARGE-SCALE&quot;" target="&quot;TECHNOLOGY&quot;">
+  <data key="d4">1.0</data>
+  <data key="d5">"The large-scale motion of electrons in electromagnetic systems is a characteristic of technology, specifically radio antenna systems."</data>
+  <data key="d6">chunk-5e6bac728c0902c18dda48082810cce0</data>
+  <data key="d7">1</data>
+</edge>
+<edge source="&quot;ONES-RESULTS&quot;" target="&quot;ELECTRIC CURRENT&quot;">
+  <data key="d4">1.0</data>
+  <data key="d5">"ones-Results describes the contribution of individual particles to electric current flow".</data>
+  <data key="d6">chunk-9449778a39d6414a69c759fa22fb620a</data>
+  <data key="d7">1</data>
+</edge>
+</graph></graphml>

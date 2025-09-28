@@ -19,7 +19,7 @@ from sentence_transformers import SentenceTransformer
 
 # Configuration
 MAX_CONCURRENT_DEFINITIONS = 15  # Set to 1 for synchronous, higher for concurrent
-WORKING_DIR = "./graphrag_cache"
+WORKING_DIR = "./graph_rag_cache"
 VLLM_HOST = "http://localhost:8000"
 VLLM_MODEL = "Qwen3-0.6B-Q8_0.gguf"
 MAX_TOKEN = 2000

@@ -1,0 +1,632 @@
+{
+  "chunk-a44e182a911da16b3e73a55dd9ea210f": {
+    "tokens": 122,
+    "content": "**See Section**\nDefinition: See section refers to a specific part of the formula discussed in the context of power calculations.\nContexts:\n1. ...upplied to the area by the utility, and (b) the utility takes active steps to regulate the voltage (see Section 6.6). Dramatic changes in demand do cause changes in voltage, but for the present dis\n2. ...iameter or radius. If the length of either cord were doubled, its resistance would also double.\n\n13 See Section 3.2.4 for the complex case that includes both resistance and reactance.\n\nTo put some",
+    "chunk_order_index": 0,
+    "full_doc_id": "doc-a44e182a911da16b3e73a55dd9ea210f"
+  },
+  "chunk-82de0bed25281d6b73dd173489195fca": {
+    "tokens": 126,
+    "content": "**Voltage Drop**\nDefinition: Voltage drop refers to the reduction in voltage along a circuit due to the resistance of the component or path.\nContexts:\n1. ...negligible effect on the overall resistance, and thus the current flowing through it). However, the voltage drop along the line (i.e., the difference in voltage between its endpoints, not to be con\n2. ...n object, there must be a\n\n17 A saying goes, 'It's the volts that jolts, and the mils that kills.'\n\nvoltage drop across it. In other words, our body must be simultaneously in contact with two sourc",
+    "chunk_order_index": 0,
+    "full_doc_id": "doc-82de0bed25281d6b73dd173489195fca"
+  },
+  "chunk-885fa97367214d0de006a2d7ec021f86": {
+    "tokens": 110,
+    "content": "**Circuit**\nDefinition: A circuit is a closed loop through which electrical energy flows, as described in the context.\nContexts:\n1. ...er has a lower internal resistance.\n\nFor an intuitive example, consider the extreme case of a short circuit , caused by an effectively zero resistance (usually unintentional). Suppose a thick metal\n2. ...es, and positive ions in the battery fluid; yet these flows are thought of as the same current.\n\nIn circuit analysis, it often becomes necessary to define a direction of current flow, so as to know",
+    "chunk_order_index": 0,
+    "full_doc_id": "doc-885fa97367214d0de006a2d7ec021f86"
+  },
+  "chunk-31fe67ae758ea3cb51acccd6053232f2": {
+    "tokens": 118,
+    "content": "**Resistive**\nDefinition: Resistive refers to materials or components that exhibit resistance, which affects power consumption.\nContexts:\n1. ...ther is halved.\n\nWhat, then, is the effect of resistance on power consumption? The key here is that resistive heating depends on the square of the current, meaning that the power is more sensitive \n2. ...n be found in engineering tables.\n\n## 1.2.2 Conductance\n\nIt is sometimes convenient to refer to the resistive property of a material or object in the inverse, as conductivity or conductance . Condu",
+    "chunk_order_index": 0,
+    "full_doc_id": "doc-31fe67ae758ea3cb51acccd6053232f2"
+  },
+  "chunk-6363be37f7d4053e0a75213a1fede734": {
+    "tokens": 119,
+    "content": "**Heating**\nDefinition: Heating refers to the generation of heat due to electrical resistance, as explained in the context.\nContexts:\n1. ...lved.\n\nWhat, then, is the effect of resistance on power consumption? The key here is that resistive heating depends on the square of the current, meaning that the power is more sensitive to changes\n2. ...ooden stick would be ideal; in the worst case, kicking is preferable to grabbing.\n\n## 1.4 RESISTIVE HEATING\n\nWhenever an electric current flows through a material that has some resistance (i.e., an",
+    "chunk_order_index": 0,
+    "full_doc_id": "doc-6363be37f7d4053e0a75213a1fede734"
+  },
+  "chunk-2ec4c0eee11f72d3b7d10e66af79e35d": {
+    "tokens": 123,
+    "content": "**Formula-Not-Decoded**\nDefinition: The formula not decoded expresses Ohm's law (V = IR) for electrical circuits.\nContexts:\n1. ...ent through the conductor increases proportionally. This statement is expressed in Ohm's law,\n\n<!-- formula-not-decoded -->\n\n10 We can draw an analogy with an ocean wave: the water itself moves ess\n2. ...the siemens (S); they are identical units. The conductance is related to the conductivity by\n\n<!-- formula-not-decoded -->\n\nand the units of s are thus mhos / m.\n\nFor the special case of an insulat",
+    "chunk_order_index": 0,
+    "full_doc_id": "doc-2ec4c0eee11f72d3b7d10e66af79e35d"
+  },
+  "chunk-8b0b91602a342b5cb9be53f574cc84fc": {
+    "tokens": 137,
+    "content": "**One-Sixth**\nDefinition: One-sixth refers to the fraction of a cycle in an alternating current (AC) waveform, calculated as 1/60.\nContexts:\n1. ...ng current changes direction (60 times per second, or every 16.7 milliseconds), this corresponds to one-sixth of a cycle, which is not negligible.\n\nwhere V is the voltage, I is the current, and R i\n2. ...ng current changes direction (60 times per second, or every 16.7 milliseconds), this corresponds to one-sixth of a cycle, which is not negligible.\n\nwhere V is the voltage, I is the current, and R i",
+    "chunk_order_index": 0,
+    "full_doc_id": "doc-8b0b91602a342b5cb9be53f574cc84fc"
+  },
+  "chunk-ab2a48a90ab6af6975523bd014f5a18d": {
+    "tokens": 147,
+    "content": "**Cross-Sectional**\nDefinition: Cross-sectional refers to the area perpendicular to the length of a conductor, such as the cross-section of a wire.\nContexts:\n1. ...composition as well as its shape. For a wire, resistance increases with length, and decreases with cross-sectional area. Again, the analogy to a gas or water pipe is handy: we know that a pipe will\n2. ...to this example, consider a typical 25-ft, 16-gauge extension cord, made of a copper conductor. The cross-sectional area of 16-gauge wire is 1.31 mm 2 (or 1.31 /C2 10 2 8 m 2 ) and the resistivity",
+    "chunk_order_index": 0,
+    "full_doc_id": "doc-ab2a48a90ab6af6975523bd014f5a18d"
+  },
+  "chunk-3efa23d729c07d63c3aedb97ee2c2ba6": {
+    "tokens": 120,
+    "content": "**Ohm-Meters**\nDefinition: Ohm-meters are devices used to measure electrical resistance.\nContexts:\n1. ...ent. By definition, one ohm equals one volt per ampere ( V ¼ V / A ).\n\nThe units of resistivity are ohm-meters ( V -m), which can be reconstructed through the preceding formula: when ohm-meters are\n2. m), which can be reconstructed through the preceding formula: when ohm-meters are multiplied by meters (for l ) and divided by square meters (for A ), the result is simply ohms....",
+    "chunk_order_index": 0,
+    "full_doc_id": "doc-3efa23d729c07d63c3aedb97ee2c2ba6"
+  },
+  "chunk-0d082e263e91177cd738d9e292b3cc6f": {
+    "tokens": 25,
+    "content": "**Alternating-Current**\nDefinition: Alternating current (AC) is a type of current that alternates direction periodically.",
+    "chunk_order_index": 0,
+    "full_doc_id": "doc-0d082e263e91177cd738d9e292b3cc6f"
+  },
+  "chunk-ccaa4de4caf2800d0df50fbdcb7a4022": {
+    "tokens": 103,
+    "content": "**Electric**\nDefinition: Electric refers to the properties of electric fields and energy transfer, as described in the context of electrical phenomena.\nContexts:\n1. ...the pipe. This is due to friction in the pipe, and in fact, an analogous 'friction' occurs when an electric current travels through a material.\n\nThis friction can be explained by referring to the m\n2. 3.4 Electric Shock\n\nAny situation where a high voltage is sustained by an electromotive force (or a very large a...",
+    "chunk_order_index": 0,
+    "full_doc_id": "doc-ccaa4de4caf2800d0df50fbdcb7a4022"
+  },
+  "chunk-9020ebdf6a3c07ff5feb1d05ec8d5de2": {
+    "tokens": 122,
+    "content": "**High-Voltage**\nDefinition: A high voltage sustained by an electromotive force (or a very large accumulation of charge) that poses a shock hazard.\nContexts:\n1. ...k on 'hot' equipment out of raised plastic 'buckets.' Linemen can also insulate themselves from the high-voltage source by wearing special rubber gloves, which are commonly used for work on up to 1\n2. ...xample, plastic wire insulation may melt if the wire becomes too hot.\n\nThe insulators often seen on high-voltage equipment consist of strings of ceramic bells, holding the energized wires away from",
+    "chunk_order_index": 0,
+    "full_doc_id": "doc-9020ebdf6a3c07ff5feb1d05ec8d5de2"
+  },
+  "chunk-b9ef156894c73fb24626130384978651": {
+    "tokens": 115,
+    "content": "**Potential-For**\nDefinition: The difference in potential between two sources of electricity, such as a power line and the ground.\nContexts:\n1. ...across it. In other words, our body must be simultaneously in contact with two sources of different potential-for example, a power line and the ground.\n\nThough it is the current that causes biologi\n2. ...across it. In other words, our body must be simultaneously in contact with two sources of different potential-for example, a power line and the ground.\n\nThough it is the current that causes biologi",
+    "chunk_order_index": 0,
+    "full_doc_id": "doc-b9ef156894c73fb24626130384978651"
+  },
+  "chunk-29c19c82969cf2706d31e5c6eb990491": {
+    "tokens": 65,
+    "content": "**Electric-Shock**\nDefinition: A current-induced injury to the body, typically caused by a high voltage.\nContexts:\n1. ...ciples of electric current can be applied to suggest a number of practical precautions for reducing electric-shock hazards. For example, when touching an object at a single high voltage, we are saf",
+    "chunk_order_index": 0,
+    "full_doc_id": "doc-29c19c82969cf2706d31e5c6eb990491"
+  },
+  "chunk-0bdf8431a0af21724d820cb5908959b6": {
+    "tokens": 22,
+    "content": "**Voltage-Drop**\nDefinition: The difference in potential across an object, which contributes to the current flow.",
+    "chunk_order_index": 0,
+    "full_doc_id": "doc-0bdf8431a0af21724d820cb5908959b6"
+  },
+  "chunk-1709f8bcb80a2c804936dd1cd482d4c7": {
+    "tokens": 117,
+    "content": "**Calculating Resistive**\nDefinition: Two formulas are used to calculate the amount of heat dissipated in a resistor.\nContexts:\n1. ...n extreme cases such as fault conditions, resistive heating can literally melt the wires.\n\n## 1.4.1 Calculating Resistive Heating\n\nThere are two simple formulas for calculating the amount of heat d\n2. ...n extreme cases such as fault conditions, resistive heating can literally melt the wires.\n\n## 1.4.1 Calculating Resistive Heating\n\nThere are two simple formulas for calculating the amount of heat d",
+    "chunk_order_index": 0,
+    "full_doc_id": "doc-1709f8bcb80a2c804936dd1cd482d4c7"
+  },
+  "chunk-349deb0a44d664f36658e6f77c171412": {
+    "tokens": 117,
+    "content": "**Resistive Losses**\nDefinition: Resistive losses refer to energy loss in electrical transmission lines due to resistance in the conductors.\nContexts:\n1. ...not to dissipate it; the energy converted to heat along the way is, in effect, lost (thus the term resistive losses ). Furthermore, resistive heating of transmission and distribution lines is undes\n2. ...not to dissipate it; the energy converted to heat along the way is, in effect, lost (thus the term resistive losses ). Furthermore, resistive heating of transmission and distribution lines is undes",
+    "chunk_order_index": 0,
+    "full_doc_id": "doc-349deb0a44d664f36658e6f77c171412"
+  },
+  "chunk-020d761d0f3e758ecc2c94427f2f6272": {
+    "tokens": 110,
+    "content": "**Large-Scale**\nDefinition: Ionization occurs along a distinct trail due to charge imbalance, leading to localized arcing.\nContexts:\n1. ...h liquid nitrogen (at minus 319 8 F). 9 While liquid nitrogen is quite cheap in a research setting, large-scale refrigeration systems aimed at taking advantage of superconductivity in electric powe\n2. ...and forth, the specific signature of the electromagnetic wave is translated back into sound.\n\nThis large-scale motion of electrons, as in radio antennas, is a special case of their interaction with",
+    "chunk_order_index": 0,
+    "full_doc_id": "doc-020d761d0f3e758ecc2c94427f2f6272"
+  },
+  "chunk-d7c638931db6729f882dac879fdf8dea": {
+    "tokens": 87,
+    "content": "**Yttrium-Barium-Copper**\nDefinition: This material exhibits superconductivity at extremely low temperatures, allowing electrons to move freely without energy loss.\nContexts:\n1. ...e of their energy is released in the form of light.\n\n9 The first such material to be discovered was yttrium-barium-copper oxide, YBa2Cu3O7.\n\nthe case of ions) moving past a given point in the mater",
+    "chunk_order_index": 0,
+    "full_doc_id": "doc-d7c638931db6729f882dac879fdf8dea"
+  },
+  "chunk-f30e29e24af4097a225aa04fdb657c31": {
+    "tokens": 103,
+    "content": "**Lead-Acid**\nDefinition: A rechargeable battery composed of lead and sulfuric acid, commonly used in portable devices.\nContexts:\n1. ...es not distinguish between these two physical phenomena. For example, the current flowing through a lead-acid battery at various times consists of negative electrons in the terminals and wires, and\n2. ...es not distinguish between these two physical phenomena. For example, the current flowing through a lead-acid battery at various times consists of negative electrons in the terminals and wires, and",
+    "chunk_order_index": 0,
+    "full_doc_id": "doc-f30e29e24af4097a225aa04fdb657c31"
+  },
+  "chunk-fb6aa8be61cc59a872e7a6cac6c8b890": {
+    "tokens": 107,
+    "content": "**Electric Power**\nDefinition: An electrical quantity representing the flow of charge, analogous to water or gas, measured in amperes (A).\nContexts:\n1. ...search setting, large-scale refrigeration systems aimed at taking advantage of superconductivity in electric power applications are generally considered too formidable in cost to be justified by th\n2. ...3), transmission voltage levels have grown steadily in conjunction with the geographic expansion of electric power systems, up to about 1000 kilovolts (kV), and with the most common voltages around",
+    "chunk_order_index": 0,
+    "full_doc_id": "doc-fb6aa8be61cc59a872e7a6cac6c8b890"
+  },
+  "chunk-246d974690c653447c766f3e61a081dd": {
+    "tokens": 71,
+    "content": "**Smes**\nDefinition: Superconducting Magnetic Energy Storage (SMES) stores and releases energy using superconducting materials.\nContexts:\n1. ...vable application of superconductivity in power systems is superconducting magnetic energy storage (SMES).\n\n## 1.1.6 Current\n\nWhen charge travels through a material, an electric current is said to",
+    "chunk_order_index": 0,
+    "full_doc_id": "doc-246d974690c653447c766f3e61a081dd"
+  },
+  "chunk-969761dad2a972a4dc9163df32a222f7": {
+    "tokens": 123,
+    "content": "**Magnetic**\nDefinition: Magnetic properties of materials, including superconductivity, where electrons move freely without resistance.\nContexts:\n1. ...tion 1.3). Another conceivable application of superconductivity in power systems is superconducting magnetic energy storage (SMES).\n\n## 1.1.6 Current\n\nWhen charge travels through a material, an ele\n2. ...closely where the force is stronger. This exercise generates the picture in Figure 1.1b.\n\n## 1.5.3 Magnetic Fields\n\nThe pattern of the electric field in Figure 1.1 may be reminiscent to some reader",
+    "chunk_order_index": 0,
+    "full_doc_id": "doc-969761dad2a972a4dc9163df32a222f7"
+  },
+  "chunk-331dc936d13e80270bd9c5424b2e8f02": {
+    "tokens": 74,
+    "content": "**Action-At-A-Distance**\nDefinition: Action-at-a-distance refers to the phenomenon where forces act instantaneously across space without requiring direct contact.\nContexts:\n1. ...ield as a physical entity is a fairly recent one. Whereas classical physics relied on the notion of action-at-a-distance, in which only tangible objects figured as 'actors,' the study of very large",
+    "chunk_order_index": 0,
+    "full_doc_id": "doc-331dc936d13e80270bd9c5424b2e8f02"
+  },
+  "chunk-e8363c6c56cdc6fb3f115e841a51b466": {
+    "tokens": 83,
+    "content": "**Entities-Mass**\nDefinition: Entities-mass describes the abstract representation of mass effects in the gravitational field, focusing on the influence of the Earth’s presence rather than explicit reference to mass.\nContexts:\n1. ...ot a definitive standard for what 'exists.' Even what once seemed like the most absolute, immutable entities-mass, distance, and time-were proved ultimately changeable and intractable to our intuit",
+    "chunk_order_index": 0,
+    "full_doc_id": "doc-e8363c6c56cdc6fb3f115e841a51b466"
+  },
+  "chunk-0ace1e9e17d65ed176cbb26b547032ed": {
+    "tokens": 77,
+    "content": "**Time-Were**\nDefinition: Time-were refers to the relativistic nature of time, where events occur at different rates depending on spatial and temporal conditions.\nContexts:\n1. ...what 'exists.' Even what once seemed like the most absolute, immutable entities-mass, distance, and time-were proved ultimately changeable and intractable to our intuition by relativity theory and",
+    "chunk_order_index": 0,
+    "full_doc_id": "doc-0ace1e9e17d65ed176cbb26b547032ed"
+  },
+  "chunk-c867c65c51a352d26da51b2e9345f9a6": {
+    "tokens": 118,
+    "content": "**The Field**\nDefinition: The field represents the influence of the Earth’s gravity throughout space, abstractly mapping potential energy and force distributions.\nContexts:\n1. ...to the Earth as a mass; rather, it represents in abstract terms the effect of the Earth's presence. The field also does not refer to any object (such as an astronaut) that it may influence, though \n2. ...ince it would be attracted rather than repelled. Thus, a negative test charge would also move along the field lines, only backwards. By convention, the direction of the electric field lines is draw",
+    "chunk_order_index": 0,
+    "full_doc_id": "doc-c867c65c51a352d26da51b2e9345f9a6"
+  },
+  "chunk-de3dbfb95d922f8d671b6526fdab94a4": {
+    "tokens": 77,
+    "content": "**Electric Fields**\nDefinition: Electric fields are maps showing potential energy and force experienced by charges, representing the potential gradient between locations.\nContexts:\n1. ...e 'field' as a strange instrument of analysis that grows more palatable with familiarity.\n\n## 1.5.2 Electric Fields\n\nIn Section 1.1, we characterized the electric potential as a property of the loc",
+    "chunk_order_index": 0,
+    "full_doc_id": "doc-de3dbfb95d922f8d671b6526fdab94a4"
+  },
+  "chunk-b4fef35eb6337f4a5886c1b727c6d63a": {
+    "tokens": 122,
+    "content": "**In Section**\nDefinition: In section, the gravitational field is described as a spatial distribution of gravitational force.\nContexts:\n1. ...range instrument of analysis that grows more palatable with familiarity.\n\n## 1.5.2 Electric Fields\n\nIn Section 1.1, we characterized the electric potential as a property of the location at which a \n2. ...be derived from the first one by substituting I . R for V (according to Ohm's law). As we\n\ndiscuss in Section 3.1, this second formula is more frequently used in practice to calculate resistive hea",
+    "chunk_order_index": 0,
+    "full_doc_id": "doc-b4fef35eb6337f4a5886c1b727c6d63a"
+  },
+  "chunk-446c955927896495da42c328263e5c0a": {
+    "tokens": 112,
+    "content": "**Quantities**\nDefinition: Quantities refer to measurable properties or variables used in physics experiments, such as mass, distance, or potential energy.\nContexts:\n1. ...on by relativity theory and quantum mechanics.\n\nBased on these insights, we might conclude that any quantities we choose to define and measure are in some sense arbitrary patterns superimposed on t\n2. ## The Physics of Electricity\n\n## 1.1 BASIC QUANTITIES\n\n## 1.1.1 Introduction\n\nThis chapter describes the quantities that are essential to our understandi...",
+    "chunk_order_index": 0,
+    "full_doc_id": "doc-446c955927896495da42c328263e5c0a"
+  },
+  "chunk-c8804c6867e80cb9ca668250b20fe18c": {
+    "tokens": 106,
+    "content": "**Physics**\nDefinition: Physics encompasses the study of fundamental principles governing the natural world, including forces, energy, and matter.\nContexts:\n1. ...erving it?\n\nThis notion of the field as a physical entity is a fairly recent one. Whereas classical physics relied on the notion of action-at-a-distance, in which only tangible objects figured as '\n2. ...mena, electric and magnetic forces, are indeed closely linked manifestations of a common underlying physics.\n\nAs we know from direct tactile experience, magnets exert force on each other: opposite",
+    "chunk_order_index": 0,
+    "full_doc_id": "doc-c8804c6867e80cb9ca668250b20fe18c"
+  },
+  "chunk-2e709bfa384081a5596f6577e224ba9e": {
+    "tokens": 130,
+    "content": "**Fields**\nDefinition: Fields represent the influence of a source, such as a charge, on other particles or objects in space, indicating both potential energy and force distributions.\nContexts:\n1. ...he notion of a 'field' does wonders. Physicists and engineers are therefore accustomed to regarding fields, however devoid of substance, as real, manipulable, and legitimate physical entities just \n2. ...where the force is stronger. This exercise generates the picture in Figure 1.1b.\n\n## 1.5.3 Magnetic Fields\n\nThe pattern of the electric field in Figure 1.1 may be reminiscent to some readers of the",
+    "chunk_order_index": 0,
+    "full_doc_id": "doc-2e709bfa384081a5596f6577e224ba9e"
+  },
+  "chunk-2716eb103e72e2dda7c54dbb31f9408d": {
+    "tokens": 32,
+    "content": "**Calculating-Resistive**\nDefinition: Using formulas like P = IV or P = I²R to determine the power dissipated in a resistor.",
+    "chunk_order_index": 0,
+    "full_doc_id": "doc-2716eb103e72e2dda7c54dbb31f9408d"
+  },
+  "chunk-26541d0d04a7ea836f98c4b349d8cbd0": {
+    "tokens": 29,
+    "content": "**Resistive-Losses**\nDefinition: Energy lost due to resistive heating in transmission lines, causing thermal expansion and potential wire melting.",
+    "chunk_order_index": 0,
+    "full_doc_id": "doc-26541d0d04a7ea836f98c4b349d8cbd0"
+  },
+  "chunk-e580c15422246893e1f740a7b45ce2e1": {
+    "tokens": 27,
+    "content": "**In-Section**\nDefinition: Refers to the context where examples of resistive heating are discussed, including appliances like toasters.",
+    "chunk_order_index": 0,
+    "full_doc_id": "doc-e580c15422246893e1f740a7b45ce2e1"
+  },
+  "chunk-d9cc980c427ac2a82cd3bf3682558eb4": {
+    "tokens": 61,
+    "content": "**Magnet-Do**\nDefinition: The magnet-do refers to the magnet itself.\nContexts:\n1. ...ar experiment-which become little test magnets since they are magnetized in the presence of the bar magnet-do not move toward one pole or the other, but rotate and align themselves with the directi",
+    "chunk_order_index": 0,
+    "full_doc_id": "doc-d9cc980c427ac2a82cd3bf3682558eb4"
+  },
+  "chunk-51063a4e756e5fed1edc0005b0531ab0": {
+    "tokens": 136,
+    "content": "**Magnetic Fields**\nDefinition: Magnetic fields are regions with directionality, where north is meaningless without south, indicating the orientation of a test magnet.\nContexts:\n1. ...closely where the force is stronger. This exercise generates the picture in Figure 1.1b.\n\n## 1.5.3 Magnetic Fields\n\nThe pattern of the electric field in Figure 1.1 may be reminiscent to some reader\n2. ...the increased cost and engineering challenge of safe and effective insulation.\n\n## 1.5 ELECTRIC AND MAGNETIC FIELDS\n\n## 1.5.1 The Field as a Concept\n\nThe notion of a field is an abstraction initial",
+    "chunk_order_index": 0,
+    "full_doc_id": "doc-51063a4e756e5fed1edc0005b0531ab0"
+  },
+  "chunk-a141a157aed9c2adab6c91abd9b26cd5": {
+    "tokens": 133,
+    "content": "**Watt-Second**\nDefinition: 1 watt-second equals 1 joule.\nContexts:\n1. .\n\n5 Ajoule can be expressed as a watt-second; 1 kilowatt-hour ¼ 3.6 /C2 10 6 joules, as there are 3600 seconds in an hour.\n\nIn equations, voltag...\n2. ...the type of battery and whether it is connected to other batteries.\n\n5 Ajoule can be expressed as a watt-second; 1 kilowatt-hour ¼ 3.6 /C2 10 6 joules, as there are 3600 seconds in an hour.\n\nIn equ",
+    "chunk_order_index": 0,
+    "full_doc_id": "doc-a141a157aed9c2adab6c91abd9b26cd5"
+  },
+  "chunk-3c85bd4e14115d807d01534976eb46c0": {
+    "tokens": 141,
+    "content": "**Kilowatt-Hour**\nDefinition: 1 kilowatt-hour equals 3.6 × 10⁶ joules.\nContexts:\n1. .\n\n5 Ajoule can be expressed as a watt-second; 1 kilowatt-hour ¼ 3.6 /C2 10 6 joules, as there are 3600 seconds in an hour.\n\nIn equations, voltage is conventional...\n2. ...tery and whether it is connected to other batteries.\n\n5 Ajoule can be expressed as a watt-second; 1 kilowatt-hour ¼ 3.6 /C2 10 6 joules, as there are 3600 seconds in an hour.\n\nIn equations, voltage",
+    "chunk_order_index": 0,
+    "full_doc_id": "doc-3c85bd4e14115d807d01534976eb46c0"
+  },
+  "chunk-6817a02e964a2ba4d8112232d6e1e97d": {
+    "tokens": 129,
+    "content": "**Electric Circuits**\nDefinition: Electric circuits involve a path for current to flow, typically consisting of components like resistors, capacitors, and conductors.\nContexts:\n1. ...ent).\n\n## 1.1.4 Ground\n\nThe term ground has a very important and specific meaning in the context of electric circuits: it is an electrically neutral place, meaning that it has zero voltage or poten\n2. ...ent).\n\n## 1.1.4 Ground\n\nThe term ground has a very important and specific meaning in the context of electric circuits: it is an electrically neutral place, meaning that it has zero voltage or poten",
+    "chunk_order_index": 0,
+    "full_doc_id": "doc-6817a02e964a2ba4d8112232d6e1e97d"
+  },
+  "chunk-c85306179260b9047d0d605990e9f153": {
+    "tokens": 111,
+    "content": "**Electricity**\nDefinition: Electricity is a form of energy associated with electric charges.\nContexts:\n1. ...s, some number of electrons are always free to travel. As a result, the material is able to conduct electricity. When a charge (i.e., an excess or deficit of electrons) is applied to one side of su\n2. ...g them thicker and heavier. A century ago, Thomas Edison found the practical limit for transmitting electricity at the level of a few hundred volts to be only a few miles.\n\nWith the help of transfo",
+    "chunk_order_index": 0,
+    "full_doc_id": "doc-c85306179260b9047d0d605990e9f153"
+  },
+  "chunk-72beb1e5cdffd9a47fbb93bd3ef86459": {
+    "tokens": 74,
+    "content": "**Transmission Voltage**\nDefinition: Transmission voltage is the voltage level used to transmit power over long distances, often higher than the line voltage to minimize losses.\nContexts:\n1. ...ors are chosen with the minimal resistance that is practically and economically feasible.\n\n## 1.4.2 Transmission Voltage and Resistive Losses\n\nResistive losses are the reason why increasingly high",
+    "chunk_order_index": 0,
+    "full_doc_id": "doc-72beb1e5cdffd9a47fbb93bd3ef86459"
+  },
+  "chunk-956badf9fff29ed173be775fdbf30eb6": {
+    "tokens": 68,
+    "content": "**Thomas Edison**\nDefinition: Thomas Edison was a pioneer in electrical engineering who developed the first practical incandescent light bulb.\nContexts:\n1. ...tance of the conductors, but only at the expense of making them thicker and heavier. A century ago, Thomas Edison found the practical limit for transmitting electricity at the level of a few hundre",
+    "chunk_order_index": 0,
+    "full_doc_id": "doc-956badf9fff29ed173be775fdbf30eb6"
+  },
+  "chunk-225307ba42399f33c5caa2d5e3303a2f": {
+    "tokens": 35,
+    "content": "**Field**\nDefinition: A field is an abstract concept used to describe forces and effects in space, representing the hypothetical impact of an object's presence rather than specifying a particular cause.",
+    "chunk_order_index": 0,
+    "full_doc_id": "doc-225307ba42399f33c5caa2d5e3303a2f"
+  },
+  "chunk-70a4a4baa0b71c369ab530febe0c85b7": {
+    "tokens": 35,
+    "content": "**Electric_Field**\nDefinition: An electric field is a region surrounding a charge where its influence can be felt by other charges, quantitatively describing the force experienced by test charges.",
+    "chunk_order_index": 0,
+    "full_doc_id": "doc-70a4a4baa0b71c369ab530febe0c85b7"
+  },
+  "chunk-1743e76254d6529efc617cacc5f316b9": {
+    "tokens": 35,
+    "content": "**Magnetic_Field**\nDefinition: A magnetic field is a region where magnetic forces act on moving charges, quantitatively describing the force experienced by moving charges in a magnetic field.",
+    "chunk_order_index": 0,
+    "full_doc_id": "doc-1743e76254d6529efc617cacc5f316b9"
+  },
+  "chunk-ce3d1ee5c571d5c572e2df230e3cfbf5": {
+    "tokens": 30,
+    "content": "**Power-Flow**\nDefinition: Power flow refers to the movement of energy in power systems, often analyzed using concepts like power balance and network analysis.",
+    "chunk_order_index": 0,
+    "full_doc_id": "doc-ce3d1ee5c571d5c572e2df230e3cfbf5"
+  },
+  "chunk-bd381e2c0337a948e77c1b246330271d": {
+    "tokens": 75,
+    "content": "**Electricity-For**\nDefinition: Electricity-for describes the process of static electricity transfer when a doorknob provides a conducting pathway.\nContexts:\n1. ...ing pathway that enables it to flow toward its opposite charge. When we receive a shock from static electricity-for example, by touching a doorknob-our body is providing just such a pathway. In thi",
+    "chunk_order_index": 0,
+    "full_doc_id": "doc-bd381e2c0337a948e77c1b246330271d"
+  },
+  "chunk-ef461728701b5214486e36a982aab9ab": {
+    "tokens": 80,
+    "content": "**Doorknob-Our**\nDefinition: Doorknob-our refers to a doorknob that acts as a conductor in static electricity scenarios.\nContexts:\n1. ...ard its opposite charge. When we receive a shock from static electricity-for example, by touching a doorknob-our body is providing just such a pathway. In this example, our body is charged through",
+    "chunk_order_index": 0,
+    "full_doc_id": "doc-ef461728701b5214486e36a982aab9ab"
+  },
+  "chunk-ecacbf708e2bd6da9e704a2b3954e8ad": {
+    "tokens": 122,
+    "content": "**Static Charge**\nDefinition: Static charge is accumulated charge that remains unmovable due to lack of a conducting pathway.\nContexts:\n1. ...on and therefore requires more insulation to prevent arcing.\n\n## 1.3 CIRCUIT FUNDAMENTALS\n\n## 1.3.1 Static Charge\n\nAcurrent can only flow as long as a potential difference is sustained; in other wo\n2. ...not true of electrical equipment that has been specifically designed to hold a very large amount of static charge!\n\n16 Unrelated to the EMF that stands for 'Electromagnetic Fields.'\n\nWhen the wires",
+    "chunk_order_index": 0,
+    "full_doc_id": "doc-ecacbf708e2bd6da9e704a2b3954e8ad"
+  },
+  "chunk-fb5881129dbb0e196e1da0b147d5fad9": {
+    "tokens": 79,
+    "content": "**Fundamentals**\nDefinition: The core principles governing how electricity behaves in circuits, such as maintaining potential differences and recycling charge.\nContexts:\n1. ...air encourages ionization and therefore requires more insulation to prevent arcing.\n\n## 1.3 CIRCUIT FUNDAMENTALS\n\n## 1.3.1 Static Charge\n\nAcurrent can only flow as long as a potential difference is",
+    "chunk_order_index": 0,
+    "full_doc_id": "doc-fb5881129dbb0e196e1da0b147d5fad9"
+  },
+  "chunk-e5184895f43424677eb8777c293e1821": {
+    "tokens": 18,
+    "content": "**Insulation**\nDefinition: Insulating materials used to prevent current flow in electrical systems.",
+    "chunk_order_index": 0,
+    "full_doc_id": "doc-e5184895f43424677eb8777c293e1821"
+  },
+  "chunk-e104ca9185345f85afd8aa47a8cc4d18": {
+    "tokens": 110,
+    "content": "**Electromagnetic Fields**\nDefinition: Electric and magnetic fields that propagate energy through space.\nContexts:\n1. ...ly designed to hold a very large amount of static charge!\n\n16 Unrelated to the EMF that stands for 'Electromagnetic Fields.'\n\nWhen the wires are connected to form a complete loop, they make a close\n2. ...y elaborate geometric arrangements of wires and magnetic fields inside actual generators.\n\n## 1.5.5 Electromagnetic Fields and Health Effects\n\nA current flowing through a wire, alternating at 60 cy",
+    "chunk_order_index": 0,
+    "full_doc_id": "doc-e104ca9185345f85afd8aa47a8cc4d18"
+  },
+  "chunk-f941012a4cdcaf6cd045a4d6303a601c": {
+    "tokens": 113,
+    "content": "**Electric Shock**\nDefinition: Any situation where a high voltage is sustained by an electromotive force (or a very large accumulation of charge) constitutes a shock hazard.\nContexts:\n1. 3.4 Electric Shock\n\nAny situation where a high voltage is sustained by an electromotive force (or a very large accumul...\n2. ...this cord can result in damage to the motor from excessively low voltage at the far end.\n\n## 1.3.4 Electric Shock\n\nAny situation where a high voltage is sustained by an electromotive force (or a ve",
+    "chunk_order_index": 0,
+    "full_doc_id": "doc-f941012a4cdcaf6cd045a4d6303a601c"
+  },
+  "chunk-b0cf74098ee46c49e22bd3f1b752c92f": {
+    "tokens": 63,
+    "content": "**Representations-Aided**\nDefinition: Uses analogies from other areas of physics to represent abstract concepts.\nContexts:\n1. ...e most part, then, electricity remains an abstraction to us, and we rely on numerical and geometric representations-aided by liberal analogies from other areas of the physical world-to form concept",
+    "chunk_order_index": 0,
+    "full_doc_id": "doc-b0cf74098ee46c49e22bd3f1b752c92f"
+  },
+  "chunk-89004272df30d4fce94073c548e084b3": {
+    "tokens": 63,
+    "content": "**World-To**\nDefinition: Connects physical experiences (like electric shocks) with the conceptual framework of electricity.\nContexts:\n1. ...numerical and geometric representations-aided by liberal analogies from other areas of the physical world-to form concepts and develop an intuition about it.\n\nElectric Power Systems: A Conceptual I",
+    "chunk_order_index": 0,
+    "full_doc_id": "doc-89004272df30d4fce94073c548e084b3"
+  },
+  "chunk-3d25d17ad5af621fbb079d7acb294c7e": {
+    "tokens": 112,
+    "content": "**Ion-Namely**\nDefinition: Atoms or molecules with a net charge (electrons lost/gained) become ions.\nContexts:\n1. ...of protons and electrons; they are called ions . The propensity of an atom or molecule to become an ion-namely, to release electrons or accept additional ones-results from peculiarities\n2. ...of protons and electrons; they are called ions . The propensity of an atom or molecule to become an ion-namely, to release electrons or accept additional ones-results from peculiarities in the geom",
+    "chunk_order_index": 0,
+    "full_doc_id": "doc-3d25d17ad5af621fbb079d7acb294c7e"
+  },
+  "chunk-9449778a39d6414a69c759fa22fb620a": {
+    "tokens": 97,
+    "content": "**Ones-Results**\nDefinition: Individual particles (e.g., electrons) contribute to the flow of electric current.\nContexts:\n1. ...ropensity of an atom or molecule to become an ion-namely, to release electrons or accept additional ones-results from peculiarities\n2. ...ropensity of an atom or molecule to become an ion-namely, to release electrons or accept additional ones-results from peculiarities in the geometric pattern by which electrons occupy the space arou",
+    "chunk_order_index": 0,
+    "full_doc_id": "doc-9449778a39d6414a69c759fa22fb620a"
+  },
+  "chunk-278bd3a8ec0aef93162f6b94cde49325": {
+    "tokens": 104,
+    "content": "**The Physics**\nDefinition: The study of the natural world through empirical methods.\nContexts:\n1. ## The Physics of Electricity\n\n## 1.1 BASIC QUANTITIES\n\n## 1.1.1 Introduction\n\nThis chapter describes the quantiti...\n2. ...le of radio waves that are broadcast and received through conducting metal\n\n23 In the fine print of the physics textbook we learn that 3 /C2 10 8 meters per second, or 186,000 miles per hour, is th",
+    "chunk_order_index": 0,
+    "full_doc_id": "doc-278bd3a8ec0aef93162f6b94cde49325"
+  },
+  "chunk-6dd1a3874f2b8dc5b194a2ca16812eb5": {
+    "tokens": 75,
+    "content": "**Conceptual Introduction**\nDefinition: This chapter provides an overview of key concepts in electricity, including charge, voltage, and electric fields.\nContexts:\n1. ...f the physical world-to form concepts and develop an intuition about it.\n\nElectric Power Systems: A Conceptual Introduction , by Alexandra von Meier Copyright # 2006 John Wiley &amp; Sons, Inc.\n\nTH",
+    "chunk_order_index": 0,
+    "full_doc_id": "doc-6dd1a3874f2b8dc5b194a2ca16812eb5"
+  },
+  "chunk-beec6823852ad25f5a161eec81bb13fd": {
+    "tokens": 83,
+    "content": "**Meier Copyright**\nDefinition: The book \"Electricity: The Physics of Electricity\" is copyrighted by Alexandra von Meier.\nContexts:\n1. ...evelop an intuition about it.\n\nElectric Power Systems: A Conceptual Introduction , by Alexandra von Meier Copyright # 2006 John Wiley &amp; Sons, Inc.\n\nTHE PHYSICS OF ELECTRICITY\n\n## 1.1.2 Charge",
+    "chunk_order_index": 0,
+    "full_doc_id": "doc-beec6823852ad25f5a161eec81bb13fd"
+  },
+  "chunk-6ba97525ba246671ac5e6378478345ab": {
+    "tokens": 87,
+    "content": "**John Wiley**\nDefinition: The book \"Electricity: The Physics of Electricity\" is published by John Wiley & Sons, Inc.\nContexts:\n1. ...ut it.\n\nElectric Power Systems: A Conceptual Introduction , by Alexandra von Meier Copyright # 2006 John Wiley &amp; Sons, Inc.\n\nTHE PHYSICS OF ELECTRICITY\n\n## 1.1.2 Charge\n\nIt was a major scientif",
+    "chunk_order_index": 0,
+    "full_doc_id": "doc-6ba97525ba246671ac5e6378478345ab"
+  },
+  "chunk-2659f970bedc7f0bc521d9e8784dac55": {
+    "tokens": 67,
+    "content": "**Benjamin Franklin**\nDefinition: Benjamin Franklin contributed to the understanding of static electricity by describing the concept of positive and negative charges.\nContexts:\n1. ...matter. Observations of static electricity like those mentioned earlier were elegantly explained by Benjamin Franklin in the late 1700s as follows: There exist in nature two types of a property cal",
+    "chunk_order_index": 0,
+    "full_doc_id": "doc-2659f970bedc7f0bc521d9e8784dac55"
+  },
+  "chunk-46b360e3a963fe5676e9ac633c5b63e1": {
+    "tokens": 98,
+    "content": "**Basic**\nDefinition: Fundamental concepts in physics, such as charge, voltage, current, resistance, and electric/magnetic fields.\nContexts:\n1. ## The Physics of Electricity\n\n## 1.1 BASIC QUANTITIES\n\n## 1.1.1 Introduction\n\nThis chapter describes the quantities that are essential to our...\n2. ...r analyzing electrical machines, while the magnetic field is particularly useful for describing the basic principles of electromagnetic induction in simplified settings.\n\nConventionally, the magnet",
+    "chunk_order_index": 0,
+    "full_doc_id": "doc-46b360e3a963fe5676e9ac633c5b63e1"
+  },
+  "chunk-77310b60121f412f53aada1e11421455": {
+    "tokens": 125,
+    "content": "**Right-Hand**\nDefinition: Directionality is described as the inherent orientation of magnetic poles, where north and south are interchangeable without meaning.\nContexts:\n1. ...an electric current points at a right angle to the flow of charge, in a direction specified by the 'right-hand rule' illustrated in Figure 1.2. If the thumb of one's right hand is pointing in the d\n2. ...) depends on the sign of the charge (positive or negative) and can be specified in terms of another right-hand rule, as illustrated in Figure 1.3.\n\nThis effect can be expressed concisely in mathema",
+    "chunk_order_index": 0,
+    "full_doc_id": "doc-77310b60121f412f53aada1e11421455"
+  },
+  "chunk-338521ef05345d0674c41a46249c3da1": {
+    "tokens": 96,
+    "content": "**Current-Carrying**\nDefinition: Moving electric charges generate magnetic fields, with their direction determined by the right-hand rule.\nContexts:\n1. ...circular manner.\n\nIn order to make practical use of this phenomenon, we can alter the shape of the current-carrying wire by winding it into a coil, which brings many turns of wire closely together \n2. current-carrying wire.\n\nMagnetic effects are essential for the generation and conversion of electric power. In order...",
+    "chunk_order_index": 0,
+    "full_doc_id": "doc-338521ef05345d0674c41a46249c3da1"
+  },
+  "chunk-52d087ed03be521ed75e9f8c720edb00": {
+    "tokens": 73,
+    "content": "**Hans Christian**\nDefinition: Hans Christian Oersted first demonstrated the interaction between electric currents and magnetic fields in 1820.\nContexts:\n1. ...rrent should produce a magnetic field as well. This phenomenon was in fact discovered in 1820, when Hans Christian Oersted observed that a compass needle was deflected by an electric current throug",
+    "chunk_order_index": 0,
+    "full_doc_id": "doc-52d087ed03be521ed75e9f8c720edb00"
+  },
+  "chunk-0050b6a8f1248eafc213b1c97d70f161": {
+    "tokens": 66,
+    "content": "**Magnetic Resonance**\nDefinition: A phenomenon where magnetic fields interact with hydrogen nuclei to produce resonance, enabling MRI imaging.\nContexts:\n1. ...s effect is quite subtle and not important in our context, but is exploited in such technologies as Magnetic Resonance Imaging (MRI) for medical diagnostic purposes, which discriminates among tissu",
+    "chunk_order_index": 0,
+    "full_doc_id": "doc-0050b6a8f1248eafc213b1c97d70f161"
+  },
+  "chunk-8578f9f551b5b37811af472c02a83a2d": {
+    "tokens": 102,
+    "content": "**Electromagnetic Induction**\nDefinition: The process of converting changing magnetic fields into electric currents, as demonstrated by Hans Christian Oersted's experiment.\nContexts:\n1. ...al machines, while the magnetic field is particularly useful for describing the basic principles of electromagnetic induction in simplified settings.\n\nConventionally, the magnetic field is denoted \n2. ...al machines, while the magnetic field is particularly useful for describing the basic principles of electromagnetic induction in simplified settings.\n\nConventionally, the magnetic field is denoted",
+    "chunk_order_index": 0,
+    "full_doc_id": "doc-8578f9f551b5b37811af472c02a83a2d"
+  },
+  "chunk-2e27a6b2ae7b5f3227fdcf57df27a33d": {
+    "tokens": 109,
+    "content": "**Electrons-That**\nDefinition: Electrons-that describe their role in forming ions and facilitating charge transfer.\nContexts:\n1. ..., Tenth Edition (Menlo Park, CA: Addison Wesley, 2006).\n\nimbalances in the spatial distribution of electrons-that is, electrons favoring one side over the other side of the molecule. These electric\n2. ...tant speed of light.\n\nElectromagnetic radiation interacts with matter through charges-specifically, electrons-that are accelerated and moved by the field. Let us consider first the example of radio",
+    "chunk_order_index": 0,
+    "full_doc_id": "doc-2e27a6b2ae7b5f3227fdcf57df27a33d"
+  },
+  "chunk-f72ac22d8ab781957fcdd9efc05c4db6": {
+    "tokens": 78,
+    "content": "**Energy-Closer**\nDefinition: Energy-closer describes the state where charges are closer to like charges, indicating a more comfortable configuration.\nContexts:\n1. ...that, by virtue of its height, the object has an inherent potential to fall down. A state of lower energy-closer to the ground, or farther away from like charges-represents a more 'comfortable' sta",
+    "chunk_order_index": 0,
+    "full_doc_id": "doc-f72ac22d8ab781957fcdd9efc05c4db6"
+  },
+  "chunk-08998a8a0b06f01c3ad4a9dd76e1fc38": {
+    "tokens": 73,
+    "content": "**Charges-Represents**\nDefinition: Charges-represents quantify the energy associated with charge interactions, analogous to potential energy.\nContexts:\n1. ...ent potential to fall down. A state of lower energy-closer to the ground, or farther away from like charges-represents a more 'comfortable' state, with a smaller potential fall.\n\nThe potential ener",
+    "chunk_order_index": 0,
+    "full_doc_id": "doc-08998a8a0b06f01c3ad4a9dd76e1fc38"
+  },
+  "chunk-5846843a2ed7dae4c34593588bfcaf3e": {
+    "tokens": 86,
+    "content": "**Paul Hewitt**\nDefinition: Paul Hewitt is the author of *Conceptual Physics*, Tenth Edition (Menlo Park, CA: Addison Wesley, 2006).\nContexts:\n1. ...cs text will provide examples. For an explanation of the basic concepts of electricity, I recommend Paul Hewitt, Conceptual Physics , Tenth Edition (Menlo Park, CA: Addison Wesley, 2006).\n\nimbalanc",
+    "chunk_order_index": 0,
+    "full_doc_id": "doc-5846843a2ed7dae4c34593588bfcaf3e"
+  },
+  "chunk-1d3ab196a1eeeb7412992709bcc61d7b": {
+    "tokens": 70,
+    "content": "**Conceptual Physics**\nDefinition: Conceptual Physics is the book recommended for explaining basic electricity concepts.\nContexts:\n1. ...provide examples. For an explanation of the basic concepts of electricity, I recommend Paul Hewitt, Conceptual Physics , Tenth Edition (Menlo Park, CA: Addison Wesley, 2006).\n\nimbalances in the spa",
+    "chunk_order_index": 0,
+    "full_doc_id": "doc-1d3ab196a1eeeb7412992709bcc61d7b"
+  },
+  "chunk-4c88b79ed46569ba382918ac41f7cb80": {
+    "tokens": 81,
+    "content": "**Tenth Edition**\nDefinition: The Tenth Edition of *Conceptual Physics* is the revised version published by Menlo Park, CA: Addison Wesley.\nContexts:\n1. ...an explanation of the basic concepts of electricity, I recommend Paul Hewitt, Conceptual Physics , Tenth Edition (Menlo Park, CA: Addison Wesley, 2006).\n\nimbalances in the spatial distribution of e",
+    "chunk_order_index": 0,
+    "full_doc_id": "doc-4c88b79ed46569ba382918ac41f7cb80"
+  },
+  "chunk-0cc71dbca09c01d6dec34b0cda9606f8": {
+    "tokens": 74,
+    "content": "**Menlo Park**\nDefinition: Menlo Park is the publisher of the Tenth Edition of *Conceptual Physics*.\nContexts:\n1. ...of the basic concepts of electricity, I recommend Paul Hewitt, Conceptual Physics , Tenth Edition (Menlo Park, CA: Addison Wesley, 2006).\n\nimbalances in the spatial distribution of electrons-that i",
+    "chunk_order_index": 0,
+    "full_doc_id": "doc-0cc71dbca09c01d6dec34b0cda9606f8"
+  },
+  "chunk-7d21a629ef8b5be5b64b94e89242de32": {
+    "tokens": 71,
+    "content": "**Addison Wesley**\nDefinition: The Addison Wesley series refers to the textbook used in introductory physics courses.\nContexts:\n1. ...ncepts of electricity, I recommend Paul Hewitt, Conceptual Physics , Tenth Edition (Menlo Park, CA: Addison Wesley, 2006).\n\nimbalances in the spatial distribution of electrons-that is, electrons fa",
+    "chunk_order_index": 0,
+    "full_doc_id": "doc-7d21a629ef8b5be5b64b94e89242de32"
+  },
+  "chunk-729cdc0d6d889d8b2d4983afc121c5aa": {
+    "tokens": 101,
+    "content": "**Charges-Specifically**\nDefinition: Charges specifically refer to the charge of electrons in electromagnetic systems.\nContexts:\n1. ...ble to derive the constant speed of light.\n\nElectromagnetic radiation interacts with matter through charges-specifically, electrons-that are accelerated and moved by the field. Let us consider firs\n2. ...ble to derive the constant speed of light.\n\nElectromagnetic radiation interacts with matter through charges-specifically, electrons-that are accelerated and moved by the field. Let us consider firs",
+    "chunk_order_index": 0,
+    "full_doc_id": "doc-729cdc0d6d889d8b2d4983afc121c5aa"
+  },
+  "chunk-fba46b18f0cd558d426da6ca14c18882": {
+    "tokens": 61,
+    "content": "**Light-Both**\nDefinition: Both light's speed and wavelength determine its energy and behavior in matter.\nContexts:\n1. ...ight travels somewhat slower through various materials, and these small differences in the speed of light-both as a function of the medium and of wavelength-give rise to familiar optical phenomena",
+    "chunk_order_index": 0,
+    "full_doc_id": "doc-fba46b18f0cd558d426da6ca14c18882"
+  },
+  "chunk-7442175b420c53b7d6e37b8e671b3643": {
+    "tokens": 69,
+    "content": "**Wavelength-Give**\nDefinition: Wavelength gives rise to optical phenomena like refraction and absorption in materials.\nContexts:\n1. ...aterials, and these small differences in the speed of light-both as a function of the medium and of wavelength-give rise to familiar optical phenomena like refraction in a lens, prism, or glass of",
+    "chunk_order_index": 0,
+    "full_doc_id": "doc-7442175b420c53b7d6e37b8e671b3643"
+  },
+  "chunk-f1df9e185b5059a54edd6a0b963e6fb0": {
+    "tokens": 70,
+    "content": "**Wave-An**\nDefinition: An electromagnetic wave characterized by rapid changes in electric and magnetic fields propagating at the speed of light.\nContexts:\n1. ...in turn induces an electric field, and so forth, with the fields propagating away in the form of a wave-an electromagnetic wave of a very specific time signature. The wave becomes weaker with incre",
+    "chunk_order_index": 0,
+    "full_doc_id": "doc-f1df9e185b5059a54edd6a0b963e6fb0"
+  },
+  "chunk-22180817a22b5177685d009c980e2b16": {
+    "tokens": 107,
+    "content": "**Electromagnetic Radiation**\nDefinition: A type of energy that travels through space as a wave, interacting with matter through charged particles like electrons.\nContexts:\n1. ...physical process. From this basic principle it is possible to derive the constant speed of light.\n\nElectromagnetic radiation interacts with matter through charges-specifically, electrons-that are a\n2. ...ent to cause a transition inside our electrons.\n\nIn the context of electric power system operation, electromagnetic radiation does not play much of an explicit role. This is because the conventiona",
+    "chunk_order_index": 0,
+    "full_doc_id": "doc-22180817a22b5177685d009c980e2b16"
+  },
+  "chunk-e48fc7c5cb48e242b36f0a55f1454e6c": {
+    "tokens": 130,
+    "content": "**Nobel Prize**\nDefinition: The 1921 Nobel Prize in Physics was awarded to Albert Einstein for his discovery of the photoelectric effect, which explained how light could eject electrons from metals.\nContexts:\n1. ...crucial experiment that demonstrated this (the photoelectric effect ) is what actually won the 1921 Nobel Prize in Physics for Einstein.\n\nmagnetic fields in space as a form of potential energy, who\n2. ...crucial experiment that demonstrated this (the photoelectric effect ) is what actually won the 1921 Nobel Prize in Physics for Einstein.\n\nmagnetic fields in space as a form of potential energy, who",
+    "chunk_order_index": 0,
+    "full_doc_id": "doc-e48fc7c5cb48e242b36f0a55f1454e6c"
+  },
+  "chunk-384a62cb3601ffc7e4725590d095cb32": {
+    "tokens": 27,
+    "content": "**Photons**\nDefinition: Photons are quantized packets of electromagnetic radiation carrying energy, resulting from electron transitions in atoms or molecules.",
+    "chunk_order_index": 0,
+    "full_doc_id": "doc-384a62cb3601ffc7e4725590d095cb32"
+  },
+  "chunk-11d7876517ef68558d1e06982ee5a03d": {
+    "tokens": 70,
+    "content": "**Ourselves-At**\nDefinition: We find ourselves-at this very moment-in a space full of radio waves.\nContexts:\n1. ...cting others. A glass window, for example, transmits visible light but not ultraviolet. And we find ourselves-at this very moment-in a space full of radio waves, oblivious to their presence because",
+    "chunk_order_index": 0,
+    "full_doc_id": "doc-11d7876517ef68558d1e06982ee5a03d"
+  },
+  "chunk-b59a3aedb09ae396dfa018b34805ca30": {
+    "tokens": 66,
+    "content": "**Moment-In**\nDefinition: Moment-in refers to the state of being at a specific point in time.\nContexts:\n1. ...indow, for example, transmits visible light but not ultraviolet. And we find ourselves-at this very moment-in a space full of radio waves, oblivious to their presence because the waves pass right t",
+    "chunk_order_index": 0,
+    "full_doc_id": "doc-b59a3aedb09ae396dfa018b34805ca30"
+  },
+  "chunk-39dedb8a020f7ec32c360c3706bbd278": {
+    "tokens": 113,
+    "content": "**Alternating Current**\nDefinition: Alternating current is a type of electrical current that changes direction periodically.\nContexts:\n1. ...-mile transmission line at the speed of light takes 2.7 milliseconds. Compared to the rate at which alternating current changes direction (60 times per second, or every 16.7 milliseconds), this cor\n2. ...cated (and less revealing) because the physical direction of current flow actually alternates (see 'Alternating Current' in Section 3.1). Instead, to capture the relationship between two currents (",
+    "chunk_order_index": 0,
+    "full_doc_id": "doc-39dedb8a020f7ec32c360c3706bbd278"
+  },
+  "chunk-1b0c211e0138020b50c19df9a0d0ec35": {
+    "tokens": 84,
+    "content": "**[Term Name], Definition: [Definition]. No Extra Text. Check For Any Missing Terms And Ensure Definitions Are Within 1-2 Sentences. Also, Avoid Adding Any Explanation Or Reasoning Beyond The Required Format.**\nDefinition: [definition]. No extra text. Check for any missing terms and ensure definitions are within 1-2 sentences. Also, avoid adding any explanation or reasoning beyond the required format.",
+    "chunk_order_index": 0,
+    "full_doc_id": "doc-1b0c211e0138020b50c19df9a0d0ec35"
+  },
+  "chunk-98938e08e1303bc30aac0ca66615a133": {
+    "tokens": 131,
+    "content": "**Health Effects**\nDefinition: Negative impacts on human health due to exposure to electromagnetic radiation, studied by organizations like the World Health Organization and National Institutes of Health.\nContexts:\n1. ...e.htm (accessed November 2004). See, for example, C.J. Portier and M.S. Wolfe (eds.), Assessment of Health Effects from Exposure to Power-Line Frequency Electric and Magnetic Fields , NIEHS Working\n2. ...gements of wires and magnetic fields inside actual generators.\n\n## 1.5.5 Electromagnetic Fields and Health Effects\n\nA current flowing through a wire, alternating at 60 cycles per second (60 Hz), pr",
+    "chunk_order_index": 0,
+    "full_doc_id": "doc-98938e08e1303bc30aac0ca66615a133"
+  },
+  "chunk-97613c16c5d563ac94129034ac871684": {
+    "tokens": 61,
+    "content": "**World Health**\nDefinition: The organization responsible for global health initiatives.\nContexts:\n1. ...s direction back and\n\n22 Technical information and summaries of research have been published by the World Health Organization, http: // www.who.int / mediacentre / factsheets / (accessed November 2",
+    "chunk_order_index": 0,
+    "full_doc_id": "doc-97613c16c5d563ac94129034ac871684"
+  },
+  "chunk-e0aa93634397c3ca3f43fb32444d86c4": {
+    "tokens": 78,
+    "content": "**National Institutes**\nDefinition: Institutions dedicated to advancing scientific knowledge and public health research.\nContexts:\n1. ...rganization, http: // www.who.int / mediacentre / factsheets / (accessed November 2004), and by the National Institutes of Health, http: // www.niehs.nih.gov / emfrapid / home.htm (accessed Novembe",
+    "chunk_order_index": 0,
+    "full_doc_id": "doc-e0aa93634397c3ca3f43fb32444d86c4"
+  },
+  "chunk-63cc9d03d4b7810761e14f387a642b3e": {
+    "tokens": 60,
+    "content": "**Line Frequency**\nDefinition: Alternating current frequency in electrical systems.\nContexts:\n1. ...or example, C.J. Portier and M.S. Wolfe (eds.), Assessment of Health Effects from Exposure to Power-Line Frequency Electric and Magnetic Fields , NIEHS Working Group Report (Research Triangle Park,",
+    "chunk_order_index": 0,
+    "full_doc_id": "doc-63cc9d03d4b7810761e14f387a642b3e"
+  },
+  "chunk-bea9ddefa39b5ea7382732bf1db50ae2": {
+    "tokens": 57,
+    "content": "**Working Group**\nDefinition: A collaborative team of experts focused on specific research objectives.\nContexts:\n1. ...ssment of Health Effects from Exposure to Power-Line Frequency Electric and Magnetic Fields , NIEHS Working Group Report (Research Triangle Park, NC: National Institute of Environmental Health Scie",
+    "chunk_order_index": 0,
+    "full_doc_id": "doc-bea9ddefa39b5ea7382732bf1db50ae2"
+  },
+  "chunk-89dd8675afe1080791f6256906d6ac61": {
+    "tokens": 58,
+    "content": "**Research Triangle**\nDefinition: A model representing interdisciplinary collaboration between scientists, policymakers, and stakeholders.\nContexts:\n1. ...ts from Exposure to Power-Line Frequency Electric and Magnetic Fields , NIEHS Working Group Report (Research Triangle Park, NC: National Institute of Environmental Health Sciences of the National I",
+    "chunk_order_index": 0,
+    "full_doc_id": "doc-89dd8675afe1080791f6256906d6ac61"
+  },
+  "chunk-b256671e85f666414dfa65dfbf3fa120": {
+    "tokens": 88,
+    "content": "**National Institute**\nDefinition: The National Institutes of Health (NIH) are responsible for funding and promoting research in various scientific areas.\nContexts:\n1. ...rganization, http: // www.who.int / mediacentre / factsheets / (accessed November 2004), and by the National Institutes of Health, http: // www.niehs.nih.gov / emfrapid / home.htm (accessed Novembe",
+    "chunk_order_index": 0,
+    "full_doc_id": "doc-b256671e85f666414dfa65dfbf3fa120"
+  },
+  "chunk-562af4dce655246def06d30e41164975": {
+    "tokens": 68,
+    "content": "**Environmental Health**\nDefinition: Environmental health refers to the study of how human activities impact public health and the environment.\nContexts:\n1. ...and Magnetic Fields , NIEHS Working Group Report (Research Triangle Park, NC: National Institute of Environmental Health Sciences of the National Institutes of Health, 1998).\n\nFigure 1.4 An electro",
+    "chunk_order_index": 0,
+    "full_doc_id": "doc-562af4dce655246def06d30e41164975"
+  },
+  "chunk-149171778d9a16b6f5b5fc7457f326a9": {
+    "tokens": 82,
+    "content": "**Niehs**\nDefinition: Not present in the context; likely a typo for \"NIH.\".\nContexts:\n1. ...tre / factsheets / (accessed November 2004), and by the National Institutes of Health, http: // www.niehs.nih.gov / emfrapid / home.htm (accessed November 2004). See, for example, C.J. Portier and",
+    "chunk_order_index": 0,
+    "full_doc_id": "doc-149171778d9a16b6f5b5fc7457f326a9"
+  },
+  "chunk-ce397675f3b37fc240270c2514521b68": {
+    "tokens": 115,
+    "content": "**Parallel-That**\nDefinition: The direction of the velocity and magnetic field determines the direction of the force.\nContexts:\n1. ...the greater the force; the more closely aligned v and B are, the smaller the force. If v and B are parallel-that is, the charge is traveling along the magnetic field lines rather than across them-t\n2. ...the greater the force; the more closely aligned v and B are, the smaller the force. If v and B are parallel-that is, the charge is traveling along the magnetic field lines rather than across them-t",
+    "chunk_order_index": 0,
+    "full_doc_id": "doc-ce397675f3b37fc240270c2514521b68"
+  },
+  "chunk-18c55db95ef55b1643339462b70641c7": {
+    "tokens": 111,
+    "content": "**Them-The**\nDefinition: A typo for \"the\" used in the context of the movement of charges.\nContexts:\n1. ...d B are parallel-that is, the charge is traveling along the magnetic field lines rather than across them-the force on the charge is zero.\n\nFigure 1.3 illustrates a typical application of this relat\n2. ...d B are parallel-that is, the charge is traveling along the magnetic field lines rather than across them-the force on the charge is zero.\n\nFigure 1.3 illustrates a typical application of this relat",
+    "chunk_order_index": 0,
+    "full_doc_id": "doc-18c55db95ef55b1643339462b70641c7"
+  },
+  "chunk-bccaf9f68ffe38fd4fdaa58e6773e832": {
+    "tokens": 67,
+    "content": "**Effects-Movement**\nDefinition: Effects-movement refers to the movement of charges due to electromagnetic forces.\nContexts:\n1. ...ow made to become stronger or weaker over time. As we will see in Chapter 4, a combination of these effects-movement through space of wires and magnets, as well as changing magnetic field strength-",
+    "chunk_order_index": 0,
+    "full_doc_id": "doc-bccaf9f68ffe38fd4fdaa58e6773e832"
+  },
+  "chunk-8d3c415aae038d585c68c1d84263933a": {
+    "tokens": 64,
+    "content": "**Strength-Is**\nDefinition: Strength is the arithmetic product of the three quantities involved in calculating the force on a charge.\nContexts:\n1. ...on of these effects-movement through space of wires and magnets, as well as changing magnetic field strength-is employed in the production of electric power by generators.\n\nThe phenomenon of electr",
+    "chunk_order_index": 0,
+    "full_doc_id": "doc-8d3c415aae038d585c68c1d84263933a"
+  },
+  "chunk-ce25a6016a5c61b8c3638337f77fa20b": {
+    "tokens": 72,
+    "content": "**Low-Frequency**\nDefinition: Low-frequency refers to the frequency of the magnetic field's variation, specifically 60 Hz, as mentioned in the context.\nContexts:\n1. ...ometimes referred to as EMF , for electromagnetic fields , or more precisely as ELF , for extremely low-frequency fields , since 60 Hz is extremely low compared to other electromagnetic radiation s",
+    "chunk_order_index": 0,
+    "full_doc_id": "doc-ce25a6016a5c61b8c3638337f77fa20b"
+  },
+  "chunk-9788ebb5b6df420a0c1378a044c8feb4": {
+    "tokens": 64,
+    "content": "**Exposed-And**\nDefinition: Exposed-and refers to the movement of the charge across the magnetic field to experience the force.\nContexts:\n1. ...sufficiently rare that no obvious disease clusters have been noted among workers who are routinely exposed-and have been over decades-to vastly stronger fields than are commonly experienced by the",
+    "chunk_order_index": 0,
+    "full_doc_id": "doc-9788ebb5b6df420a0c1378a044c8feb4"
+  },
+  "chunk-a75a2b59a3e6ac8b74dff8b7d289f8c8": {
+    "tokens": 63,
+    "content": "**Decades-To**\nDefinition: Decades-to refers to the long-term exposure to significantly stronger magnetic fields compared to everyday exposure.\nContexts:\n1. ...obvious disease clusters have been noted among workers who are routinely exposed-and have been over decades-to vastly stronger fields than are commonly experienced by the general population.\n\nFrom",
+    "chunk_order_index": 0,
+    "full_doc_id": "doc-a75a2b59a3e6ac8b74dff8b7d289f8c8"
+  },
+  "chunk-47aceab6f3cb2d1ae13abd9e65c1f10b": {
+    "tokens": 16,
+    "content": "**Field, Definition: [Definition].\"**\nDefinition: [definition].\".",
+    "chunk_order_index": 0,
+    "full_doc_id": "doc-47aceab6f3cb2d1ae13abd9e65c1f10b"
+  }
+}

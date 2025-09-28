@@ -10,8 +10,5 @@ wheels/
 .venv
 *models/
 *graphrag_cache/
-*graph_rag_cache/
-book.pdf
-book.txt
 book2.txt
 **.gguf

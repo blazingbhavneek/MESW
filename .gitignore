@@ -1,0 +1,17 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+*models/
+*graphrag_cache/
+*graph_rag_cache/
+book.pdf
+book.txt
+book2.txt
+**.gguf

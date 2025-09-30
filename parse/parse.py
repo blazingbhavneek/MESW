@@ -254,7 +254,7 @@ class HybridDocxExtractor:
                         "section_name": current_section_name,
                         "subsection": current_subsection,
                         "subsection_name": current_subsection_name,
-                        "content": "\n\n".join(current_content),
+                        "content": self._join_content(current_content),
                     }
                 )
                 current_content = []
@@ -288,11 +288,38 @@ class HybridDocxExtractor:
                     "section_name": current_section_name,
                     "subsection": current_subsection,
                     "subsection_name": current_subsection_name,
-                    "content": "\n\n".join(current_content),
+                    "content": self._join_content(current_content),
                 }
             )
 
         return result
+
+    def _join_content(self, content_list: List[str]) -> str:
+        """Join content with smart spacing - single newline for table rows, double for others"""
+        if not content_list:
+            return ""
+
+        result = []
+        for i, content in enumerate(content_list):
+            result.append(content)
+
+            # Check if we need spacing after this line
+            if i < len(content_list) - 1:
+                current_is_table = self.is_table_line(content)
+                next_is_table = self.is_table_line(content_list[i + 1])
+
+                # Single newline between table lines, double newline otherwise
+                if current_is_table and next_is_table:
+                    result.append("\n")
+                else:
+                    result.append("\n\n")
+
+        return "".join(result)
+
+    def is_table_line(self, text: str) -> bool:
+        """Check if a line is part of a markdown table"""
+        text = text.strip()
+        return text.startswith("|") and text.endswith("|") and text.count("|") >= 2
 
     def extract(self) -> List[Dict[str, Any]]:
         """Main extraction method combining both approaches"""

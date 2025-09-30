@@ -1318,6 +1318,121 @@ class BookDictionaryQuery:
 
         return output
 
+    async def query_graphrag_raw(
+        self, query: str, max_results: int = 5
+    ) -> Dict[str, Any]:
+        """Query GraphRAG and return raw entities, relationships, and text chunks"""
+        if not self.graph_rag:
+            if not self.load_graphrag():
+                return {"entities": [], "relationships": [], "text_chunks": []}
+
+        try:
+            # Get embedding for the query
+            query_embedding = await local_embedding([query])
+            query_vec = query_embedding[0]
+
+            entities = []
+            relationships = []
+            text_chunks = []
+
+            # Access the graph directly from file
+            graph_file = os.path.join(
+                self.working_dir, "graph_chunk_entity_relation.graphml"
+            )
+            if os.path.exists(graph_file):
+                import networkx as nx
+
+                G = nx.read_graphml(graph_file)
+
+                # Search for nodes matching the query
+                query_lower = query.lower()
+                for node, data in G.nodes(data=True):
+                    node_lower = str(node).lower()
+                    # Check if query matches node name or description
+                    description = data.get("description", "").lower()
+                    entity_type = data.get("entity_type", "")
+
+                    if (
+                        query_lower in node_lower
+                        or node_lower in query_lower
+                        or query_lower in description
+                    ):
+
+                        # Calculate similarity score
+                        if query_lower == node_lower:
+                            similarity = 1.0
+                        elif query_lower in node_lower or node_lower in query_lower:
+                            similarity = 0.9
+                        else:
+                            similarity = 0.7
+
+                        entities.append(
+                            {
+                                "name": node,
+                                "description": data.get("description", ""),
+                                "type": entity_type,
+                                "similarity": similarity,
+                                "source_id": data.get("source_id", ""),
+                            }
+                        )
+
+                    if len(entities) >= max_results:
+                        break
+
+                # Get relationships for found entities
+                if entities:
+                    entity_names = {e["name"] for e in entities}
+                    for source, target, data in G.edges(data=True):
+                        if source in entity_names or target in entity_names:
+                            relationships.append(
+                                {
+                                    "source": source,
+                                    "target": target,
+                                    "description": data.get("description", ""),
+                                    "weight": float(data.get("weight", 1.0)),
+                                    "keywords": data.get("keywords", ""),
+                                }
+                            )
+                            if len(relationships) >= max_results * 2:
+                                break
+
+            # Access text chunks using proper storage API
+            if hasattr(self.graph_rag, "text_chunks"):
+                try:
+                    # Get all keys first
+                    all_keys = await self.graph_rag.text_chunks.get_all_keys()
+                    query_lower = query.lower()
+
+                    for key in all_keys[: max_results * 5]:
+                        chunk_data = await self.graph_rag.text_chunks.get_by_id(key)
+                        if chunk_data:
+                            content = chunk_data.get("content", "")
+                            if query_lower in content.lower():
+                                text_chunks.append(
+                                    {
+                                        "id": key,
+                                        "content": content[:500],
+                                        "similarity": 0.9,
+                                    }
+                                )
+                                if len(text_chunks) >= max_results:
+                                    break
+                except AttributeError:
+                    pass
+
+            return {
+                "entities": entities,
+                "relationships": relationships,
+                "text_chunks": text_chunks,
+            }
+
+        except Exception as e:
+            print(f"Error in raw GraphRAG query: {e}")
+            import traceback
+
+            traceback.print_exc()
+            return {"entities": [], "relationships": [], "text_chunks": []}
+
 
 # ============================================================================
 # MAIN EXECUTION
@@ -1372,13 +1487,24 @@ async def main():
             print("\n❌ GraphRAG build failed")
 
     elif command == "query":
-        # Query mode - look up specific term
+        # Query mode - return raw GraphRAG entities and relationships
         if len(sys.argv) < 3:
-            print("❌ Please specify a term to query")
+            print("Usage: python script.py query <term> [max_results]")
+            print("Example: python script.py query impedance 10")
             return
 
-        term = " ".join(sys.argv[2:])
-        print(f"🔍 Querying term: '{term}'")
+        term = sys.argv[2]
+        max_results = 5  # Default
+
+        if len(sys.argv) >= 4:
+            try:
+                max_results = int(sys.argv[3])
+            except ValueError:
+                print(
+                    f"Warning: Invalid max_results '{sys.argv[3]}', using default of 5"
+                )
+
+        print(f"🔍 Querying term: '{term}' (max results: {max_results})")
 
         # Initialize query system
         query_system = BookDictionaryQuery()
@@ -1390,19 +1516,96 @@ async def main():
             )
             return
 
-        # Get definition for the term
-        result = query_system.define_word(term)
+        # Try to get raw GraphRAG data
+        print(f"🕸️ Retrieving raw graph data for: '{term}'")
 
-        # Format and display result
-        print(query_system.format_definition(result))
+        try:
+            raw_result = await query_system.query_graphrag_raw(
+                term, max_results=max_results
+            )
 
-        # If term not found, show similar terms
-        if not result["found"]:
-            print(f"\n💡 Similar terms you might be looking for:")
-            suggestions = query_system.suggest_words(term, n=5)
-            for i, suggestion in enumerate(suggestions, 1):
-                if suggestion != term:
-                    print(f"  {i}. {suggestion}")
+            print("\n" + "=" * 60)
+            print(f"📖 Raw GraphRAG Results for '{term.upper()}'")
+            print("=" * 60)
+
+            # Display entities
+            if raw_result.get("entities"):
+                print(f"\n🔷 ENTITIES ({len(raw_result['entities'])} found):")
+                for i, entity in enumerate(raw_result["entities"][:max_results], 1):
+                    print(f"\n{i}. {entity['name'].upper()}")
+                    if entity.get("description"):
+                        print(f"   Description: {entity['description']}.")
+                    print(f"   Similarity: {entity.get('similarity', 0):.3f}")
+            else:
+                print("\n🔷 ENTITIES: None found")
+
+            # Display relationships
+            if raw_result.get("relationships"):
+                print(f"\n🔗 RELATIONSHIPS ({len(raw_result['relationships'])} found):")
+                for i, rel in enumerate(raw_result["relationships"][:max_results], 1):
+                    print(f"\n{i}. {rel['source']} → {rel['target']}")
+                    if rel.get("description"):
+                        print(f"   {rel['description']}")
+                    if rel.get("weight"):
+                        print(f"   Weight: {rel['weight']}")
+            else:
+                print("\n🔗 RELATIONSHIPS: None found")
+
+            # Display text chunks
+            if raw_result.get("text_chunks"):
+                print(
+                    f"\n📄 RELEVANT TEXT CHUNKS ({len(raw_result['text_chunks'])} found):"
+                )
+                for i, chunk in enumerate(raw_result["text_chunks"][:max_results], 1):
+                    print(f"\n{i}. Chunk ID: {chunk.get('id', 'unknown')}")
+                    print(f"   {chunk['content'][:300]}...")
+                    if chunk.get("similarity"):
+                        print(f"   Similarity: {chunk['similarity']:.3f}")
+            else:
+                print("\n📄 RELEVANT TEXT CHUNKS: None found")
+
+        except Exception as e:
+            print(f"❌ GraphRAG query failed: {e}")
+            print(f"\nFalling back to dictionary lookup...")
+            result = query_system.define_word(term)
+            print(query_system.format_definition(result))
+
+    elif command == "dict":
+        # Dictionary lookup mode
+        if len(sys.argv) < 3:
+            print("Usage: python script.py dict <term>")
+            print("Example: python script.py dict impedance")
+            return
+
+        term = sys.argv[2]
+        print(f"📚 Looking up dictionary term: '{term}'")
+
+        # Initialize query system
+        query_system = BookDictionaryQuery()
+
+        # Check if we have data to query
+        if not query_system.vocabulary:
+            print(
+                "❌ No vocabulary loaded. Please build the graph first with: python script.py build [book_file]"
+            )
+            return
+
+        # Dictionary lookup
+        if term.lower() in query_system.vocabulary:
+            vocab_entry = query_system.vocabulary[term.lower()]
+            print(f"\n📚 Dictionary Lookup:")
+            print(f"   Definition: {vocab_entry['definition']}")
+            print(f"   Found in {len(vocab_entry['found_in_chunks'])} chunks")
+            print(f"   Has {len(vocab_entry['contexts'])} contexts")
+
+            if vocab_entry["contexts"]:
+                print(f"\n   Sample context:")
+                print(f"   {vocab_entry['contexts'][0][:200]}...")
+        else:
+            print(f"\n📚 Dictionary Lookup: '{term}' not found in dictionary")
+            suggestions = query_system.suggest_words(term, n=3)
+            if suggestions:
+                print(f"   Similar terms: {', '.join(suggestions)}")
 
     elif command == "interactive":
         # Interactive query mode

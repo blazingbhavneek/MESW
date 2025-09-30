@@ -18,25 +18,23 @@ from pydantic import BaseModel, Field
 from sentence_transformers import SentenceTransformer
 
 # Configuration
-MAX_CONCURRENT_DEFINITIONS = 15  # Set to 1 for synchronous, higher for concurrent
+MAX_CONCURRENT_DEFINITIONS = 15
 WORKING_DIR = "./graph_rag_cache"
 VLLM_HOST = "http://localhost:8000"
 VLLM_MODEL = "Qwen3-0.6B-Q8_0.gguf"
 MAX_TOKEN = 2000
-DEFINITION_SIMILARITY_THRESHOLD = (
-    0.7  # If definitions are > threshold, consider them similar
-)
+DEFINITION_SIMILARITY_THRESHOLD = 0.7  # For semantic similarity in graph
 
 # Initialize embedding model
 try:
     EMBED_MODEL = SentenceTransformer("models/embeddings", local_files_only=True)
-    print("✅ Local embedding model loaded")
+    print("Local embedding model loaded")
 except:
     try:
         EMBED_MODEL = SentenceTransformer("Qwen/Qwen3-Embedding-0.6B")
-        print("✅ Fallback embedding model loaded")
+        print("Fallback embedding model loaded")
     except Exception as e:
-        print(f"❌ Failed to load embedding model: {e}")
+        print(f"Failed to load embedding model: {e}")
         sys.exit(1)
 
 # vLLM client
@@ -89,19 +87,8 @@ def extract_technical_terms(text: str, **kwargs) -> Dict[str, str]:
     Placeholder function to extract technical terms.
     CRITICAL: Later this will be replaced with a hardcoded list of terms.
     For now, it returns a dictionary of terms with empty definitions.
-
-    Args:
-        text: Book text to extract terms from
-        **kwargs: Additional parameters (not used now)
-
-    Returns:
-        Dict[str, str]: Dictionary of terms to definitions (empty for now)
     """
-    # This is a placeholder - in reality, we would get a hardcoded list later
-    # For now, we'll extract some basic terms as an example
     terms = {}
-
-    # Simple pattern matching for technical terms (placeholder)
     patterns = [
         r"\b[A-Za-z]+(?:-[A-Za-z]+)+\b",  # hyphenated terms
         r"\b[A-Z][a-z]+ [A-Z][a-z]+\b",  # proper noun phrases
@@ -112,33 +99,12 @@ def extract_technical_terms(text: str, **kwargs) -> Dict[str, str]:
     for pattern in patterns:
         matches = re.findall(pattern, text)
         for match in matches:
-            # Clean the term
             term = match.lower().strip()
             if len(term) > 3:
-                terms[term] = ""  # Empty definition for now
+                terms[term] = ""
 
-    print(f"🔍 Extracted {len(terms)} placeholder technical terms")
+    print(f"Extracted {len(terms)} placeholder technical terms")
     return terms
-
-
-# ============================================================================
-# MODEL FOR LLM OUTPUT
-# ============================================================================
-class TermDefinition(BaseModel):
-    """Pydantic model to ensure LLM returns correct format"""
-
-    term: str = Field(..., description="The technical term being defined")
-    definition: str = Field(
-        ..., description="Clear, concise definition of the term (1-2 sentences)"
-    )
-
-
-class TermDefinitionsResponse(BaseModel):
-    """Pydantic model for the full response"""
-
-    definitions: List[TermDefinition] = Field(
-        ..., description="List of term definitions found in the text chunk"
-    )
 
 
 # ============================================================================
@@ -150,7 +116,6 @@ class BookChunker:
     def __init__(self, chunk_size: int = 1000, overlap: int = 200):
         self.chunk_size = chunk_size
         self.overlap = overlap
-        # Try to get tiktoken for accurate token counting
         try:
             import tiktoken
 
@@ -159,11 +124,11 @@ class BookChunker:
         except:
             self.tokenizer = None
             self.use_tiktoken = False
-            print("⚠️ tiktoken not available, using approximate word-based chunking")
+            print("tiktoken not available, using approximate word-based chunking")
 
     def create_chunks(self, text: str) -> List[Dict[str, Any]]:
         """Create overlapping chunks from the book text"""
-        print(f"📖 Creating chunks from book ({len(text)} characters)...")
+        print(f"Creating chunks from book ({len(text)} characters)...")
         if self.use_tiktoken:
             return self._create_token_chunks(text)
         else:
@@ -183,12 +148,9 @@ class BookChunker:
                     "start_token": i,
                     "end_token": i + len(chunk_tokens),
                     "token_count": len(chunk_tokens),
-                    "char_start": self._find_char_position(text, chunk_text, i > 0),
-                    "char_end": self._find_char_position(text, chunk_text, i > 0)
-                    + len(chunk_text),
                 }
             )
-        print(f"✅ Created {len(chunks)} token-based chunks")
+        print(f"Created {len(chunks)} token-based chunks")
         return chunks
 
     def _create_word_chunks(self, text: str) -> List[Dict[str, Any]]:
@@ -205,112 +167,9 @@ class BookChunker:
                     "start_word": i,
                     "end_word": i + len(chunk_words),
                     "word_count": len(chunk_words),
-                    "char_start": self._find_char_position(text, chunk_text, i > 0),
-                    "char_end": self._find_char_position(text, chunk_text, i > 0)
-                    + len(chunk_text),
                 }
             )
-        print(f"✅ Created {len(chunks)} word-based chunks")
-        return chunks
-
-    def _find_char_position(
-        self, full_text: str, chunk_text: str, is_continuation: bool
-    ) -> int:
-        """Find character position of chunk in full text"""
-        if not is_continuation:
-            return 0
-        # Find first few words to locate position
-        first_words = " ".join(chunk_text.split()[:5])
-        position = full_text.find(first_words)
-        return max(0, position)
-
-
-# ============================================================================
-# GRAPH MANAGER
-# ============================================================================
-class GraphManager:
-    """Manage the knowledge graph and entity relationships"""
-
-    def __init__(self, working_dir: str = WORKING_DIR):
-        self.working_dir = working_dir
-        self.entity_definitions = {}
-        self.entity_contexts = defaultdict(list)
-        os.makedirs(working_dir, exist_ok=True)
-
-    def add_or_update_entities(
-        self,
-        terms_with_definitions: Dict[str, str],
-        terms_with_contexts: Dict[str, List[str]],
-    ) -> Dict[str, Any]:
-        """Add or update entities in the graph"""
-        print(f"🕸️ Processing {len(terms_with_definitions)} entities for graph...")
-        updates = []
-        new_entities = []
-        similar_entities = []
-
-        for term, definition in terms_with_definitions.items():
-            contexts = terms_with_contexts.get(term, [])
-
-            if term in self.entity_definitions:
-                # Entity exists - check similarity
-                existing_def = self.entity_definitions[term]
-                similarity = self._calculate_similarity(definition, existing_def)
-
-                if similarity < DEFINITION_SIMILARITY_THRESHOLD:
-                    # Definitions are different enough to append
-                    updated_def = self._merge_definitions(existing_def, definition)
-                    self.entity_definitions[term] = updated_def
-                    self.entity_contexts[term].extend(contexts)
-                    similar_entities.append(
-                        {
-                            "term": term,
-                            "existing_definition": existing_def,
-                            "new_definition": definition,
-                            "similarity": similarity,
-                            "updated_definition": updated_def,
-                        }
-                    )
-                # If very similar (>= threshold), do nothing
-            else:
-                # New entity
-                self.entity_definitions[term] = definition
-                self.entity_contexts[term] = contexts.copy()
-                new_entities.append(term)
-                updates.append(
-                    {"term": term, "definition": definition, "contexts": contexts}
-                )
-
-        print(f"✅ New entities: {len(new_entities)}")
-        print(f"🔄 Updated entities: {len(similar_entities)}")
-        return {
-            "new_entities": new_entities,
-            "updated_entities": similar_entities,
-            "total_entities": len(self.entity_definitions),
-        }
-
-    def _calculate_similarity(self, text1: str, text2: str) -> float:
-        """Calculate similarity between two definitions"""
-        return SequenceMatcher(None, text1.lower(), text2.lower()).ratio()
-
-    def _merge_definitions(self, def1: str, def2: str) -> str:
-        """Merge two definitions when they are sufficiently different"""
-        # Simple merge - could be improved later
-        return f"{def1} {def2}"
-
-    def create_graph_chunks(self) -> List[str]:
-        """Create chunks for GraphRAG from stored entities"""
-        chunks = []
-        for term, definition in self.entity_definitions.items():
-            contexts = self.entity_contexts.get(term, [])
-            chunk_lines = [f"**{term.title()}**", f"Definition: {definition}"]
-            if contexts:
-                chunk_lines.append("Contexts:")
-                for i, context in enumerate(contexts[:2], 1):
-                    clean_context = context.strip()[:200]
-                    chunk_lines.append(f"{i}. {clean_context}")
-            chunk_text = "\n".join(chunk_lines)
-            chunks.append(chunk_text)
-        print(f"📚 Created {len(chunks)} graph chunks")
+        print(f"Created {len(chunks)} word-based chunks")
         return chunks
 
 
@@ -321,45 +180,33 @@ class ChunkProcessor:
     """Process individual chunks to find terms and generate definitions"""
 
     def __init__(self):
-        self.chunk_terms = {}  # chunk_id -> terms found
-        self.chunk_definitions = {}  # chunk_id -> {term: definition}
-        self.global_terms = set()  # all unique terms found
+        self.chunk_terms = {}
+        self.chunk_definitions = {}
+        self.global_terms = set()
 
     async def process_chunk(
         self, chunk: Dict[str, Any], given_terms: Dict[str, str]
     ) -> Dict[str, Any]:
-        """
-        Process a single chunk to find terms and generate definitions
-
-        Args:
-            chunk: Dictionary containing chunk information
-            given_terms: Dictionary of terms to look for (term: empty definition)
-
-        Returns:
-            Dictionary with processing results
-        """
+        """Process a single chunk to find terms and generate definitions"""
         chunk_id = chunk["id"]
         chunk_text = chunk["text"]
-        print(
-            f"🔍 Processing chunk {chunk_id} ({chunk.get('token_count', chunk.get('word_count', 0))} tokens/words)"
-        )
+        print(f"Processing chunk {chunk_id}")
 
-        # Step 1: Find which given terms are present in this chunk
+        # Find which given terms are present in this chunk
         present_terms = []
         for term in given_terms.keys():
             if term.lower() in chunk_text.lower():
                 present_terms.append(term)
 
-        print(f"  📋 Found {len(present_terms)} given terms in chunk")
+        print(f"  Found {len(present_terms)} given terms in chunk")
 
-        # Step 2: Generate definitions for terms in this chunk
+        # Generate definitions for terms in this chunk
         definitions = {}
         if present_terms:
             definitions = await self._generate_chunk_definitions(
                 chunk_text, present_terms, chunk_id
             )
 
-        # Store results
         self.chunk_terms[chunk_id] = present_terms
         self.chunk_definitions[chunk_id] = definitions
         self.global_terms.update(present_terms)
@@ -377,7 +224,6 @@ class ChunkProcessor:
     ) -> Dict[str, str]:
         """Generate definitions for terms found in a specific chunk"""
         definitions = {}
-        # Process in smaller batches to avoid overwhelming the LLM
         batch_size = 5
         for i in range(0, len(terms), batch_size):
             batch_terms = terms[i : i + batch_size]
@@ -391,13 +237,12 @@ class ChunkProcessor:
                 )
                 definitions.update(batch_definitions)
                 print(
-                    f"    ✅ Chunk {chunk_id}: Generated definitions for batch {i//batch_size + 1}"
+                    f"    Chunk {chunk_id}: Generated definitions for batch {i//batch_size + 1}"
                 )
             except Exception as e:
                 print(
-                    f"    ❌ Failed to generate definitions for chunk {chunk_id}, batch {i//batch_size + 1}: {e}"
+                    f"    Failed to generate definitions for chunk {chunk_id}, batch {i//batch_size + 1}: {e}"
                 )
-                # Fallback definitions
                 for term in batch_terms:
                     definitions[term] = (
                         f"Term from chunk {chunk_id} context: {chunk_text[:200]}..."
@@ -408,32 +253,30 @@ class ChunkProcessor:
         """Create prompt for generating definitions from chunk context"""
         term_list = ", ".join(terms)
         return f"""Based on the following text chunk, provide clear, concise definitions for these technical terms:
-    Terms to define: {term_list}
-    Text chunk context:
-    {chunk_text}
-    For each term, provide a definition in this exact format:
-    TERM: [term name]
-    DEFINITION: [1-2 sentence definition based on the context]
-    Only define terms that actually appear in the context. If a term doesn't appear, skip it.
-    Do not include any reasoning, explanations, or text outside the format."""
+Terms to define: {term_list}
+Text chunk context:
+{chunk_text}
+For each term, provide a definition in this exact format:
+TERM: [term name]
+DEFINITION: [1-2 sentence definition based on the context]
+Only define terms that actually appear in the context. If a term doesn't appear, skip it.
+Do not include any reasoning, explanations, or text outside the format."""
 
     def _get_definition_system_prompt(self) -> str:
         """Get system prompt for definition generation"""
         return """You are an expert at creating clear, contextual definitions for technical terms found in books. 
-    Based on the provided text chunk, create precise definitions for the requested terms. 
-    Use ONLY the context provided. Keep definitions to 1-2 sentences.
-    Follow the exact format requested: TERM: [name] followed by DEFINITION: [definition].
-    Do not include any reasoning, explanations, or additional text outside the format."""
+Based on the provided text chunk, create precise definitions for the requested terms. 
+Use ONLY the context provided. Keep definitions to 1-2 sentences.
+Follow the exact format requested: TERM: [name] followed by DEFINITION: [definition].
+Do not include any reasoning, explanations, or additional text outside the format."""
 
     def _parse_definitions_response(
         self, response: str, expected_terms: List[str]
     ) -> Dict[str, str]:
         """Parse the LLM response to extract definitions"""
         definitions = {}
-        # Split response into sections
         sections = re.split(r"\n(?=TERM:)", response)
         for section in sections:
-            # Extract term and definition
             term_match = re.search(r"TERM:\s*(.+?)(?:\n|$)", section, re.IGNORECASE)
             def_match = re.search(
                 r"DEFINITION:\s*(.+?)(?=\nTERM:|\n|$)",
@@ -443,57 +286,256 @@ class ChunkProcessor:
             if term_match and def_match:
                 term = term_match.group(1).strip().lower()
                 definition = def_match.group(1).strip()
-                # Clean up the definition
                 definition = re.sub(r"\s+", " ", definition)
                 if definition and not definition.endswith((".", "!", "?")):
                     definition += "."
                 definitions[term] = definition
 
-        # Ensure we got definitions for the expected terms
         missing_terms = [t for t in expected_terms if t.lower() not in definitions]
         if missing_terms:
-            print(f"    ⚠️ Missing definitions for: {missing_terms}")
+            print(f"    Missing definitions for: {missing_terms}")
 
         return definitions
+
+
+# ============================================================================
+# DICTIONARY MANAGER
+# ============================================================================
+class DictionaryManager:
+    """Manages the term dictionary with character-based lookup"""
+
+    def __init__(self, working_dir: str = WORKING_DIR):
+        self.working_dir = working_dir
+        self.dictionary = {}  # term -> definition
+        os.makedirs(working_dir, exist_ok=True)
+
+    def add_terms(self, terms_with_definitions: Dict[str, str]) -> None:
+        """Add or update terms in dictionary"""
+        print(f"Adding {len(terms_with_definitions)} terms to dictionary...")
+        for term, definition in terms_with_definitions.items():
+            if term in self.dictionary:
+                # Term exists - merge definitions if different
+                existing_def = self.dictionary[term]
+                similarity = SequenceMatcher(
+                    None, definition.lower(), existing_def.lower()
+                ).ratio()
+                if similarity < 0.7:
+                    # Definitions are different, merge them
+                    self.dictionary[term] = f"{existing_def} {definition}"
+            else:
+                # New term
+                self.dictionary[term] = definition
+        print(f"Dictionary now contains {len(self.dictionary)} terms")
+
+    def lookup_exact(self, term: str) -> Optional[str]:
+        """Exact character match lookup"""
+        term_normalized = term.lower().strip()
+        return self.dictionary.get(term_normalized)
+
+    def lookup_similar(self, term: str, top_n: int = 5) -> List[Dict[str, Any]]:
+        """Character similarity based lookup using fuzzy matching"""
+        term_normalized = term.lower().strip()
+
+        # Calculate similarity for all terms
+        similarities = []
+        for dict_term in self.dictionary.keys():
+            similarity = SequenceMatcher(None, term_normalized, dict_term).ratio()
+            similarities.append(
+                {
+                    "term": dict_term,
+                    "similarity": similarity,
+                    "definition": self.dictionary[dict_term],
+                }
+            )
+
+        # Sort by similarity
+        similarities.sort(key=lambda x: x["similarity"], reverse=True)
+        return similarities[:top_n]
+
+    def save(self) -> None:
+        """Save dictionary to disk"""
+        dict_path = os.path.join(self.working_dir, "dictionary.json")
+        with open(dict_path, "w", encoding="utf-8") as f:
+            json.dump(self.dictionary, f, indent=2, ensure_ascii=False)
+        print(f"Dictionary saved to {dict_path}")
+
+    def load(self) -> bool:
+        """Load dictionary from disk"""
+        dict_path = os.path.join(self.working_dir, "dictionary.json")
+        if os.path.exists(dict_path):
+            with open(dict_path, "r", encoding="utf-8") as f:
+                self.dictionary = json.load(f)
+            print(f"Loaded {len(self.dictionary)} terms from dictionary")
+            return True
+        return False
+
+
+# ============================================================================
+# GRAPH MANAGER
+# ============================================================================
+class GraphManager:
+    """Manages the GraphRAG knowledge graph for semantic similarity"""
+
+    def __init__(self, working_dir: str = WORKING_DIR):
+        self.working_dir = working_dir
+        self.terms_definitions = {}  # term -> definition
+        self.term_embeddings = {}  # term -> embedding vector
+        os.makedirs(working_dir, exist_ok=True)
+
+    def add_terms(self, terms_with_definitions: Dict[str, str]) -> None:
+        """Add terms to graph - definitions will be used for semantic similarity"""
+        print(f"Adding {len(terms_with_definitions)} terms to graph...")
+        self.terms_definitions.update(terms_with_definitions)
+        print(f"Graph now contains {len(self.terms_definitions)} terms")
+
+    def create_graph_chunks(self) -> List[str]:
+        """
+        Create chunks for GraphRAG where:
+        - Each chunk is: TERM + DEFINITION
+        - GraphRAG will create nodes from these
+        - Relationships will be based on:
+          1. Terms appearing in other term definitions
+          2. Semantic similarity between definitions
+        """
+        chunks = []
+        for term, definition in self.terms_definitions.items():
+            # Format: Just term and definition, nothing else
+            chunk_text = f"{term}: {definition}"
+            chunks.append(chunk_text)
+
+        print(f"Created {len(chunks)} graph chunks")
+        return chunks
+
+    def compute_embeddings(self) -> None:
+        """Pre-compute embeddings for all definitions"""
+        print("Computing definition embeddings...")
+        terms = list(self.terms_definitions.keys())
+        definitions = [self.terms_definitions[t] for t in terms]
+
+        embeddings = EMBED_MODEL.encode(definitions, normalize_embeddings=True)
+
+        for term, embedding in zip(terms, embeddings):
+            self.term_embeddings[term] = embedding
+
+        print(f"Computed embeddings for {len(self.term_embeddings)} terms")
+
+    def find_semantically_similar(
+        self, term: str, top_n: int = 10
+    ) -> List[Dict[str, Any]]:
+        """Find terms with semantically similar definitions"""
+        if term not in self.term_embeddings:
+            return []
+
+        query_embedding = self.term_embeddings[term]
+        similarities = []
+
+        for other_term, other_embedding in self.term_embeddings.items():
+            if other_term == term:
+                continue
+
+            # Cosine similarity (embeddings are already normalized)
+            similarity = float(np.dot(query_embedding, other_embedding))
+
+            similarities.append(
+                {
+                    "term": other_term,
+                    "definition": self.terms_definitions[other_term],
+                    "similarity": similarity,
+                }
+            )
+
+        similarities.sort(key=lambda x: x["similarity"], reverse=True)
+        return similarities[:top_n]
+
+    def find_related_by_definition(self, term: str) -> List[str]:
+        """Find terms that appear in this term's definition or vice versa"""
+        if term not in self.terms_definitions:
+            return []
+
+        definition = self.terms_definitions[term].lower()
+        related = []
+
+        for other_term in self.terms_definitions.keys():
+            if other_term == term:
+                continue
+
+            # Check if other_term appears in this definition
+            if other_term in definition:
+                related.append(other_term)
+                continue
+
+            # Check if this term appears in other's definition
+            other_def = self.terms_definitions[other_term].lower()
+            if term in other_def:
+                related.append(other_term)
+
+        return related
+
+    def save(self) -> None:
+        """Save graph data"""
+        terms_path = os.path.join(self.working_dir, "graph_terms.json")
+        with open(terms_path, "w", encoding="utf-8") as f:
+            json.dump(self.terms_definitions, f, indent=2, ensure_ascii=False)
+
+        # Save embeddings as numpy array
+        if self.term_embeddings:
+            embeddings_path = os.path.join(self.working_dir, "term_embeddings.npz")
+            terms_list = list(self.term_embeddings.keys())
+            embeddings_array = np.array([self.term_embeddings[t] for t in terms_list])
+            np.savez(embeddings_path, terms=terms_list, embeddings=embeddings_array)
+            print(f"Graph data saved to {self.working_dir}")
+
+    def load(self) -> bool:
+        """Load graph data"""
+        terms_path = os.path.join(self.working_dir, "graph_terms.json")
+        if os.path.exists(terms_path):
+            with open(terms_path, "r", encoding="utf-8") as f:
+                self.terms_definitions = json.load(f)
+
+            # Load embeddings
+            embeddings_path = os.path.join(self.working_dir, "term_embeddings.npz")
+            if os.path.exists(embeddings_path):
+                data = np.load(embeddings_path, allow_pickle=True)
+                terms_list = data["terms"]
+                embeddings_array = data["embeddings"]
+                self.term_embeddings = {
+                    term: embedding
+                    for term, embedding in zip(terms_list, embeddings_array)
+                }
+
+            print(f"Loaded {len(self.terms_definitions)} terms from graph")
+            return True
+        return False
 
 
 # ============================================================================
 # MAIN ORCHESTRATOR
 # ============================================================================
 class GraphRAGBuilder:
-    """Main class that builds the GraphRAG knowledge graph"""
+    """Main class that builds the dictionary and GraphRAG"""
 
     def __init__(self):
+        self.dictionary_manager = DictionaryManager()
         self.graph_manager = GraphManager()
         self.processed_chunks = []
         self.terms_with_definitions = {}
-        self.terms_with_contexts = defaultdict(list)
 
     async def build_graph(self, book_text: str, term_extractor=extract_technical_terms):
-        """
-        Build the GraphRAG knowledge graph from book text
-
-        Args:
-            book_text: Full book text
-            term_extractor: Function to extract technical terms
-
-        Returns:
-            Boolean indicating success
-        """
-        print("🚀 Starting GraphRAG build process")
+        """Build the dictionary and GraphRAG from book text"""
+        print("Starting GraphRAG build process")
         print("=" * 60)
 
-        # Step 1: Extract technical terms (placeholder for now)
+        # Step 1: Extract technical terms
         print("\nSTEP 1: EXTRACTING TECHNICAL TERMS")
         print("-" * 30)
         technical_terms = term_extractor(book_text)
-        print(f"✅ Extracted {len(technical_terms)} technical terms")
+        print(f"Extracted {len(technical_terms)} technical terms")
 
         if not technical_terms:
-            print("⚠️ No technical terms found. Cannot build graph without terms.")
+            print("No technical terms found. Cannot build graph without terms.")
             return False
 
-        # Step 2: Create chunks from the entire book
+        # Step 2: Create chunks from the book
         print("\nSTEP 2: CREATING BOOK CHUNKS")
         print("-" * 30)
         chunker = BookChunker(chunk_size=1000, overlap=200)
@@ -504,27 +546,18 @@ class GraphRAGBuilder:
         print("-" * 30)
         chunk_processor = ChunkProcessor()
 
-        # Process chunks with concurrency control
         if MAX_CONCURRENT_DEFINITIONS <= 1:
-            # Synchronous processing
             for i, chunk in enumerate(chunks):
-                print(f"\n📖 Chunk {i+1}/{len(chunks)}:")
+                print(f"\nChunk {i+1}/{len(chunks)}:")
                 result = await chunk_processor.process_chunk(chunk, technical_terms)
                 self.processed_chunks.append(result)
-                print(
-                    f"  📊 Chunk summary: {result['terms_found']} terms, {result['definitions_generated']} definitions"
-                )
         else:
-            # Concurrent processing
             semaphore = asyncio.Semaphore(MAX_CONCURRENT_DEFINITIONS)
 
             async def process_chunk_with_semaphore(chunk, idx):
                 async with semaphore:
-                    print(f"\n📖 Chunk {idx+1}/{len(chunks)}:")
+                    print(f"\nChunk {idx+1}/{len(chunks)}:")
                     result = await chunk_processor.process_chunk(chunk, technical_terms)
-                    print(
-                        f"  📊 Chunk summary: {result['terms_found']} terms, {result['definitions_generated']} definitions"
-                    )
                     return result
 
             tasks = [
@@ -532,93 +565,51 @@ class GraphRAGBuilder:
             ]
             self.processed_chunks = await asyncio.gather(*tasks)
 
-        # Step 4: Compile contexts for all terms
-        print("\nSTEP 4: COMPILING TERM CONTEXTS")
-        print("-" * 30)
-        self._compile_term_contexts(chunks, chunk_processor)
-
-        # Step 5: Merge definitions from all chunks
-        print("\nSTEP 5: MERGING DEFINITIONS")
+        # Step 4: Merge definitions from all chunks
+        print("\nSTEP 4: MERGING DEFINITIONS")
         print("-" * 30)
         self._merge_definitions(chunk_processor)
 
-        # Step 6: Add to graph
-        print("\nSTEP 6: ADDING TO GRAPH")
+        # Step 5: Add to dictionary
+        print("\nSTEP 5: ADDING TO DICTIONARY")
         print("-" * 30)
-        graph_result = self.graph_manager.add_or_update_entities(
-            self.terms_with_definitions, self.terms_with_contexts
-        )
+        self.dictionary_manager.add_terms(self.terms_with_definitions)
 
-        # Step 7: Create GraphRAG
-        print("\nSTEP 7: CREATING GRAPHRAG")
+        # Step 6: Add to graph and compute embeddings
+        print("\nSTEP 6: BUILDING GRAPH")
+        print("-" * 30)
+        self.graph_manager.add_terms(self.terms_with_definitions)
+        self.graph_manager.compute_embeddings()
+
+        # Step 7: Create GraphRAG (optional - for advanced graph features)
+        print("\nSTEP 7: CREATING GRAPHRAG (optional)")
         print("-" * 30)
         graph_chunks = self.graph_manager.create_graph_chunks()
-        return await self._build_graphrag(graph_chunks)
+        await self._build_graphrag(graph_chunks)
 
-    def _compile_term_contexts(
-        self, chunks: List[Dict[str, Any]], chunk_processor: ChunkProcessor
-    ) -> None:
-        """Compile contexts for all terms from all chunks"""
-        print(f"📚 Compiling contexts for all terms from {len(chunks)} chunks...")
-
-        for chunk_id, terms in chunk_processor.chunk_terms.items():
-            chunk = next((c for c in chunks if c["id"] == chunk_id), None)
-            if not chunk:
-                continue
-
-            chunk_text = chunk["text"]
-            for term in terms:
-                # Create a focused context around the term
-                context = self._extract_term_context(chunk_text, term)
-                if context:
-                    self.terms_with_contexts[term].append(context)
-
-    def _extract_term_context(
-        self, chunk_text: str, term: str, context_size: int = 200
-    ) -> str:
-        """Extract focused context around a term"""
-        term_lower = term.lower()
-        text_lower = chunk_text.lower()
-        # Find the term in the text
-        pos = text_lower.find(term_lower)
-        if pos == -1:
-            return ""
-        # Extract context around the term
-        start = max(0, pos - context_size // 2)
-        end = min(len(chunk_text), pos + len(term) + context_size // 2)
-        context = chunk_text[start:end].strip()
-        # Add ellipsis if we truncated
-        if start > 0:
-            context = "..." + context
-        if end < len(chunk_text):
-            context = context + "..."
-        return context
+        return True
 
     def _merge_definitions(self, chunk_processor: ChunkProcessor) -> None:
         """Merge definitions from different chunks"""
-        print(f"🔄 Merging definitions from {len(self.processed_chunks)} chunks...")
+        print(f"Merging definitions from {len(self.processed_chunks)} chunks...")
 
-        # Group definitions by term
         term_definitions = defaultdict(list)
         for chunk_id, definitions in chunk_processor.chunk_definitions.items():
             for term, definition in definitions.items():
                 term_definitions[term].append(definition)
 
-        # Select the best definition for each term
         for term, definitions in term_definitions.items():
             if len(definitions) == 1:
-                # Single definition, use as-is
                 self.terms_with_definitions[term] = definitions[0]
             else:
-                # Multiple definitions, use the first one for now (could be improved)
+                # Use first definition (could use most common or merge)
                 self.terms_with_definitions[term] = definitions[0]
 
-        print(f"✅ Merged {len(self.terms_with_definitions)} definitions")
+        print(f"Merged {len(self.terms_with_definitions)} definitions")
 
     async def _build_graphrag(self, graph_chunks: List[str]) -> bool:
-        """Build the GraphRAG knowledge graph (async version)"""
+        """Build the GraphRAG knowledge graph (optional for advanced features)"""
         try:
-            # Initialize GraphRAG with more robust JSON handling
             rag = GraphRAG(
                 working_dir=WORKING_DIR,
                 embedding_func=local_embedding,
@@ -626,482 +617,147 @@ class GraphRAGBuilder:
                 cheap_model_func=vllm_complete,
                 best_model_max_token_size=MAX_TOKEN,
                 cheap_model_max_token_size=MAX_TOKEN,
-                # More robust JSON conversion function
                 convert_response_to_json_func=lambda x: (
                     json_repair.loads(x) if x else {}
                 ),
                 embedding_func_max_async=3,
                 embedding_batch_num=4,
             )
-            # Insert data using async insert
-            await rag.ainsert(graph_chunks)  # This is the key fix
-            print("✅ GraphRAG knowledge graph built successfully!")
+            await rag.ainsert(graph_chunks)
+            print("GraphRAG knowledge graph built successfully")
             return True
         except Exception as e:
-            print(f"❌ GraphRAG build failed: {e}")
+            print(f"GraphRAG build failed (non-critical): {e}")
             return False
 
     def save_results(self) -> None:
-        """Save the built graph and related data"""
-        os.makedirs(WORKING_DIR, exist_ok=True)
-
-        # Save entity definitions
-        definitions_path = os.path.join(WORKING_DIR, "entity_definitions.json")
-        with open(definitions_path, "w", encoding="utf-8") as f:
-            json.dump(
-                self.graph_manager.entity_definitions, f, indent=2, ensure_ascii=False
-            )
-
-        # Save entity contexts
-        contexts_path = os.path.join(WORKING_DIR, "entity_contexts.json")
-        with open(contexts_path, "w", encoding="utf-8") as f:
-            json.dump(
-                {k: list(v) for k, v in self.graph_manager.entity_contexts.items()},
-                f,
-                indent=2,
-                ensure_ascii=False,
-            )
+        """Save the built dictionary and graph"""
+        self.dictionary_manager.save()
+        self.graph_manager.save()
 
         # Save processing stats
         stats_path = os.path.join(WORKING_DIR, "processing_stats.json")
         stats = {
             "total_chunks": len(self.processed_chunks),
             "total_terms": len(self.terms_with_definitions),
-            "total_entities": len(self.graph_manager.entity_definitions),
         }
         with open(stats_path, "w", encoding="utf-8") as f:
             json.dump(stats, f, indent=2, ensure_ascii=False)
 
-        print(f"✅ Results saved to {WORKING_DIR}")
+        print(f"Results saved to {WORKING_DIR}")
 
 
 # ============================================================================
 # QUERY SYSTEM
 # ============================================================================
-
-
 class BookDictionaryQuery:
     """Query interface for dictionary and GraphRAG"""
 
     def __init__(self, working_dir: str = WORKING_DIR):
         self.working_dir = working_dir
-        self.vocabulary = {}
-        self.graph_rag = None
+        self.dictionary = DictionaryManager(working_dir)
+        self.graph = GraphManager(working_dir)
         self.load_all_data()
 
     def load_all_data(self):
-        """Load definitions and contexts"""
-        print(f"📚 Loading dictionary data from {self.working_dir}...")
+        """Load dictionary and graph data"""
+        print(f"Loading data from {self.working_dir}...")
 
-        # Load definitions
-        definitions_path = os.path.join(self.working_dir, "entity_definitions.json")
-        if os.path.exists(definitions_path):
-            with open(definitions_path, "r", encoding="utf-8") as f:
-                definitions = json.load(f)
-            print(f"✅ Loaded {len(definitions)} definitions")
-        else:
-            definitions = {}
-            print("⚠️ No definitions file found")
+        dict_loaded = self.dictionary.load()
+        graph_loaded = self.graph.load()
 
-        # Load contexts
-        contexts_path = os.path.join(self.working_dir, "entity_contexts.json")
-        if os.path.exists(contexts_path):
-            with open(contexts_path, "r", encoding="utf-8") as f:
-                contexts = json.load(f)
-            print(f"✅ Loaded contexts for {len(contexts)} terms")
-        else:
-            contexts = {}
-            print("⚠️ No contexts file found")
+        if not dict_loaded:
+            print("No dictionary data found")
+        if not graph_loaded:
+            print("No graph data found")
 
-        # Build vocabulary
-        self.vocabulary = {}
-        for term, definition in definitions.items():
-            term_contexts = contexts.get(term, [])
-            self.vocabulary[term] = {
-                "definition": definition,
-                "contexts": term_contexts,
-            }
+    def dict_lookup(self, term: str, show_similar: bool = True) -> Dict[str, Any]:
+        """
+        Dictionary lookup with character-based similarity
 
-        print(f"📊 Dictionary ready: {len(self.vocabulary)} terms")
+        Args:
+            term: Term to look up
+            show_similar: If exact match not found, show similar terms
+        """
+        # Try exact match first
+        exact_match = self.dictionary.lookup_exact(term)
 
-    def load_graphrag(self) -> bool:
-        """Load GraphRAG if available"""
-        try:
-            self.graph_rag = GraphRAG(
-                working_dir=self.working_dir,
-                embedding_func=local_embedding,
-                best_model_func=vllm_complete,
-                cheap_model_func=vllm_complete,
-            )
-            print("✅ GraphRAG loaded successfully")
-            return True
-        except Exception as e:
-            print(f"⚠️ GraphRAG not available: {e}")
-            return False
-
-    def dict_lookup(self, term: str) -> Dict[str, Any]:
-        """Dictionary lookup for a term"""
-        term_lower = term.lower().strip()
-
-        if term_lower in self.vocabulary:
-            vocab_entry = self.vocabulary[term_lower]
+        if exact_match:
             return {
                 "found": True,
-                "term": term_lower,
-                "definition": vocab_entry["definition"],
-                "contexts": vocab_entry["contexts"][:3],
-                "context_count": len(vocab_entry["contexts"]),
+                "exact_match": True,
+                "term": term.lower(),
+                "definition": exact_match,
+            }
+
+        # No exact match, find similar
+        if show_similar:
+            similar_terms = self.dictionary.lookup_similar(term, top_n=5)
+            return {
+                "found": False,
+                "exact_match": False,
+                "query": term,
+                "similar_terms": similar_terms,
+                "message": f"No exact match for '{term}'. Did you mean one of these?",
             }
         else:
             return {
                 "found": False,
-                "term": term_lower,
+                "exact_match": False,
+                "query": term,
                 "message": f"Term '{term}' not found in dictionary",
             }
 
-    async def query_graphrag_raw(
-        self, query: str, max_results: int = 5
-    ) -> Dict[str, Any]:
-        """Query GraphRAG and return raw entities and relationships"""
-        if not self.graph_rag:
-            if not self.load_graphrag():
-                return {"entities": [], "relationships": []}
-
-        try:
-            # Access the graph directly
-            graph_file = os.path.join(
-                self.working_dir, "graph_chunk_entity_relation.graphml"
-            )
-            if not os.path.exists(graph_file):
-                return {"entities": [], "relationships": []}
-
-            import networkx as nx
-
-            G = nx.read_graphml(graph_file)
-
-            entities = []
-            relationships = []
-
-            # Search for matching nodes
-            query_lower = query.lower()
-            for node, data in G.nodes(data=True):
-                node_lower = str(node).lower()
-                description = data.get("description", "").lower()
-
-                if (
-                    query_lower in node_lower
-                    or node_lower in query_lower
-                    or query_lower in description
-                ):
-
-                    # Calculate similarity
-                    if query_lower == node_lower:
-                        similarity = 1.0
-                    elif query_lower in node_lower or node_lower in query_lower:
-                        similarity = 0.9
-                    else:
-                        similarity = 0.7
-
-                    entities.append(
-                        {
-                            "name": node,
-                            "description": data.get("description", ""),
-                            "type": data.get("entity_type", ""),
-                            "similarity": similarity,
-                        }
-                    )
-
-                if len(entities) >= max_results:
-                    break
-
-            # Get relationships for found entities
-            if entities:
-                entity_names = {e["name"] for e in entities}
-                for source, target, data in G.edges(data=True):
-                    if source in entity_names or target in entity_names:
-                        relationships.append(
-                            {
-                                "source": source,
-                                "target": target,
-                                "description": data.get("description", ""),
-                                "weight": float(data.get("weight", 1.0)),
-                            }
-                        )
-                        if len(relationships) >= max_results * 2:
-                            break
-
-            return {"entities": entities, "relationships": relationships}
-
-        except Exception as e:
-            print(f"Error in GraphRAG query: {e}")
-            return {"entities": [], "relationships": []}
-
-    async def search_dict_n_hop(
-        self, term: str, n_hops: int = 2, max_results: int = 10
-    ) -> Dict[str, Any]:
+    def graph_query(self, term: str, top_n: int = 10) -> Dict[str, Any]:
         """
-        Dictionary-based n-hop search: Find term in dict, then traverse NetworkX graph
+        Graph query with semantic similarity
 
         Args:
-            term: Term to search in dictionary
-            n_hops: Number of hops to traverse
-            max_results: Maximum results per hop
+            term: Term to query
+            top_n: Number of similar terms to return
         """
-        # Step 1: Find in dictionary
-        dict_result = self.dict_lookup(term)
-
-        if not dict_result["found"]:
+        # First check if term exists
+        if term.lower() not in self.graph.terms_definitions:
             return {
-                "error": f"Term '{term}' not found in dictionary",
-                "start_method": "dict",
-                "hops": [],
+                "found": False,
+                "term": term,
+                "message": f"Term '{term}' not found in graph",
             }
 
-        # Step 2: Do n-hop traversal from this term
-        graph_file = os.path.join(
-            self.working_dir, "graph_chunk_entity_relation.graphml"
-        )
-        if not os.path.exists(graph_file):
-            return {
-                "error": "Graph file not found",
-                "dict_result": dict_result,
-                "hops": [],
-            }
+        term_normalized = term.lower()
 
-        try:
-            import networkx as nx
+        # Get semantically similar terms (based on definition similarity)
+        semantic_similar = self.graph.find_semantically_similar(term_normalized, top_n)
 
-            G = nx.read_graphml(graph_file)
+        # Get related terms (terms that appear in definitions)
+        related_terms = self.graph.find_related_by_definition(term_normalized)
 
-            # Find the node in graph (case-insensitive match)
-            term_lower = term.lower()
-            start_node = None
-            for node in G.nodes():
-                if term_lower == str(node).lower():
-                    start_node = node
-                    break
+        return {
+            "found": True,
+            "term": term_normalized,
+            "definition": self.graph.terms_definitions[term_normalized],
+            "semantically_similar": semantic_similar,
+            "related_by_definition": related_terms,
+        }
 
-            if not start_node:
-                return {
-                    "error": f"Term '{term}' found in dict but not in graph",
-                    "dict_result": dict_result,
-                    "hops": [],
-                }
-
-            # Traverse n-hops
-            visited = {start_node}
-            hops_data = [
-                {
-                    "hop": 0,
-                    "entities": [
-                        {
-                            "name": start_node,
-                            "description": G.nodes[start_node].get("description", ""),
-                            "type": G.nodes[start_node].get("entity_type", ""),
-                        }
-                    ],
-                }
-            ]
-
-            current_nodes = [start_node]
-
-            for hop in range(1, n_hops + 1):
-                next_nodes = []
-                hop_entities = []
-                hop_relationships = []
-
-                for node in current_nodes:
-                    neighbors = list(G.neighbors(node))
-
-                    for neighbor in neighbors:
-                        if neighbor not in visited:
-                            visited.add(neighbor)
-                            next_nodes.append(neighbor)
-
-                            hop_entities.append(
-                                {
-                                    "name": neighbor,
-                                    "description": G.nodes[neighbor].get(
-                                        "description", ""
-                                    ),
-                                    "type": G.nodes[neighbor].get("entity_type", ""),
-                                    "from_node": node,
-                                }
-                            )
-
-                            edge_data = G.get_edge_data(node, neighbor)
-                            if edge_data:
-                                hop_relationships.append(
-                                    {
-                                        "source": node,
-                                        "target": neighbor,
-                                        "description": edge_data.get("description", ""),
-                                        "weight": float(edge_data.get("weight", 1.0)),
-                                    }
-                                )
-
-                            if len(hop_entities) >= max_results:
-                                break
-
-                    if len(hop_entities) >= max_results:
-                        break
-
-                hops_data.append(
-                    {
-                        "hop": hop,
-                        "entities": hop_entities,
-                        "relationships": hop_relationships,
-                    }
-                )
-
-                current_nodes = next_nodes
-                if not current_nodes:
-                    break
-
-            return {
-                "start_term": term,
-                "start_method": "dict",
-                "dict_result": dict_result,
-                "n_hops": n_hops,
-                "total_visited": len(visited),
-                "hops": hops_data,
-            }
-
-        except Exception as e:
-            return {"error": str(e), "dict_result": dict_result, "hops": []}
-
-    async def search_graphrag_n_hop(
-        self, query: str, n_hops: int = 2, max_results: int = 10
-    ) -> Dict[str, Any]:
+    def combined_query(self, query: str) -> Dict[str, Any]:
         """
-        GraphRAG-based n-hop search: Use GraphRAG to find top match, then traverse graph
-
-        Args:
-            query: Query to search with GraphRAG
-            n_hops: Number of hops to traverse
-            max_results: Maximum results per hop
+        Combined query: dictionary lookup + graph relationships
         """
-        # Step 1: Use GraphRAG to find top match
-        graphrag_result = await self.query_graphrag_raw(query, max_results=1)
+        # Step 1: Dictionary lookup
+        dict_result = self.dict_lookup(query, show_similar=True)
 
-        if not graphrag_result.get("entities"):
+        # Step 2: If exact match, also get graph data
+        if dict_result.get("exact_match"):
+            graph_result = self.graph_query(dict_result["term"])
             return {
-                "error": f"No entities found for query '{query}'",
-                "start_method": "graphrag",
-                "hops": [],
+                "method": "combined",
+                "dictionary": dict_result,
+                "graph": graph_result,
             }
-
-        # Get top entity
-        top_entity = graphrag_result["entities"][0]
-        start_term = top_entity["name"]
-
-        # Step 2: Do n-hop traversal from this entity
-        graph_file = os.path.join(
-            self.working_dir, "graph_chunk_entity_relation.graphml"
-        )
-        if not os.path.exists(graph_file):
-            return {
-                "error": "Graph file not found",
-                "graphrag_result": graphrag_result,
-                "hops": [],
-            }
-
-        try:
-            import networkx as nx
-
-            G = nx.read_graphml(graph_file)
-
-            # Verify node exists
-            if start_term not in G.nodes():
-                return {
-                    "error": f"Top entity '{start_term}' not found in graph",
-                    "graphrag_result": graphrag_result,
-                    "hops": [],
-                }
-
-            # Traverse n-hops
-            visited = {start_term}
-            hops_data = [
-                {
-                    "hop": 0,
-                    "entities": [
-                        {
-                            "name": start_term,
-                            "description": G.nodes[start_term].get("description", ""),
-                            "type": G.nodes[start_term].get("entity_type", ""),
-                            "similarity": top_entity.get("similarity", 0),
-                        }
-                    ],
-                }
-            ]
-
-            current_nodes = [start_term]
-
-            for hop in range(1, n_hops + 1):
-                next_nodes = []
-                hop_entities = []
-                hop_relationships = []
-
-                for node in current_nodes:
-                    neighbors = list(G.neighbors(node))
-
-                    for neighbor in neighbors:
-                        if neighbor not in visited:
-                            visited.add(neighbor)
-                            next_nodes.append(neighbor)
-
-                            hop_entities.append(
-                                {
-                                    "name": neighbor,
-                                    "description": G.nodes[neighbor].get(
-                                        "description", ""
-                                    ),
-                                    "type": G.nodes[neighbor].get("entity_type", ""),
-                                    "from_node": node,
-                                }
-                            )
-
-                            edge_data = G.get_edge_data(node, neighbor)
-                            if edge_data:
-                                hop_relationships.append(
-                                    {
-                                        "source": node,
-                                        "target": neighbor,
-                                        "description": edge_data.get("description", ""),
-                                        "weight": float(edge_data.get("weight", 1.0)),
-                                    }
-                                )
-
-                            if len(hop_entities) >= max_results:
-                                break
-
-                    if len(hop_entities) >= max_results:
-                        break
-
-                hops_data.append(
-                    {
-                        "hop": hop,
-                        "entities": hop_entities,
-                        "relationships": hop_relationships,
-                    }
-                )
-
-                current_nodes = next_nodes
-                if not current_nodes:
-                    break
-
-            return {
-                "query": query,
-                "start_term": start_term,
-                "start_method": "graphrag",
-                "graphrag_result": graphrag_result,
-                "n_hops": n_hops,
-                "total_visited": len(visited),
-                "hops": hops_data,
-            }
-
-        except Exception as e:
-            return {"error": str(e), "graphrag_result": graphrag_result, "hops": []}
+        else:
+            # No exact match, just return similar terms
+            return {"method": "dictionary_only", "dictionary": dict_result}
 
 
 # ============================================================================
@@ -1111,34 +767,39 @@ async def main():
     """Main execution function"""
     if len(sys.argv) < 2:
         print("Usage:")
-        print("  python script.py build [book_file] - Build GraphRAG from book")
+        print("  python script.py build [book_file] - Build dictionary and graph")
         print(
-            "  python script.py query [term] X- Query X similar terms from built GraphRAG"
+            "  python script.py dict [term] - Dictionary lookup (character similarity)"
         )
         print(
-            "  python script.py dict [query] - Search dictionary for term based on character similarity"
+            "  python script.py graph [term] [top_n] - Graph query (semantic similarity)"
         )
-        print("Example: python script.py build book2.txt")
+        print("  python script.py query [term] - Combined query")
+        print("\nExamples:")
+        print("  python script.py build book.txt")
+        print("  python script.py dict impedance")
+        print("  python script.py graph impedance 10")
+        print("  python script.py query impedance")
         return
 
     command = sys.argv[1].lower()
 
     if command == "build":
         if len(sys.argv) < 3:
-            print("❌ Please specify a book file")
+            print("Please specify a book file")
             return
 
         book_file = sys.argv[2]
         if not os.path.exists(book_file):
-            print(f"❌ Book file not found: {book_file}")
+            print(f"Book file not found: {book_file}")
             return
 
         try:
             with open(book_file, encoding="utf-8") as f:
                 book_text = f.read()
-            print(f"✅ Loaded book: {book_file} ({len(book_text)} characters)")
+            print(f"Loaded book: {book_file} ({len(book_text)} characters)")
         except Exception as e:
-            print(f"❌ Error reading book: {e}")
+            print(f"Error reading book: {e}")
             return
 
         builder = GraphRAGBuilder()
@@ -1146,189 +807,150 @@ async def main():
 
         if success:
             builder.save_results()
-            print("\n✅ GraphRAG build completed successfully!")
-            print(
-                f"   📚 Entity definitions saved to {os.path.join(WORKING_DIR, 'entity_definitions.json')}"
-            )
-            print(
-                f"   📌 Entity contexts saved to {os.path.join(WORKING_DIR, 'entity_contexts.json')}"
-            )
-            print(
-                f"   📊 Statistics saved to {os.path.join(WORKING_DIR, 'processing_stats.json')}"
-            )
-        else:
-            print("\n❌ GraphRAG build failed")
-
-    elif command == "query":
-        # Query mode - return raw GraphRAG entities and relationships
-        if len(sys.argv) < 3:
-            print("Usage: python script.py query <term> [max_results]")
-            print("Example: python script.py query impedance 10")
-            return
-
-        term = sys.argv[2]
-        max_results = 5  # Default
-
-        if len(sys.argv) >= 4:
-            try:
-                max_results = int(sys.argv[3])
-            except ValueError:
-                print(
-                    f"Warning: Invalid max_results '{sys.argv[3]}', using default of 5"
-                )
-
-        print(f"🔍 Querying term: '{term}' (max results: {max_results})")
-
-        # Initialize query system
-        query_system = BookDictionaryQuery()
-
-        # Check if we have data to query
-        if not query_system.vocabulary:
-            print(
-                "❌ No vocabulary loaded. Please build the graph first with: python script.py build [book_file]"
-            )
-            return
-
-        # Try to get raw GraphRAG data
-        print(f"🕸️ Retrieving raw graph data for: '{term}'")
-
-        try:
-            raw_result = await query_system.query_graphrag_raw(
-                term, max_results=max_results
-            )
-
-            print("\n" + "=" * 60)
-            print(f"📖 Raw GraphRAG Results for '{term.upper()}'")
-            print("=" * 60)
-
-            # Display entities
-            if raw_result.get("entities"):
-                print(f"\n🔷 ENTITIES ({len(raw_result['entities'])} found):")
-                for i, entity in enumerate(raw_result["entities"][:max_results], 1):
-                    print(f"\n{i}. {entity['name'].upper()}")
-                    if entity.get("description"):
-                        print(f"   Description: {entity['description']}.")
-                    print(f"   Similarity: {entity.get('similarity', 0):.3f}")
-            else:
-                print("\n🔷 ENTITIES: None found")
-
-            # Display relationships
-            if raw_result.get("relationships"):
-                print(f"\n🔗 RELATIONSHIPS ({len(raw_result['relationships'])} found):")
-                for i, rel in enumerate(raw_result["relationships"][:max_results], 1):
-                    print(f"\n{i}. {rel['source']} → {rel['target']}")
-                    if rel.get("description"):
-                        print(f"   {rel['description']}")
-                    if rel.get("weight"):
-                        print(f"   Weight: {rel['weight']}")
-            else:
-                print("\n🔗 RELATIONSHIPS: None found")
-
-            # Display text chunks
-            if raw_result.get("text_chunks"):
-                print(
-                    f"\n📄 RELEVANT TEXT CHUNKS ({len(raw_result['text_chunks'])} found):"
-                )
-                for i, chunk in enumerate(raw_result["text_chunks"][:max_results], 1):
-                    print(f"\n{i}. Chunk ID: {chunk.get('id', 'unknown')}")
-                    print(f"   {chunk['content'][:300]}...")
-                    if chunk.get("similarity"):
-                        print(f"   Similarity: {chunk['similarity']:.3f}")
-            else:
-                print("\n📄 RELEVANT TEXT CHUNKS: None found")
-
-        except Exception as e:
-            print(f"❌ GraphRAG query failed: {e}")
-            print(f"\nFalling back to dictionary lookup...")
-            result = query_system.define_word(term)
-            print(query_system.format_definition(result))
+            print("\nBuild completed successfully")
 
     elif command == "dict":
-        # Dictionary lookup mode
         if len(sys.argv) < 3:
             print("Usage: python script.py dict <term>")
-            print("Example: python script.py dict impedance")
             return
 
         term = sys.argv[2]
-        print(f"📚 Looking up dictionary term: '{term}'")
-
         query_system = BookDictionaryQuery()
 
-        if not query_system.vocabulary:
-            print("❌ No vocabulary loaded. Please build the graph first")
+        if not query_system.dictionary.dictionary:
+            print(
+                "No dictionary data. Build first with: python script.py build [book_file]"
+            )
             return
 
         result = query_system.dict_lookup(term)
 
-        if result["found"]:
-            print(f"\n📚 Dictionary Lookup:")
-            print(f"   Term: {result['term']}")
-            print(f"   Definition: {result['definition']}")
-            print(f"   Contexts: {result['context_count']}")
+        print("\n" + "=" * 60)
+        print("DICTIONARY LOOKUP (Character Similarity)")
+        print("=" * 60)
 
-            if result["contexts"]:
-                print(f"\n   Sample context:")
-                print(f"   {result['contexts'][0][:200]}...")
+        if result["exact_match"]:
+            print(f"Term: {result['term']}")
+            print(f"Definition: {result['definition']}")
         else:
-            print(f"\n❌ {result['message']}")
+            print(f"Query: {result['query']}")
+            print(f"{result['message']}\n")
 
-    elif command == "search":
-        # Two modes: dict or query
-        if len(sys.argv) < 4:
-            print("Usage:")
-            print("  python script.py search dict <term> [n_hops] [max_results]")
-            print("  python script.py search query <query> [n_hops] [max_results]")
-            print("Examples:")
-            print("  python script.py search dict impedance 2 10")
-            print("  python script.py search query 'electrical properties' 2 10")
+            if result.get("similar_terms"):
+                for i, similar in enumerate(result["similar_terms"], 1):
+                    print(
+                        f"{i}. {similar['term']} (similarity: {similar['similarity']:.2f})"
+                    )
+                    print(f"   {similar['definition']}\n")
+
+    elif command == "graph":
+        if len(sys.argv) < 3:
+            print("Usage: python script.py graph <term> [top_n]")
             return
 
-        search_mode = sys.argv[2].lower()
-        search_term = sys.argv[3]
-        n_hops = int(sys.argv[4]) if len(sys.argv) > 4 else 2
-        max_results = int(sys.argv[5]) if len(sys.argv) > 5 else 10
+        term = sys.argv[2]
+        top_n = int(sys.argv[3]) if len(sys.argv) > 3 else 10
 
         query_system = BookDictionaryQuery()
 
-        if search_mode == "dict":
-            print(f"📚 Dictionary-based {n_hops}-hop search for: '{search_term}'")
-            result = await query_system.search_dict_n_hop(
-                search_term, n_hops, max_results
-            )
-        elif search_mode == "query":
-            print(f"🕸️ GraphRAG-based {n_hops}-hop search for: '{search_term}'")
-            result = await query_system.search_graphrag_n_hop(
-                search_term, n_hops, max_results
-            )
-        else:
-            print(f"❌ Invalid search mode: {search_mode}")
-            print("Use 'dict' or 'query'")
+        if not query_system.graph.terms_definitions:
+            print("No graph data. Build first with: python script.py build [book_file]")
             return
 
-        # Display results
+        result = query_system.graph_query(term, top_n)
+
         print("\n" + "=" * 60)
-        if "error" in result:
-            print(f"❌ Error: {result['error']}")
+        print("GRAPH QUERY (Semantic Similarity)")
+        print("=" * 60)
+
+        if not result["found"]:
+            print(f"{result['message']}")
             return
 
-        print(f"Start method: {result['start_method']}")
-        print(f"Start term: {result['start_term']}")
-        print(f"Total entities visited: {result['total_visited']}")
+        print(f"Term: {result['term']}")
+        print(f"Definition: {result['definition']}\n")
 
-        for hop_data in result["hops"]:
-            print(f"\n🔷 HOP {hop_data['hop']}:")
-            if hop_data.get("entities"):
-                for entity in hop_data["entities"]:
-                    print(f"  • {entity['name']}")
-                    if entity.get("description"):
-                        print(f"    {entity['description'][:100]}...")
+        # Semantically similar terms
+        if result.get("semantically_similar"):
+            print(f"SEMANTICALLY SIMILAR TERMS (based on definition similarity):")
+            print("-" * 60)
+            for i, similar in enumerate(result["semantically_similar"], 1):
+                print(
+                    f"\n{i}. {similar['term']} (similarity: {similar['similarity']:.3f})"
+                )
+                print(f"   {similar['definition']}")
 
-            if hop_data.get("relationships"):
-                print(f"  Relationships: {len(hop_data['relationships'])}")
+        # Related by definition
+        if result.get("related_by_definition"):
+            print(f"\n\nRELATED TERMS (appearing in definitions):")
+            print("-" * 60)
+            for term in result["related_by_definition"]:
+                print(f"  - {term}")
+
+    elif command == "query":
+        if len(sys.argv) < 3:
+            print("Usage: python script.py query <term>")
+            return
+
+        term = sys.argv[2]
+        query_system = BookDictionaryQuery()
+
+        if not query_system.dictionary.dictionary:
+            print("No data. Build first with: python script.py build [book_file]")
+            return
+
+        result = query_system.combined_query(term)
+
+        print("\n" + "=" * 60)
+        print("COMBINED QUERY")
+        print("=" * 60)
+
+        # Dictionary results
+        dict_result = result["dictionary"]
+        print("\nDICTIONARY LOOKUP:")
+        print("-" * 60)
+
+        if dict_result["exact_match"]:
+            print(f"Term: {dict_result['term']}")
+            print(f"Definition: {dict_result['definition']}")
+        else:
+            print(f"Query: {dict_result['query']}")
+            print(f"{dict_result['message']}\n")
+
+            if dict_result.get("similar_terms"):
+                for i, similar in enumerate(dict_result["similar_terms"][:3], 1):
+                    print(
+                        f"{i}. {similar['term']} (similarity: {similar['similarity']:.2f})"
+                    )
+                    print(f"   {similar['definition']}\n")
+
+        # Graph results (if exact match found)
+        if result["method"] == "combined" and result.get("graph"):
+            graph_result = result["graph"]
+
+            if graph_result["found"]:
+                print("\nGRAPH ANALYSIS:")
+                print("-" * 60)
+
+                # Semantically similar
+                if graph_result.get("semantically_similar"):
+                    print("\nSemantically similar terms:")
+                    for i, similar in enumerate(
+                        graph_result["semantically_similar"][:5], 1
+                    ):
+                        print(
+                            f"  {i}. {similar['term']} (similarity: {similar['similarity']:.3f})"
+                        )
+
+                # Related terms
+                if graph_result.get("related_by_definition"):
+                    print("\nRelated terms (in definitions):")
+                    for term in graph_result["related_by_definition"][:10]:
+                        print(f"  - {term}")
 
     else:
-        print(f"❌ Unknown command: {command}")
+        print(f"Unknown command: {command}")
+        print("Use: build, dict, graph, or query")
 
 
 if __name__ == "__main__":

@@ -305,7 +305,6 @@ class JsonToMarkdown:
 
             # Content
             markdown_lines.append(block["content"])
-            markdown_lines.append("\n")
 
         markdown_content = "\n".join(markdown_lines)
 
@@ -328,13 +327,10 @@ class JsonToMarkdown:
         print("\n✓ All formats generated successfully!")
 
 
-# Usage Example
+import sys
+
 if __name__ == "__main__":
-    # Initialize converter
+    name = sys.argv[1] if len(sys.argv) > 1 else ""
 
-    num_suffix = ""
-
-    converter = JsonToMarkdown("extracted_data" + str(num_suffix) + ".json")
-
-    # Option 1: Generate a specific format
-    converter.convert_simple("output_simple" + str(num_suffix) + ".md")
+    converter = JsonToMarkdown(f"{name}.json")
+    converter.convert_simple(f"{name}.md")

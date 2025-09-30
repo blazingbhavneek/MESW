@@ -1,31 +1,233 @@
 {
-  "0": {
-    "report_string": "# Short-Circuiting Community\n\nThe community centers around Short-Circuiting, an event driven by improper winding connections and voltage imbalances. Key entities include Short-Circuiting, Communication, Control, Degradation, Energy-Loss, First-Contact, Insulation, Intelligent-Nature, and Unknown-Inelligence, all interconnected through the phenomenon.\n\n## Short-Circuiting as the primary driver of community issues\n\nShort-Circuiting, linked to improper winding connections and voltage imbalances, directly causes energy loss, degradation of insulation, and potential disruptions in power grids, highlighting its critical role in the community's dynamics.\n\n## Communication challenges arising from unknown intelligence\n\nThe presence of an unknown intelligence writing its own rules introduces complexity in maintaining effective communication, which can hinder coordination among entities tied to Short-Circuiting.\n\n## Insulation failure exacerbating the problem\n\nDegradation of the insulating material due to improper connections increases the risk of short-circuits, further amplifying the impact on infrastructure and safety.\n\n## Unknown intelligence's influence on control mechanisms\n\nThe unknown intelligence's rules and adaptability challenge traditional control paradigms, creating uncertainty and instability in how entities interact within the community.\n\n## Voltage imbalance affecting system stability\n\nVoltage imbalances, a result of improper connections, directly contribute to energy losses and the spread of Short-Circuiting, underscoring the interdependence of these factors.",
+  "3": {
+    "report_string": "# Verdant Oasis Plaza and Unity March\n\nThe community centers around the Verdant Oasis Plaza, which hosts the Unity March. The plaza is linked to the Harmony Assembly, organizing the event, and is reported by Tribune Spotlight. Key entities include the plaza as the central location, the assembly as the organizer, and the march as a significant event.\n\n## Verdant Oasis Plaza as the central location\n\nThe plaza serves as the primary venue for the Unity March, making it a critical element in the community's structure. Its association with the event underscores its centrality and highlights its potential to influence public sentiment.\n\n## Harmony Assembly's role in the community\n\nAs the organizer of the Unity March, the Harmony Assembly plays a pivotal role in shaping the event's dynamics. Their involvement may raise concerns about their objectives or the consequences of the march, depending on the context.\n\n## Unity March as a significant event\n\nThe Unity March itself is a notable event in the community, representing a key action or initiative. Its presence in the plaza indicates its importance in the social or political landscape.\n\n## Tribune Spotlight's role in amplifying the event\n\nThe Tribune Spotlight's reporting on the Unity March contributes to public awareness and can shape perceptions of the event, thereby influencing its impact on the community.\n\n## Plaza's connection to media coverage\n\nThe plaza's proximity to the Tribune Spotlight allows it to attract media attention, which can enhance its visibility and influence over the community's discourse.",
     "report_json": {
-      "title": "Short-Circuiting Community",
-      "summary": "The community centers around Short-Circuiting, an event driven by improper winding connections and voltage imbalances. Key entities include Short-Circuiting, Communication, Control, Degradation, Energy-Loss, First-Contact, Insulation, Intelligent-Nature, and Unknown-Inelligence, all interconnected through the phenomenon.",
+      "title": "Verdant Oasis Plaza and Unity March",
+      "summary": "The community centers around the Verdant Oasis Plaza, which hosts the Unity March. The plaza is linked to the Harmony Assembly, organizing the event, and is reported by Tribune Spotlight. Key entities include the plaza as the central location, the assembly as the organizer, and the march as a significant event.",
       "rating": 5.0,
-      "rating_explanation": "The impact severity rating is moderate due to the potential for cascading failures in infrastructure and communication networks caused by Short-Circuiting.",
+      "rating_explanation": "The impact severity rating is moderate due to the potential for unrest or conflict during the Unity March, though the community's structure supports its prominence.",
       "findings": [
         {
-          "summary": "Short-Circuiting as the primary driver of community issues",
-          "explanation": "Short-Circuiting, linked to improper winding connections and voltage imbalances, directly causes energy loss, degradation of insulation, and potential disruptions in power grids, highlighting its critical role in the community's dynamics."
+          "summary": "Verdant Oasis Plaza as the central location",
+          "explanation": "The plaza serves as the primary venue for the Unity March, making it a critical element in the community's structure. Its association with the event underscores its centrality and highlights its potential to influence public sentiment."
         },
         {
-          "summary": "Communication challenges arising from unknown intelligence",
-          "explanation": "The presence of an unknown intelligence writing its own rules introduces complexity in maintaining effective communication, which can hinder coordination among entities tied to Short-Circuiting."
+          "summary": "Harmony Assembly's role in the community",
+          "explanation": "As the organizer of the Unity March, the Harmony Assembly plays a pivotal role in shaping the event's dynamics. Their involvement may raise concerns about their objectives or the consequences of the march, depending on the context."
         },
         {
-          "summary": "Insulation failure exacerbating the problem",
-          "explanation": "Degradation of the insulating material due to improper connections increases the risk of short-circuits, further amplifying the impact on infrastructure and safety."
+          "summary": "Unity March as a significant event",
+          "explanation": "The Unity March itself is a notable event in the community, representing a key action or initiative. Its presence in the plaza indicates its importance in the social or political landscape."
         },
         {
-          "summary": "Unknown intelligence's influence on control mechanisms",
-          "explanation": "The unknown intelligence's rules and adaptability challenge traditional control paradigms, creating uncertainty and instability in how entities interact within the community."
+          "summary": "Tribune Spotlight's role in amplifying the event",
+          "explanation": "The Tribune Spotlight's reporting on the Unity March contributes to public awareness and can shape perceptions of the event, thereby influencing its impact on the community."
         },
         {
-          "summary": "Voltage imbalance affecting system stability",
-          "explanation": "Voltage imbalances, a result of improper connections, directly contribute to energy losses and the spread of Short-Circuiting, underscoring the interdependence of these factors."
+          "summary": "Plaza's connection to media coverage",
+          "explanation": "The plaza's proximity to the Tribune Spotlight allows it to attract media attention, which can enhance its visibility and influence over the community's discourse."
+        }
+      ]
+    },
+    "level": 1,
+    "title": "Cluster 3",
+    "edges": [
+      [
+        "\"CYCLE TIME\"",
+        "\"EVENT\""
+      ],
+      [
+        "\"EVENT\"",
+        "\"PROCESS\""
+      ],
+      [
+        "\"EVENT\"",
+        "\"OPERATIONS\""
+      ],
+      [
+        "\"EVENT\"",
+        "\"TEAM\""
+      ],
+      [
+        "\"DIMENSION\"",
+        "\"EVENT\""
+      ],
+      [
+        "\"EVENT\"",
+        "\"EXECUTION\""
+      ],
+      [
+        "\"EVENT\"",
+        "\"TIME\""
+      ],
+      [
+        "\"EVENT\"",
+        "\"TIMING\""
+      ],
+      [
+        "\"DELTA\"",
+        "\"EVENT\""
+      ],
+      [
+        "\"EVENT\"",
+        "\"TASK\""
+      ],
+      [
+        "\"EVENT\"",
+        "\"TIP-TO-END\""
+      ],
+      [
+        "\"EVENT\"",
+        "\"LEVEL\""
+      ],
+      [
+        "\"EVENT\"",
+        "\"WAVEFORM\""
+      ],
+      [
+        "\"EVENT\"",
+        "\"STAGE\""
+      ],
+      [
+        "\"EVENT\"",
+        "\"OPERATION\""
+      ],
+      [
+        "\"EVENT\"",
+        "\"[EVENT]\""
+      ],
+      [
+        "\"EVENT\"",
+        "\"EVENT\""
+      ]
+    ],
+    "nodes": [
+      "\"EXECUTION\"",
+      "\"TIMING\"",
+      "\"[EVENT]\"",
+      "\"OPERATIONS\"",
+      "\"CYCLE TIME\"",
+      "\"LEVEL\"",
+      "\"STAGE\"",
+      "\"EVENT\"",
+      "\"TEAM\"",
+      "\"DIMENSION\"",
+      "\"TIME\"",
+      "\"WAVEFORM\"",
+      "\"TASK\"",
+      "\"TIP-TO-END\""
+    ],
+    "chunk_ids": [
+      "chunk-401a62e9310ba0e4ee72ee3292ce388b",
+      "chunk-20d9af01ba6011e799778dbc0a43314e",
+      "chunk-38c6066e5698f1e68e60f3b0002ce8df",
+      "chunk-b6ad9bdcf0e4609d49c052c8b84f7dd9",
+      "chunk-13f4b68d5e238d788c54bb915adb02e0",
+      "chunk-bc13e0c5039aef634af5ae8e225be788",
+      "chunk-40c6921953bdfda2f6950833bf5669d7",
+      "chunk-e0b1d252ed6ce47ee7f132238db391c2",
+      "chunk-02229e9a9822d931fc2f9c6411e5f3be",
+      "chunk-ee7f14cc9425c7a5237d488bb4632a3e",
+      "chunk-d15d909dbe2c4a5acca8bf08fc37fbc4",
+      "chunk-cadac032166c7ee069a687ff99339634",
+      "chunk-8ed2ade1c270b1f4c3017fd90d2e7bd8",
+      "chunk-2f98959639350235ab031c4fc4e64021",
+      "chunk-af0b8fe70b2fb46ad78d4d20ac12b8d6",
+      "chunk-341432ca5a011d4163c183583a645a25",
+      "chunk-d3536be1a977dd1295be5abc0993040f",
+      "chunk-664a6cb92208ec5ced66c5c9e2493f93",
+      "chunk-d382941f75f212f6bb40225963db601c",
+      "chunk-8ec2b9ad7883c2b1824484d19044e9a5",
+      "chunk-2aa4e14bddfc3a128fcd837d971e7863",
+      "chunk-fa97af8493d38ed8f304b793336ffd69",
+      "chunk-81782c9e6c63c8e159753b91c7b452b7",
+      "chunk-41d2dc6fdfaa42ecdc6fda075e9a7993",
+      "chunk-8a75483974cb1ad8b6767227d0531442",
+      "chunk-53737757f69b565fe939f532ae3cb3da",
+      "chunk-560eac57256024d1dd64507888571991",
+      "chunk-12c2eb67f4d75ad619de5a6d150b30ef",
+      "chunk-cc32d8630ada80842d636b82bbb447d6"
+    ],
+    "occurrence": 0.6170212765957447,
+    "sub_communities": []
+  },
+  "4": {
+    "report_string": "# Verdant Oasis Plaza and Unity March\n\nThe community centers around the Verdant Oasis Plaza, which serves as the location for the Unity March. The plaza links to the Harmony Assembly, an organization organizing the march, and the Tribune Spotlight, which reports on the event. Key entities include the plaza itself and the Harmony Assembly.\n\n## Verdant Oasis Plaza as the central location\n\nThe plaza is the primary focal point of the community, serving as the venue for the Unity March. Its association with the event underscores its critical role in the community's structure and highlights its potential to influence public sentiment or conflict.\n\n## Harmony Assembly's role in the community\n\nHarmony Assembly acts as the organizer of the Unity March, reinforcing its significance in the community. The relationship between the assembly and the plaza further emphasizes its active participation in the event's dynamics.\n\n## Unity March as a significant event\n\nThe Unity March is a pivotal event in the community, representing a key activity that draws attention and may spark public interest or concern. Its prominence in the plaza's context indicates its importance in the community's identity.\n\n## Role of Tribune Spotlight\n\nTribune Spotlight reports on the Unity March, highlighting its visibility and potential to attract media coverage. This media presence can shape public perception and influence community discourse.\n\n## Iterative process in the event\n\nThe Unity March involves iterative processes, reflecting its dynamic nature and the complexity of the event. Understanding the iterative aspects aids in assessing the event's feasibility and impact.",
+    "report_json": {
+      "title": "Verdant Oasis Plaza and Unity March",
+      "summary": "The community centers around the Verdant Oasis Plaza, which serves as the location for the Unity March. The plaza links to the Harmony Assembly, an organization organizing the march, and the Tribune Spotlight, which reports on the event. Key entities include the plaza itself and the Harmony Assembly.",
+      "rating": 5.0,
+      "rating_explanation": "The impact severity rating is moderate due to the potential for unrest or conflict during the Unity March, considering the plaza's central role and the involvement of multiple entities.",
+      "findings": [
+        {
+          "summary": "Verdant Oasis Plaza as the central location",
+          "explanation": "The plaza is the primary focal point of the community, serving as the venue for the Unity March. Its association with the event underscores its critical role in the community's structure and highlights its potential to influence public sentiment or conflict."
+        },
+        {
+          "summary": "Harmony Assembly's role in the community",
+          "explanation": "Harmony Assembly acts as the organizer of the Unity March, reinforcing its significance in the community. The relationship between the assembly and the plaza further emphasizes its active participation in the event's dynamics."
+        },
+        {
+          "summary": "Unity March as a significant event",
+          "explanation": "The Unity March is a pivotal event in the community, representing a key activity that draws attention and may spark public interest or concern. Its prominence in the plaza's context indicates its importance in the community's identity."
+        },
+        {
+          "summary": "Role of Tribune Spotlight",
+          "explanation": "Tribune Spotlight reports on the Unity March, highlighting its visibility and potential to attract media coverage. This media presence can shape public perception and influence community discourse."
+        },
+        {
+          "summary": "Iterative process in the event",
+          "explanation": "The Unity March involves iterative processes, reflecting its dynamic nature and the complexity of the event. Understanding the iterative aspects aids in assessing the event's feasibility and impact."
+        }
+      ]
+    },
+    "level": 1,
+    "title": "Cluster 4",
+    "edges": [
+      [
+        "\"EVENT\"",
+        "\"PROCESS\""
+      ],
+      [
+        "\"ITERATIVE\"",
+        "\"PROCESS\""
+      ]
+    ],
+    "nodes": [
+      "\"PROCESS\"",
+      "\"ITERATIVE\""
+    ],
+    "chunk_ids": [
+      "chunk-d75d6ab35375e3702888d29bc6f24d20",
+      "chunk-1a31350745a9ef3b7e02c8aca0d4cdbe",
+      "chunk-af0b8fe70b2fb46ad78d4d20ac12b8d6"
+    ],
+    "occurrence": 0.06382978723404255,
+    "sub_communities": []
+  },
+  "0": {
+    "report_string": "# Verdant Oasis Plaza and Unity March\n\nThe community revolves around the Verdant Oasis Plaza, which is the location of the Unity March. The plaza is linked to the Harmony Assembly, an organization organizing the event, and is reported by Tribune Spotlight. Key entities include the plaza as the central location, the assembly as the organizer, and the march as a significant event.\n\n## Verdant Oasis Plaza as the central location\n\nVerdant Oasis Plaza is the primary venue for the Unity March, making it a critical element in the community's structure. Its association with the event underscores its centrality and highlights its potential to influence public sentiment or conflict.\n\n## Harmony Assembly's role in the community\n\nHarmony Assembly is the organizer of the Unity March, reinforcing its significance in the community. The relationship between the assembly and the plaza further emphasizes its active participation in the event's dynamics.\n\n## Unity March as a significant event\n\nThe Unity March itself is a notable event taking place at Verdant Oasis Plaza, representing a key action or initiative. Its prominence in the plaza's context indicates its importance in the community's identity.\n\n## Role of Tribune Spotlight\n\nTribune Spotlight reports on the Unity March, highlighting its visibility and potential to attract media attention. This media presence can shape public perception and influence community discourse.",
+    "report_json": {
+      "title": "Verdant Oasis Plaza and Unity March",
+      "summary": "The community revolves around the Verdant Oasis Plaza, which is the location of the Unity March. The plaza is linked to the Harmony Assembly, an organization organizing the event, and is reported by Tribune Spotlight. Key entities include the plaza as the central location, the assembly as the organizer, and the march as a significant event.",
+      "rating": 5.0,
+      "rating_explanation": "The impact severity rating is moderate due to the potential for unrest or conflict during the Unity March.",
+      "findings": [
+        {
+          "summary": "Verdant Oasis Plaza as the central location",
+          "explanation": "Verdant Oasis Plaza is the primary venue for the Unity March, making it a critical element in the community's structure. Its association with the event underscores its centrality and highlights its potential to influence public sentiment or conflict."
+        },
+        {
+          "summary": "Harmony Assembly's role in the community",
+          "explanation": "Harmony Assembly is the organizer of the Unity March, reinforcing its significance in the community. The relationship between the assembly and the plaza further emphasizes its active participation in the event's dynamics."
+        },
+        {
+          "summary": "Unity March as a significant event",
+          "explanation": "The Unity March itself is a notable event taking place at Verdant Oasis Plaza, representing a key action or initiative. Its prominence in the plaza's context indicates its importance in the community's identity."
+        },
+        {
+          "summary": "Role of Tribune Spotlight",
+          "explanation": "Tribune Spotlight reports on the Unity March, highlighting its visibility and potential to attract media attention. This media presence can shape public perception and influence community discourse."
         }
       ]
     },
@@ -33,27 +235,83 @@
     "title": "Cluster 0",
     "edges": [
       [
+        "\"SHORT-CIRCUITING\"",
+        "\"VOLTAGE\""
+      ],
+      [
+        "\"EVENT\"",
+        "\"TIME\""
+      ],
+      [
+        "\"DELTA\"",
+        "\"EVENT\""
+      ],
+      [
+        "\"EVENT\"",
+        "\"TIP-TO-END\""
+      ],
+      [
         "\"FIRST-CONTACT\"",
         "\"SHORT-CIRCUITING\""
       ],
       [
-        "\"SHORT-CIRCUITING\"",
-        "\"UNKNOWN-INTELLIGENCE\""
+        "\"EVENT\"",
+        "\"OPERATION\""
       ],
       [
         "\"SHORT-CIRCUITING\"",
         "\"WINDING\""
       ],
       [
-        "\"INSULATION\"",
+        "\"HUMANITY-RESPONSE\"",
         "\"SHORT-CIRCUITING\""
       ],
       [
-        "\"DEGRADATION\"",
+        "\"EVENT\"",
+        "\"[EVENT]\""
+      ],
+      [
+        "\"EVENT\"",
+        "\"EVENT\""
+      ],
+      [
+        "\"SHORT-CIRCUITING\"",
+        "\"UNKNOWN-INTELLIGENCE\""
+      ],
+      [
+        "\"EVENT\"",
+        "\"PROCESS\""
+      ],
+      [
+        "\"SHORT-CIRCUITING\"",
         "\"SHORT-CIRCUITING\""
+      ],
+      [
+        "\"EVENT\"",
+        "\"TEAM\""
+      ],
+      [
+        "\"DIMENSION\"",
+        "\"EVENT\""
+      ],
+      [
+        "\"EVENT\"",
+        "\"EXECUTION\""
+      ],
+      [
+        "\"EVENT\"",
+        "\"TASK\""
+      ],
+      [
+        "\"EVENT\"",
+        "\"STAGE\""
       ],
       [
         "\"CONTROL\"",
+        "\"SHORT-CIRCUITING\""
+      ],
+      [
+        "\"ENERGY-LOSS\"",
         "\"SHORT-CIRCUITING\""
       ],
       [
@@ -61,52 +319,264 @@
         "\"SHORT-CIRCUITING\""
       ],
       [
-        "\"SHORT-CIRCUITING\"",
-        "\"VOLTAGE\""
+        "\"DEGRADATION\"",
+        "\"SHORT-CIRCUITING\""
       ],
       [
         "\"COMMUNICATION\"",
         "\"SHORT-CIRCUITING\""
       ],
       [
-        "\"SHORT-CIRCUITING\"",
+        "\"CYCLE TIME\"",
+        "\"EVENT\""
+      ],
+      [
+        "\"EVENT\"",
+        "\"OPERATIONS\""
+      ],
+      [
+        "\"INVERTERS\"",
+        "\"VOLTAGE\""
+      ],
+      [
+        "\"EVENT\"",
+        "\"TIMING\""
+      ],
+      [
+        "\"INSULATION\"",
         "\"SHORT-CIRCUITING\""
       ],
       [
-        "\"HUMANITY-RESPONSE\"",
-        "\"SHORT-CIRCUITING\""
+        "\"CURRENT\"",
+        "\"VOLTAGE\""
+      ],
+      [
+        "\"EVENT\"",
+        "\"LEVEL\""
+      ],
+      [
+        "\"EVENT\"",
+        "\"WAVEFORM\""
+      ],
+      [
+        "\"ITERATIVE\"",
+        "\"PROCESS\""
       ],
       [
         "\"INTELLIGENT-NATURE\"",
         "\"SHORT-CIRCUITING\""
-      ],
-      [
-        "\"ENERGY-LOSS\"",
-        "\"SHORT-CIRCUITING\""
       ]
     ],
     "nodes": [
-      "\"COMMUNICATION\"",
-      "\"INSULATION\"",
-      "\"HUMANITY-RESPONSE\"",
-      "\"WINDING\"",
-      "\"ENERGY-LOSS\"",
-      "\"FIRST-CONTACT\"",
       "\"INTELLIGENT-NATURE\"",
-      "\"DEGRADATION\"",
-      "\"VOLTAGE\"",
-      "\"CONTROL\"",
+      "\"EXECUTION\"",
+      "\"ITERATIVE\"",
+      "\"PROCESS\"",
+      "\"PERFORMANCE\"",
+      "\"COMMUNICATION\"",
+      "\"HUMANITY-RESPONSE\"",
+      "\"ENERGY-LOSS\"",
+      "\"WAVEFORM\"",
+      "\"TIP-TO-END\"",
+      "\"TIMING\"",
+      "\"EVENT\"",
+      "\"WINDING\"",
+      "\"DIMENSION\"",
       "\"UNKNOWN-INTELLIGENCE\"",
+      "\"VOLTAGE\"",
+      "\"FIRST-CONTACT\"",
+      "\"[EVENT]\"",
+      "\"OPERATIONS\"",
+      "\"CYCLE TIME\"",
       "\"SHORT-CIRCUITING\"",
-      "\"PERFORMANCE\""
+      "\"CONTROL\"",
+      "\"LEVEL\"",
+      "\"INSULATION\"",
+      "\"DEGRADATION\"",
+      "\"STAGE\"",
+      "\"TEAM\"",
+      "\"TIME\"",
+      "\"TASK\""
     ],
     "chunk_ids": [
-      "chunk-ea7f4ab88cbcb576ed23e3aa680693e4",
-      "chunk-32a9d6fe621cb678c6fe907643ca4f2c",
+      "chunk-401a62e9310ba0e4ee72ee3292ce388b",
       "chunk-38c684af8d76e456f32b652ce1afd994",
-      "chunk-e99377aa9d126160e3e21bd977afa8f2"
+      "chunk-34b39d24ed91ffa8d8db9c0a465db564",
+      "chunk-20d9af01ba6011e799778dbc0a43314e",
+      "chunk-32a9d6fe621cb678c6fe907643ca4f2c",
+      "chunk-38c6066e5698f1e68e60f3b0002ce8df",
+      "chunk-b6ad9bdcf0e4609d49c052c8b84f7dd9",
+      "chunk-1d3115547c9397cf30146c2c36342efd",
+      "chunk-13f4b68d5e238d788c54bb915adb02e0",
+      "chunk-bc13e0c5039aef634af5ae8e225be788",
+      "chunk-40c6921953bdfda2f6950833bf5669d7",
+      "chunk-7372cb5e60df131bb99c482c2dcb2f12",
+      "chunk-e0b1d252ed6ce47ee7f132238db391c2",
+      "chunk-9c4f9d8febe435a0ab12fe6373af46ab",
+      "chunk-914fcc5fbca22d7249f3466cb55e2064",
+      "chunk-02229e9a9822d931fc2f9c6411e5f3be",
+      "chunk-5db5888ce16fcfdefc6c3478ce8592b0",
+      "chunk-1a31350745a9ef3b7e02c8aca0d4cdbe",
+      "chunk-ee7f14cc9425c7a5237d488bb4632a3e",
+      "chunk-d15d909dbe2c4a5acca8bf08fc37fbc4",
+      "chunk-cadac032166c7ee069a687ff99339634",
+      "chunk-8ed2ade1c270b1f4c3017fd90d2e7bd8",
+      "chunk-844ff48f78fe5086ff5b1ee1dcbbd09b",
+      "chunk-6f2549ad04e4d858b1091e281850bccb",
+      "chunk-d309a4cae32439dcfe031d887adf69e0",
+      "chunk-2f98959639350235ab031c4fc4e64021",
+      "chunk-af0b8fe70b2fb46ad78d4d20ac12b8d6",
+      "chunk-341432ca5a011d4163c183583a645a25",
+      "chunk-d3536be1a977dd1295be5abc0993040f",
+      "chunk-664a6cb92208ec5ced66c5c9e2493f93",
+      "chunk-d382941f75f212f6bb40225963db601c",
+      "chunk-8ec2b9ad7883c2b1824484d19044e9a5",
+      "chunk-12c2eb67f4d75ad619de5a6d150b30ef",
+      "chunk-2aa4e14bddfc3a128fcd837d971e7863",
+      "chunk-d75d6ab35375e3702888d29bc6f24d20",
+      "chunk-4d582fb8a9240c051a57bfc790a2bd9d",
+      "chunk-fa97af8493d38ed8f304b793336ffd69",
+      "chunk-81782c9e6c63c8e159753b91c7b452b7",
+      "chunk-ea7f4ab88cbcb576ed23e3aa680693e4",
+      "chunk-41d2dc6fdfaa42ecdc6fda075e9a7993",
+      "chunk-356fb9e6ea28e6dcc1c949d6c6e729d0",
+      "chunk-8a75483974cb1ad8b6767227d0531442",
+      "chunk-e99377aa9d126160e3e21bd977afa8f2",
+      "chunk-53737757f69b565fe939f532ae3cb3da",
+      "chunk-560eac57256024d1dd64507888571991",
+      "chunk-07adc1f2140be8b2b02c04037ce60c5f",
+      "chunk-cc32d8630ada80842d636b82bbb447d6"
     ],
     "occurrence": 1.0,
+    "sub_communities": [
+      "3",
+      "4"
+    ]
+  },
+  "2": {
+    "report_string": "# System Operations and Event Management\n\nThe community centers around the operation as an event managed through structured systems. Key entities include the operation, systems, and desired outcomes, connected through relationships defining their roles and interactions.\n\n## Operation as a structured event\n\nThe operation is defined as managing systems through structured efforts, highlighting its critical role in the community. Its relationships with systems emphasize its integration into organizational frameworks.\n\n## Systems as foundational components\n\nSystems are defined as entities emphasizing efficiency, reflecting their core function in maintaining operational stability. Their connections to the operation underscore their interdependence.\n\n## Relationships between entities\n\nThe operation links to systems and desired outcomes, while systems interact with operations to achieve goals. These relationships define the community's dynamic structure.\n\n## Media influence through Tribune Spotlight\n\nTribune Spotlight reports on the operation, indicating public interest and potential scrutiny. This media presence amplifies the community's visibility and relevance.\n\n## Potential for conflict or disruption\n\nIf the operation leads to issues, stakeholders may face challenges. The relationship between the operation and systems underscores the community's sensitivity to external pressures.",
+    "report_json": {
+      "title": "System Operations and Event Management",
+      "summary": "The community centers around the operation as an event managed through structured systems. Key entities include the operation, systems, and desired outcomes, connected through relationships defining their roles and interactions.",
+      "rating": 5.0,
+      "rating_explanation": "The impact severity rating is moderate due to the operational complexity and potential for stakeholder engagement, though risks of mismanagement or unintended consequences remain.",
+      "findings": [
+        {
+          "summary": "Operation as a structured event",
+          "explanation": "The operation is defined as managing systems through structured efforts, highlighting its critical role in the community. Its relationships with systems emphasize its integration into organizational frameworks."
+        },
+        {
+          "summary": "Systems as foundational components",
+          "explanation": "Systems are defined as entities emphasizing efficiency, reflecting their core function in maintaining operational stability. Their connections to the operation underscore their interdependence."
+        },
+        {
+          "summary": "Relationships between entities",
+          "explanation": "The operation links to systems and desired outcomes, while systems interact with operations to achieve goals. These relationships define the community's dynamic structure."
+        },
+        {
+          "summary": "Media influence through Tribune Spotlight",
+          "explanation": "Tribune Spotlight reports on the operation, indicating public interest and potential scrutiny. This media presence amplifies the community's visibility and relevance."
+        },
+        {
+          "summary": "Potential for conflict or disruption",
+          "explanation": "If the operation leads to issues, stakeholders may face challenges. The relationship between the operation and systems underscores the community's sensitivity to external pressures."
+        }
+      ]
+    },
+    "level": 0,
+    "title": "Cluster 2",
+    "edges": [
+      [
+        "\"OPERATION\"",
+        "\"OUTCOMES\""
+      ],
+      [
+        "\"DESIRED_OUTCOMES\"",
+        "\"OPERATION\""
+      ],
+      [
+        "\"EFFICIENTLY\"",
+        "\"OPERATION\""
+      ],
+      [
+        "\"EVENT\"",
+        "\"OPERATION\""
+      ],
+      [
+        "\"OPERATION\"",
+        "\"SYSTEMS\""
+      ]
+    ],
+    "nodes": [
+      "\"OPERATION\"",
+      "\"EFFICIENTLY\"",
+      "\"DESIRED_OUTCOMES\"",
+      "\"SYSTEMS\"",
+      "\"OUTCOMES\""
+    ],
+    "chunk_ids": [
+      "chunk-1970affe578bf67b9c237e56075d980f",
+      "chunk-89e87ddc79898b99679f9e1ee2f7d6cc",
+      "chunk-af0b8fe70b2fb46ad78d4d20ac12b8d6",
+      "chunk-faa4f2be64f9ea12a4660660bb0df48d",
+      "chunk-bad6aa94b430d2c9eed2cda5bd657a69",
+      "chunk-16ecc1e32970275194c500bfd4c5a0c9",
+      "chunk-b63f1414102d908bc3d67f6ce1ba6a67",
+      "chunk-bf401de561dc9a16919f6362a75f95d6",
+      "chunk-d382941f75f212f6bb40225963db601c",
+      "chunk-e9da4c61a0b3b0aff37e220c50bf7ecd",
+      "chunk-7ab2ec28ce52d300785106a190f4822d"
+    ],
+    "occurrence": 0.23404255319148937,
+    "sub_communities": []
+  },
+  "1": {
+    "report_string": "# Community of Power Connections\n\nThe community consists of two primary entities: DELTA, representing a connection between three phases, and THREE-PHASE POWER CONNECTIONS, detailing the balance of load distribution through power networks. These entities are interconnected via relationships indicating their functional roles in energy management.\n\n## DELTA as a critical node in power systems\n\nDELTA serves as a key entity in balancing three-phase loads, highlighting its essential role in maintaining stable power distribution. Its presence underscores its significance in the community's infrastructure.\n\n## Three-phase connections as foundational components\n\nTHREE-PHASE POWER CONNECTIONS represent the core elements of the community's technological framework, emphasizing their critical function in ensuring reliable energy supply.\n\n## Relationships between entities define the community's structure\n\nThe interplay between DELTA and THREE-PHASE POWER CONNECTIONS illustrates how these entities collaborate to achieve shared goals, reflecting the community's cohesive design.\n\n## Impact of power network stability\n\nThe community's reliance on balanced power systems indicates a strong foundation for sustainable operations, though no direct impact assessments are provided.",
+    "report_json": {
+      "title": "Community of Power Connections",
+      "summary": "The community consists of two primary entities: DELTA, representing a connection between three phases, and THREE-PHASE POWER CONNECTIONS, detailing the balance of load distribution through power networks. These entities are interconnected via relationships indicating their functional roles in energy management.",
+      "rating": 0.0,
+      "rating_explanation": "No specific information is provided regarding the community's impact or potential risks, resulting in an impact severity rating of 0.",
+      "findings": [
+        {
+          "summary": "DELTA as a critical node in power systems",
+          "explanation": "DELTA serves as a key entity in balancing three-phase loads, highlighting its essential role in maintaining stable power distribution. Its presence underscores its significance in the community's infrastructure."
+        },
+        {
+          "summary": "Three-phase connections as foundational components",
+          "explanation": "THREE-PHASE POWER CONNECTIONS represent the core elements of the community's technological framework, emphasizing their critical function in ensuring reliable energy supply."
+        },
+        {
+          "summary": "Relationships between entities define the community's structure",
+          "explanation": "The interplay between DELTA and THREE-PHASE POWER CONNECTIONS illustrates how these entities collaborate to achieve shared goals, reflecting the community's cohesive design."
+        },
+        {
+          "summary": "Impact of power network stability",
+          "explanation": "The community's reliance on balanced power systems indicates a strong foundation for sustainable operations, though no direct impact assessments are provided."
+        }
+      ]
+    },
+    "level": 0,
+    "title": "Cluster 1",
+    "edges": [
+      [
+        "\"DELTA\"",
+        "\"THREE-PHASE POWER CONNECTIONS\""
+      ],
+      [
+        "\"DELTA\"",
+        "\"EVENT\""
+      ]
+    ],
+    "nodes": [
+      "\"DELTA\"",
+      "\"THREE-PHASE POWER CONNECTIONS\""
+    ],
+    "chunk_ids": [
+      "chunk-97998b6aecba312ee7b4db8dc83fa30b",
+      "chunk-8ea05ca72bb5858c881be45a75aa5287"
+    ],
+    "occurrence": 0.0425531914893617,
     "sub_communities": []
   }
 }

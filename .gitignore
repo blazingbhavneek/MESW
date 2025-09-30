@@ -12,3 +12,5 @@ wheels/
 *graphrag_cache/
 book2.txt
 **.gguf
+*pyproject.toml
+*uv.lock

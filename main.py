@@ -681,22 +681,19 @@ class GraphRAGBuilder:
 
 
 class BookDictionaryQuery:
-    """Enhanced query interface for the chunk-based dictionary"""
+    """Query interface for dictionary and GraphRAG"""
 
     def __init__(self, working_dir: str = WORKING_DIR):
         self.working_dir = working_dir
         self.vocabulary = {}
-        self.chunk_data = {}
-        self.chunk_results = []
-        self.processing_stats = {}
         self.graph_rag = None
         self.load_all_data()
 
     def load_all_data(self):
-        """Load all saved data from the comprehensive build"""
+        """Load definitions and contexts"""
         print(f"📚 Loading dictionary data from {self.working_dir}...")
 
-        # Load definitions (main vocabulary) - using entity_definitions.json
+        # Load definitions
         definitions_path = os.path.join(self.working_dir, "entity_definitions.json")
         if os.path.exists(definitions_path):
             with open(definitions_path, "r", encoding="utf-8") as f:
@@ -706,7 +703,7 @@ class BookDictionaryQuery:
             definitions = {}
             print("⚠️ No definitions file found")
 
-        # Load terms with contexts - using entity_contexts.json
+        # Load contexts
         contexts_path = os.path.join(self.working_dir, "entity_contexts.json")
         if os.path.exists(contexts_path):
             with open(contexts_path, "r", encoding="utf-8") as f:
@@ -716,45 +713,19 @@ class BookDictionaryQuery:
             contexts = {}
             print("⚠️ No contexts file found")
 
-        # Load processing stats
-        stats_path = os.path.join(self.working_dir, "processing_stats.json")
-        if os.path.exists(stats_path):
-            with open(stats_path, "r", encoding="utf-8") as f:
-                self.processing_stats = json.load(f)
-            print(f"✅ Loaded processing statistics")
-
-        # Create vocabulary structure from loaded data
+        # Build vocabulary
         self.vocabulary = {}
         for term, definition in definitions.items():
-            # Get contexts for this term
-            term_contexts = contexts.get(term, []) if isinstance(contexts, dict) else []
-
-            # Find which chunks contain this term (if we have chunk results)
-            found_in_chunks = []
-            if hasattr(self, "chunk_results") and self.chunk_results:
-                for result in self.chunk_results:
-                    if term in result.get("terms", []):
-                        found_in_chunks.append(result["chunk_id"])
-
+            term_contexts = contexts.get(term, [])
             self.vocabulary[term] = {
                 "definition": definition,
                 "contexts": term_contexts,
-                "found_in_chunks": found_in_chunks,
-                "has_definition": True,
             }
 
         print(f"📊 Dictionary ready: {len(self.vocabulary)} terms")
 
-    def _find_term_chunks(self, term: str) -> List[int]:
-        """Find which chunks contain this term"""
-        chunks_with_term = []
-        for result in self.chunk_results:
-            if term in result.get("terms", []):
-                chunks_with_term.append(result["chunk_id"])
-        return chunks_with_term
-
     def load_graphrag(self) -> bool:
-        """Try to load GraphRAG if available"""
+        """Load GraphRAG if available"""
         try:
             self.graph_rag = GraphRAG(
                 working_dir=self.working_dir,
@@ -768,670 +739,369 @@ class BookDictionaryQuery:
             print(f"⚠️ GraphRAG not available: {e}")
             return False
 
-    def suggest_words(self, query: str, n: int = 5) -> List[str]:
-        """Suggest similar words based on query"""
-        query = query.lower().strip()
-        vocab_words = list(self.vocabulary.keys())
-
-        if query in vocab_words:
-            return [query]
-
-        from difflib import get_close_matches
-
-        matches = get_close_matches(query, vocab_words, n=n, cutoff=0.6)
-
-        # Prefix matching
-        prefix_matches = [w for w in vocab_words if w.startswith(query)][:n]
-
-        # Substring matching
-        substring_matches = [w for w in vocab_words if query in w.lower()][:n]
-
-        # Combine and deduplicate
-        combined = matches + [w for w in prefix_matches if w not in matches]
-        combined = combined + [w for w in substring_matches if w not in combined]
-
-        return combined[:n]
-
-    def define_word(self, word: str) -> Dict[str, Any]:
-        """Get comprehensive definition for a word"""
-        word_lower = word.lower().strip()
-        start_time = time.time()
-
-        if word_lower in self.vocabulary:
-            vocab_entry = self.vocabulary[word_lower]
-
-            result = {
-                "word": word,
-                "definition": vocab_entry["definition"],
-                "found": True,
-                "contexts": vocab_entry["contexts"],
-                "found_in_chunks": vocab_entry["found_in_chunks"],
-                "chunk_count": len(vocab_entry["found_in_chunks"]),
-                "context_count": len(vocab_entry["contexts"]),
-                "has_definition": vocab_entry["has_definition"],
-                "query_time": time.time() - start_time,
-                "suggestions": [],
-            }
-        else:
-            suggestions = self.suggest_words(word)
-            result = {
-                "word": word,
-                "definition": None,
-                "found": False,
-                "contexts": [],
-                "found_in_chunks": [],
-                "chunk_count": 0,
-                "context_count": 0,
-                "has_definition": False,
-                "query_time": time.time() - start_time,
-                "suggestions": suggestions,
-            }
-
-        return result
-
-    async def query_graphrag(self, query: str, mode: str = "local") -> str:
-        """Query using GraphRAG if available"""
-        if not self.graph_rag:
-            if not self.load_graphrag():
-                return "GraphRAG not available"
-
-        try:
-            result = await self.graph_rag.aquery(
-                query, param=QueryParam(mode=mode, top_k=5)
-            )
-            return result
-        except Exception as e:
-            return f"GraphRAG query failed: {e}"
-
-    def search_in_chunks(
-        self, query: str, max_results: int = 10
-    ) -> List[Dict[str, Any]]:
-        """Search for terms or phrases across chunks"""
-        query_lower = query.lower().strip()
-        results = []
-
-        for result in self.chunk_results:
-            chunk_id = result["chunk_id"]
-
-            # Check if query matches any terms in this chunk
-            matching_terms = []
-            for term in result.get("terms", []):
-                if query_lower in term.lower() or term.lower() in query_lower:
-                    matching_terms.append(term)
-
-            # Check definitions for matches
-            matching_definitions = []
-            for term, definition in result.get("definitions", {}).items():
-                if query_lower in definition.lower():
-                    matching_definitions.append(
-                        {"term": term, "definition": definition}
-                    )
-
-            if matching_terms or matching_definitions:
-                chunk_info = None
-                if self.chunk_data and "chunks" in self.chunk_data:
-                    chunk_info = next(
-                        (c for c in self.chunk_data["chunks"] if c["id"] == chunk_id),
-                        None,
-                    )
-
-                results.append(
-                    {
-                        "chunk_id": chunk_id,
-                        "matching_terms": matching_terms,
-                        "matching_definitions": matching_definitions,
-                        "chunk_info": chunk_info,
-                        "relevance_score": len(matching_terms)
-                        + len(matching_definitions),
-                    }
-                )
-
-        # Sort by relevance
-        results.sort(key=lambda x: x["relevance_score"], reverse=True)
-        return results[:max_results]
-
-    def get_term_distribution(self, term: str) -> Dict[str, Any]:
-        """Get distribution of term across chunks"""
-        word_lower = term.lower().strip()
-
-        if word_lower not in self.vocabulary:
-            return {"error": "Term not found"}
-
-        vocab_entry = self.vocabulary[word_lower]
-        chunk_distribution = []
-
-        for chunk_id in vocab_entry["found_in_chunks"]:
-            chunk_result = next(
-                (r for r in self.chunk_results if r["chunk_id"] == chunk_id), None
-            )
-            if chunk_result:
-                chunk_info = None
-                if self.chunk_data and "chunks" in self.chunk_data:
-                    chunk_info = next(
-                        (c for c in self.chunk_data["chunks"] if c["id"] == chunk_id),
-                        None,
-                    )
-
-                chunk_distribution.append(
-                    {
-                        "chunk_id": chunk_id,
-                        "chunk_info": chunk_info,
-                        "has_definition": term in chunk_result.get("definitions", {}),
-                        "definition": chunk_result.get("definitions", {}).get(term, ""),
-                    }
-                )
-
-        return {
-            "term": term,
-            "total_chunks": len(vocab_entry["found_in_chunks"]),
-            "distribution": chunk_distribution,
-            "contexts": vocab_entry["contexts"],
-        }
-
-    def format_definition(self, result: Dict[str, Any]) -> str:
-        """Format definition result for display"""
-        word = result["word"]
-        definition = result["definition"]
-
-        output = f"📖 **{word.upper()}**"
-        if result["found"]:
-            output += f" (found in {result['chunk_count']} chunks, {result['context_count']} contexts)"
-
-        output += "\n" + "=" * (len(word) + 20) + "\n"
-
-        if definition:
-            output += f"💡 **Definition:** {definition}\n"
-
-            if result["contexts"]:
-                output += f"\n📚 **Contexts:**\n"
-                for i, context in enumerate(result["contexts"][:3], 1):
-                    output += f"  {i}. {context[:200]}...\n"
-
-            if result["found_in_chunks"]:
-                chunks_str = ", ".join(map(str, result["found_in_chunks"][:10]))
-                if len(result["found_in_chunks"]) > 10:
-                    chunks_str += f" and {len(result['found_in_chunks']) - 10} more"
-                output += f"\n🧩 **Found in chunks:** {chunks_str}\n"
-
-        else:
-            output += f"❌ No definition found for '{word}'\n"
-            if result["suggestions"]:
-                output += (
-                    f"\n💡 **Similar words:** {', '.join(result['suggestions'][:5])}\n"
-                )
-
-        output += f"\n⏱️ Query time: {result['query_time']:.3f}s"
-        return output
-
-    def get_stats(self) -> Dict[str, Any]:
-        """Get comprehensive statistics"""
-        stats = {
-            "total_terms": len(self.vocabulary),
-            "total_chunks": self.chunk_data.get("total_chunks", 0),
-            "chunks_with_terms": len(
-                [r for r in self.chunk_results if r.get("terms_found", 0) > 0]
-            ),
-            "chunks_with_definitions": len(
-                [r for r in self.chunk_results if r.get("definitions_generated", 0) > 0]
-            ),
-            "average_terms_per_chunk": 0,
-            "terms_with_multiple_chunks": 0,
-            "processing_strategy": "unknown",
-        }
-
-        if self.chunk_results:
-            total_terms = sum(r.get("terms_found", 0) for r in self.chunk_results)
-            stats["average_terms_per_chunk"] = total_terms / len(self.chunk_results)
-
-        # Count terms that appear in multiple chunks
-        for term_info in self.vocabulary.values():
-            if len(term_info.get("found_in_chunks", [])) > 1:
-                stats["terms_with_multiple_chunks"] += 1
-
-        if self.processing_stats:
-            stats["processing_strategy"] = self.processing_stats.get(
-                "processing_stats", {}
-            ).get("strategy", "unknown")
-
-        return stats
-
-    async def interactive_query(self):
-        """Enhanced interactive query interface with the new search capabilities"""
-        print(
-            f"""
-    📚 Enhanced Book Dictionary Interface
-    {"="*60}
-    📊 Dictionary: {len(self.vocabulary)} terms from {self.chunk_data.get('total_chunks', 0)} chunks
-    📈 Coverage: {len([r for r in self.chunk_results if r.get('terms_found', 0) > 0])}/{self.chunk_data.get('total_chunks', 0)} chunks have terms
-    🔗 Multi-chunk terms: {len([t for t in self.vocabulary.values() if len(t.get('found_in_chunks', [])) > 1])}
-
-    Commands:
-    <word>           - Look up word definition
-    search <query>   - Search across chunks
-    sim <term> [hops] - Find similar terms (default hops=1)
-    dist <word>      - Show word distribution across chunks
-    graphrag <query> - Query using GraphRAG (if available)
-    vocab            - Show vocabulary sample
-    stats            - Show detailed statistics
-    chunks           - Show chunk information
-    quit/exit        - Exit
-    {"="*60}"""
-        )
-
-        has_graphrag = self.load_graphrag()
-
-        while True:
-            try:
-                user_input = input("\n🔍 Enter command: ").strip()
-                if user_input.lower() in ["quit", "exit", "q"]:
-                    print("👋 Goodbye!")
-                    break
-                if not user_input:
-                    continue
-
-                parts = user_input.split(" ", 2)
-                command = parts[0].lower()
-                query = parts[1] if len(parts) > 1 else ""
-                params = parts[2] if len(parts) > 2 else ""
-
-                if command == "sim":
-                    hops = 1
-                    if params:
-                        try:
-                            hops = int(params)
-                        except:
-                            pass
-
-                    if not query:
-                        print("❌ Please provide a term")
-                        continue
-
-                    result = self.enhanced_query(query, hops=hops)
-                    print(self.format_enhanced_query_result(result))
-
-                elif command == "graphrag":
-                    if not has_graphrag:
-                        print("❌ GraphRAG not available")
-                        continue
-                    if not query:
-                        print("❌ Please provide a GraphRAG query")
-                        continue
-                    print(f"🕸️ Querying GraphRAG: '{query}'...")
-                    result = await self.query_graphrag(query)
-                    print(f"\n💡 **GraphRAG Response:**\n{result}")
-
-                elif command == "search":
-                    if not query:
-                        print("❌ Please provide a search query")
-                        continue
-                    search_results = self.search_in_chunks(query)
-                    print(
-                        f"\n🔍 **SEARCH RESULTS for '{query}'** ({len(search_results)} matches)"
-                    )
-                    for result in search_results:
-                        chunk_id = result["chunk_id"]
-                        print(
-                            f"\n📄 **Chunk {chunk_id}** (relevance: {result['relevance_score']})"
-                        )
-                        if result["matching_terms"]:
-                            print(f"  🏷️ Terms: {', '.join(result['matching_terms'])}")
-                        if result["matching_definitions"]:
-                            for def_match in result["matching_definitions"][:2]:
-                                print(
-                                    f"  💡 {def_match['term']}: {def_match['definition'][:100]}..."
-                                )
-
-                elif command == "dist":
-                    if not query:
-                        print("❌ Please provide a term")
-                        continue
-                    distribution = self.get_term_distribution(query)
-                    if "error" in distribution:
-                        print(f"❌ {distribution['error']}")
-                    else:
-                        print(f"\n📊 **DISTRIBUTION of '{distribution['term']}'**")
-                        print(f"Found in {distribution['total_chunks']} chunks:")
-                        for chunk_dist in distribution["distribution"][:10]:
-                            chunk_id = chunk_dist["chunk_id"]
-                            has_def = "✓" if chunk_dist["has_definition"] else "○"
-                            print(f"  Chunk {chunk_id}: {has_def}")
-
-                elif command == "vocab":
-                    vocab_sample = sorted(list(self.vocabulary.keys()))[:20]
-                    print(
-                        f"\n📝 **VOCABULARY SAMPLE** (first 20 of {len(self.vocabulary)}):"
-                    )
-                    for i, word in enumerate(vocab_sample, 1):
-                        info = self.vocabulary[word]
-                        chunks = len(info["found_in_chunks"])
-                        contexts = len(info["contexts"])
-                        print(
-                            f"  {i:2d}. {word} (chunks: {chunks}, contexts: {contexts})"
-                        )
-
-                elif command == "stats":
-                    detailed_stats = self.get_stats()
-                    print(f"\n📊 **DETAILED STATISTICS**")
-                    for key, value in detailed_stats.items():
-                        formatted_key = key.replace("_", " ").title()
-                        if isinstance(value, float):
-                            print(f"  {formatted_key}: {value:.2f}")
-                        else:
-                            print(f"  {formatted_key}: {value}")
-
-                elif command == "chunks":
-                    if self.chunk_data and "chunks" in self.chunk_data:
-                        print(
-                            f"\n🧩 **CHUNK INFORMATION** ({self.chunk_data['total_chunks']} total)"
-                        )
-                        for chunk in self.chunk_data["chunks"][:10]:
-                            chunk_result = next(
-                                (
-                                    r
-                                    for r in self.chunk_results
-                                    if r["chunk_id"] == chunk["id"]
-                                ),
-                                {},
-                            )
-                            terms_count = chunk_result.get("terms_found", 0)
-                            defs_count = chunk_result.get("definitions_generated", 0)
-                            print(
-                                f"  Chunk {chunk['id']}: {terms_count} terms, {defs_count} definitions"
-                            )
-                            print(f"    Preview: {chunk.get('preview', 'No preview')}")
-                        if len(self.chunk_data["chunks"]) > 10:
-                            print(
-                                f"  ... and {len(self.chunk_data['chunks']) - 10} more chunks"
-                            )
-                    else:
-                        print("❌ No chunk information available")
-
-                else:
-                    # Default: word lookup
-                    word_to_lookup = user_input
-                    result = self.enhanced_query(word_to_lookup)
-                    print(self.format_enhanced_query_result(result))
-
-            except KeyboardInterrupt:
-                print("\n👋 Goodbye!")
-                break
-            except Exception as e:
-                print(f"❌ Error: {e}")
-
-    def find_similar_terms(
-        self, term: str, hops: int = 1, max_terms: int = 10
-    ) -> List[Dict[str, Any]]:
-        """
-        Find similar terms in the graph up to the specified number of hops.
-
-        Args:
-            term: The term to search from
-            hops: Number of hops to traverse in the graph
-            max_terms: Maximum number of terms to return
-
-        Returns:
-            List of similar terms with their definitions and hop distance
-        """
-        if not self.vocabulary:
-            return []
-
+    def dict_lookup(self, term: str) -> Dict[str, Any]:
+        """Dictionary lookup for a term"""
         term_lower = term.lower().strip()
 
-        # If the term exists, start from it
         if term_lower in self.vocabulary:
-            seed_terms = [term_lower]
-        else:
-            # If not found, use suggestions as seed
-            seed_terms = self.suggest_words(term, n=1)
-            if not seed_terms:
-                return []
-
-        # Initialize the search
-        visited = set()
-        results = []
-        current_terms = seed_terms
-        current_hop = 0
-
-        while current_terms and current_hop <= hops:
-            next_terms = []
-
-            for t in current_terms:
-                if t in visited:
-                    continue
-
-                visited.add(t)
-
-                # Add to results with hop information
-                if t in self.vocabulary:
-                    results.append(
-                        {
-                            "term": t,
-                            "definition": self.vocabulary[t]["definition"],
-                            "hop": current_hop,
-                            "is_original": t == term_lower,
-                            "context_count": len(self.vocabulary[t]["contexts"]),
-                        }
-                    )
-
-                # Find neighbors at this level if not at max hops
-                if current_hop < hops:
-                    neighbors = self._find_similar_terms(t, threshold=0.5)
-                    for neighbor in neighbors:
-                        if neighbor not in visited and neighbor not in next_terms:
-                            next_terms.append(neighbor)
-
-            current_terms = next_terms
-            current_hop += 1
-
-        # Sort by hop distance and context count
-        results.sort(key=lambda x: (x["hop"], -x["context_count"]))
-
-        # Return only up to max_terms
-        return results[:max_terms]
-
-    def _find_similar_terms(self, term: str, threshold: float = 0.6) -> List[str]:
-        """Find similar terms in the vocabulary"""
-        similar_terms = []
-        for t in self.vocabulary.keys():
-            if t == term:
-                continue
-            similarity = SequenceMatcher(None, term.lower(), t.lower()).ratio()
-            if similarity >= threshold:
-                similar_terms.append(t)
-
-        # Sort by similarity
-        similar_terms.sort(
-            key=lambda x: SequenceMatcher(None, term.lower(), x.lower()).ratio(),
-            reverse=True,
-        )
-        return similar_terms[:5]  # Return top 5 similar terms
-
-    def enhanced_query(self, term: str, hops: int = 1) -> Dict[str, Any]:
-        """
-        Enhanced query that handles both exact matches and similar terms.
-
-        Args:
-            term: The term to search for
-            hops: Number of hops for similar term search
-
-        Returns:
-            Dictionary with query results
-        """
-        term_lower = term.lower().strip()
-
-        # Check if term exists exactly
-        if term_lower in self.vocabulary:
-            definition = self.vocabulary[term_lower]["definition"]
-            contexts = self.vocabulary[term_lower]["contexts"][:3]
+            vocab_entry = self.vocabulary[term_lower]
             return {
                 "found": True,
                 "term": term_lower,
-                "definition": definition,
-                "contexts": contexts,
-                "similar_terms": self.find_similar_terms(term, hops=hops, max_terms=3),
-                "hops": hops,
+                "definition": vocab_entry["definition"],
+                "contexts": vocab_entry["contexts"][:3],
+                "context_count": len(vocab_entry["contexts"]),
             }
-
-        # Term not found, suggest similar terms
-        similar_terms = self.find_similar_terms(term, hops=hops, max_terms=3)
-
-        return {
-            "found": False,
-            "term": term_lower,
-            "message": f"Term '{term}' not found in the dictionary. Here are similar terms:",
-            "similar_terms": similar_terms,
-            "hops": hops,
-        }
-
-    def format_enhanced_query_result(self, result: Dict[str, Any]) -> str:
-        """Format enhanced query results for display"""
-        output = ""
-
-        if result["found"]:
-            output += f"📖 **{result['term'].upper()}**\n"
-            output += "=" * (len(result["term"]) + 20) + "\n"
-            output += f"💡 **Definition:** {result['definition']}\n"
-
-            if result["contexts"]:
-                output += "\n📚 **Contexts:**\n"
-                for i, context in enumerate(result["contexts"], 1):
-                    output += f"  {i}. {context[:200]}...\n"
-
-            output += f"\n🔗 Found in {len(self.vocabulary[result['term']]['found_in_chunks'])} chunks"
         else:
-            output += f"❌ **{result['term'].upper()}**\n"
-            output += "=" * (len(result["term"]) + 20) + "\n"
-            output += f"{result['message']}\n"
-
-        if result["similar_terms"]:
-            output += f"\n🔍 **SIMILAR TERMS (up to {result['hops']} hop{'s' if result['hops'] > 1 else ''}):**\n"
-            for i, term_info in enumerate(result["similar_terms"], 1):
-                hop_label = (
-                    "Original"
-                    if term_info["is_original"]
-                    else f"Hop {term_info['hop']}"
-                )
-                output += f"\n{i}. **{term_info['term'].upper()}** [{hop_label}]"
-                output += f" (contexts: {term_info['context_count']})"
-                if "definition" in term_info:
-                    output += f"\n   💡 {term_info['definition'][:150]}..."
-
-        return output
+            return {
+                "found": False,
+                "term": term_lower,
+                "message": f"Term '{term}' not found in dictionary",
+            }
 
     async def query_graphrag_raw(
         self, query: str, max_results: int = 5
     ) -> Dict[str, Any]:
-        """Query GraphRAG and return raw entities, relationships, and text chunks"""
+        """Query GraphRAG and return raw entities and relationships"""
         if not self.graph_rag:
             if not self.load_graphrag():
-                return {"entities": [], "relationships": [], "text_chunks": []}
+                return {"entities": [], "relationships": []}
 
         try:
-            # Get embedding for the query
-            query_embedding = await local_embedding([query])
-            query_vec = query_embedding[0]
-
-            entities = []
-            relationships = []
-            text_chunks = []
-
-            # Access the graph directly from file
+            # Access the graph directly
             graph_file = os.path.join(
                 self.working_dir, "graph_chunk_entity_relation.graphml"
             )
-            if os.path.exists(graph_file):
-                import networkx as nx
+            if not os.path.exists(graph_file):
+                return {"entities": [], "relationships": []}
 
-                G = nx.read_graphml(graph_file)
+            import networkx as nx
 
-                # Search for nodes matching the query
-                query_lower = query.lower()
-                for node, data in G.nodes(data=True):
-                    node_lower = str(node).lower()
-                    # Check if query matches node name or description
-                    description = data.get("description", "").lower()
-                    entity_type = data.get("entity_type", "")
+            G = nx.read_graphml(graph_file)
 
-                    if (
-                        query_lower in node_lower
-                        or node_lower in query_lower
-                        or query_lower in description
-                    ):
+            entities = []
+            relationships = []
 
-                        # Calculate similarity score
-                        if query_lower == node_lower:
-                            similarity = 1.0
-                        elif query_lower in node_lower or node_lower in query_lower:
-                            similarity = 0.9
-                        else:
-                            similarity = 0.7
+            # Search for matching nodes
+            query_lower = query.lower()
+            for node, data in G.nodes(data=True):
+                node_lower = str(node).lower()
+                description = data.get("description", "").lower()
 
-                        entities.append(
+                if (
+                    query_lower in node_lower
+                    or node_lower in query_lower
+                    or query_lower in description
+                ):
+
+                    # Calculate similarity
+                    if query_lower == node_lower:
+                        similarity = 1.0
+                    elif query_lower in node_lower or node_lower in query_lower:
+                        similarity = 0.9
+                    else:
+                        similarity = 0.7
+
+                    entities.append(
+                        {
+                            "name": node,
+                            "description": data.get("description", ""),
+                            "type": data.get("entity_type", ""),
+                            "similarity": similarity,
+                        }
+                    )
+
+                if len(entities) >= max_results:
+                    break
+
+            # Get relationships for found entities
+            if entities:
+                entity_names = {e["name"] for e in entities}
+                for source, target, data in G.edges(data=True):
+                    if source in entity_names or target in entity_names:
+                        relationships.append(
                             {
-                                "name": node,
+                                "source": source,
+                                "target": target,
                                 "description": data.get("description", ""),
-                                "type": entity_type,
-                                "similarity": similarity,
-                                "source_id": data.get("source_id", ""),
+                                "weight": float(data.get("weight", 1.0)),
                             }
                         )
+                        if len(relationships) >= max_results * 2:
+                            break
 
-                    if len(entities) >= max_results:
-                        break
+            return {"entities": entities, "relationships": relationships}
 
-                # Get relationships for found entities
-                if entities:
-                    entity_names = {e["name"] for e in entities}
-                    for source, target, data in G.edges(data=True):
-                        if source in entity_names or target in entity_names:
-                            relationships.append(
+        except Exception as e:
+            print(f"Error in GraphRAG query: {e}")
+            return {"entities": [], "relationships": []}
+
+    async def search_dict_n_hop(
+        self, term: str, n_hops: int = 2, max_results: int = 10
+    ) -> Dict[str, Any]:
+        """
+        Dictionary-based n-hop search: Find term in dict, then traverse NetworkX graph
+
+        Args:
+            term: Term to search in dictionary
+            n_hops: Number of hops to traverse
+            max_results: Maximum results per hop
+        """
+        # Step 1: Find in dictionary
+        dict_result = self.dict_lookup(term)
+
+        if not dict_result["found"]:
+            return {
+                "error": f"Term '{term}' not found in dictionary",
+                "start_method": "dict",
+                "hops": [],
+            }
+
+        # Step 2: Do n-hop traversal from this term
+        graph_file = os.path.join(
+            self.working_dir, "graph_chunk_entity_relation.graphml"
+        )
+        if not os.path.exists(graph_file):
+            return {
+                "error": "Graph file not found",
+                "dict_result": dict_result,
+                "hops": [],
+            }
+
+        try:
+            import networkx as nx
+
+            G = nx.read_graphml(graph_file)
+
+            # Find the node in graph (case-insensitive match)
+            term_lower = term.lower()
+            start_node = None
+            for node in G.nodes():
+                if term_lower == str(node).lower():
+                    start_node = node
+                    break
+
+            if not start_node:
+                return {
+                    "error": f"Term '{term}' found in dict but not in graph",
+                    "dict_result": dict_result,
+                    "hops": [],
+                }
+
+            # Traverse n-hops
+            visited = {start_node}
+            hops_data = [
+                {
+                    "hop": 0,
+                    "entities": [
+                        {
+                            "name": start_node,
+                            "description": G.nodes[start_node].get("description", ""),
+                            "type": G.nodes[start_node].get("entity_type", ""),
+                        }
+                    ],
+                }
+            ]
+
+            current_nodes = [start_node]
+
+            for hop in range(1, n_hops + 1):
+                next_nodes = []
+                hop_entities = []
+                hop_relationships = []
+
+                for node in current_nodes:
+                    neighbors = list(G.neighbors(node))
+
+                    for neighbor in neighbors:
+                        if neighbor not in visited:
+                            visited.add(neighbor)
+                            next_nodes.append(neighbor)
+
+                            hop_entities.append(
                                 {
-                                    "source": source,
-                                    "target": target,
-                                    "description": data.get("description", ""),
-                                    "weight": float(data.get("weight", 1.0)),
-                                    "keywords": data.get("keywords", ""),
+                                    "name": neighbor,
+                                    "description": G.nodes[neighbor].get(
+                                        "description", ""
+                                    ),
+                                    "type": G.nodes[neighbor].get("entity_type", ""),
+                                    "from_node": node,
                                 }
                             )
-                            if len(relationships) >= max_results * 2:
-                                break
 
-            # Access text chunks using proper storage API
-            if hasattr(self.graph_rag, "text_chunks"):
-                try:
-                    # Get all keys first
-                    all_keys = await self.graph_rag.text_chunks.get_all_keys()
-                    query_lower = query.lower()
-
-                    for key in all_keys[: max_results * 5]:
-                        chunk_data = await self.graph_rag.text_chunks.get_by_id(key)
-                        if chunk_data:
-                            content = chunk_data.get("content", "")
-                            if query_lower in content.lower():
-                                text_chunks.append(
+                            edge_data = G.get_edge_data(node, neighbor)
+                            if edge_data:
+                                hop_relationships.append(
                                     {
-                                        "id": key,
-                                        "content": content[:500],
-                                        "similarity": 0.9,
+                                        "source": node,
+                                        "target": neighbor,
+                                        "description": edge_data.get("description", ""),
+                                        "weight": float(edge_data.get("weight", 1.0)),
                                     }
                                 )
-                                if len(text_chunks) >= max_results:
-                                    break
-                except AttributeError:
-                    pass
+
+                            if len(hop_entities) >= max_results:
+                                break
+
+                    if len(hop_entities) >= max_results:
+                        break
+
+                hops_data.append(
+                    {
+                        "hop": hop,
+                        "entities": hop_entities,
+                        "relationships": hop_relationships,
+                    }
+                )
+
+                current_nodes = next_nodes
+                if not current_nodes:
+                    break
 
             return {
-                "entities": entities,
-                "relationships": relationships,
-                "text_chunks": text_chunks,
+                "start_term": term,
+                "start_method": "dict",
+                "dict_result": dict_result,
+                "n_hops": n_hops,
+                "total_visited": len(visited),
+                "hops": hops_data,
             }
 
         except Exception as e:
-            print(f"Error in raw GraphRAG query: {e}")
-            import traceback
+            return {"error": str(e), "dict_result": dict_result, "hops": []}
 
-            traceback.print_exc()
-            return {"entities": [], "relationships": [], "text_chunks": []}
+    async def search_graphrag_n_hop(
+        self, query: str, n_hops: int = 2, max_results: int = 10
+    ) -> Dict[str, Any]:
+        """
+        GraphRAG-based n-hop search: Use GraphRAG to find top match, then traverse graph
+
+        Args:
+            query: Query to search with GraphRAG
+            n_hops: Number of hops to traverse
+            max_results: Maximum results per hop
+        """
+        # Step 1: Use GraphRAG to find top match
+        graphrag_result = await self.query_graphrag_raw(query, max_results=1)
+
+        if not graphrag_result.get("entities"):
+            return {
+                "error": f"No entities found for query '{query}'",
+                "start_method": "graphrag",
+                "hops": [],
+            }
+
+        # Get top entity
+        top_entity = graphrag_result["entities"][0]
+        start_term = top_entity["name"]
+
+        # Step 2: Do n-hop traversal from this entity
+        graph_file = os.path.join(
+            self.working_dir, "graph_chunk_entity_relation.graphml"
+        )
+        if not os.path.exists(graph_file):
+            return {
+                "error": "Graph file not found",
+                "graphrag_result": graphrag_result,
+                "hops": [],
+            }
+
+        try:
+            import networkx as nx
+
+            G = nx.read_graphml(graph_file)
+
+            # Verify node exists
+            if start_term not in G.nodes():
+                return {
+                    "error": f"Top entity '{start_term}' not found in graph",
+                    "graphrag_result": graphrag_result,
+                    "hops": [],
+                }
+
+            # Traverse n-hops
+            visited = {start_term}
+            hops_data = [
+                {
+                    "hop": 0,
+                    "entities": [
+                        {
+                            "name": start_term,
+                            "description": G.nodes[start_term].get("description", ""),
+                            "type": G.nodes[start_term].get("entity_type", ""),
+                            "similarity": top_entity.get("similarity", 0),
+                        }
+                    ],
+                }
+            ]
+
+            current_nodes = [start_term]
+
+            for hop in range(1, n_hops + 1):
+                next_nodes = []
+                hop_entities = []
+                hop_relationships = []
+
+                for node in current_nodes:
+                    neighbors = list(G.neighbors(node))
+
+                    for neighbor in neighbors:
+                        if neighbor not in visited:
+                            visited.add(neighbor)
+                            next_nodes.append(neighbor)
+
+                            hop_entities.append(
+                                {
+                                    "name": neighbor,
+                                    "description": G.nodes[neighbor].get(
+                                        "description", ""
+                                    ),
+                                    "type": G.nodes[neighbor].get("entity_type", ""),
+                                    "from_node": node,
+                                }
+                            )
+
+                            edge_data = G.get_edge_data(node, neighbor)
+                            if edge_data:
+                                hop_relationships.append(
+                                    {
+                                        "source": node,
+                                        "target": neighbor,
+                                        "description": edge_data.get("description", ""),
+                                        "weight": float(edge_data.get("weight", 1.0)),
+                                    }
+                                )
+
+                            if len(hop_entities) >= max_results:
+                                break
+
+                    if len(hop_entities) >= max_results:
+                        break
+
+                hops_data.append(
+                    {
+                        "hop": hop,
+                        "entities": hop_entities,
+                        "relationships": hop_relationships,
+                    }
+                )
+
+                current_nodes = next_nodes
+                if not current_nodes:
+                    break
+
+            return {
+                "query": query,
+                "start_term": start_term,
+                "start_method": "graphrag",
+                "graphrag_result": graphrag_result,
+                "n_hops": n_hops,
+                "total_visited": len(visited),
+                "hops": hops_data,
+            }
+
+        except Exception as e:
+            return {"error": str(e), "graphrag_result": graphrag_result, "hops": []}
 
 
 # ============================================================================
@@ -1442,9 +1112,12 @@ async def main():
     if len(sys.argv) < 2:
         print("Usage:")
         print("  python script.py build [book_file] - Build GraphRAG from book")
-        print("  python script.py query [term] - Query term from built GraphRAG")
-        print("  python script.py interactive - Interactive query mode")
-        print("  python script.py search [query] - Search across chunks")
+        print(
+            "  python script.py query [term] X- Query X similar terms from built GraphRAG"
+        )
+        print(
+            "  python script.py dict [query] - Search dictionary for term based on character similarity"
+        )
         print("Example: python script.py build book2.txt")
         return
 
@@ -1580,90 +1253,82 @@ async def main():
         term = sys.argv[2]
         print(f"📚 Looking up dictionary term: '{term}'")
 
-        # Initialize query system
         query_system = BookDictionaryQuery()
 
-        # Check if we have data to query
         if not query_system.vocabulary:
-            print(
-                "❌ No vocabulary loaded. Please build the graph first with: python script.py build [book_file]"
-            )
+            print("❌ No vocabulary loaded. Please build the graph first")
             return
 
-        # Dictionary lookup
-        if term.lower() in query_system.vocabulary:
-            vocab_entry = query_system.vocabulary[term.lower()]
+        result = query_system.dict_lookup(term)
+
+        if result["found"]:
             print(f"\n📚 Dictionary Lookup:")
-            print(f"   Definition: {vocab_entry['definition']}")
-            print(f"   Found in {len(vocab_entry['found_in_chunks'])} chunks")
-            print(f"   Has {len(vocab_entry['contexts'])} contexts")
+            print(f"   Term: {result['term']}")
+            print(f"   Definition: {result['definition']}")
+            print(f"   Contexts: {result['context_count']}")
 
-            if vocab_entry["contexts"]:
+            if result["contexts"]:
                 print(f"\n   Sample context:")
-                print(f"   {vocab_entry['contexts'][0][:200]}...")
+                print(f"   {result['contexts'][0][:200]}...")
         else:
-            print(f"\n📚 Dictionary Lookup: '{term}' not found in dictionary")
-            suggestions = query_system.suggest_words(term, n=3)
-            if suggestions:
-                print(f"   Similar terms: {', '.join(suggestions)}")
-
-    elif command == "interactive":
-        # Interactive query mode
-        print("📚 Starting interactive query interface...")
-        query_system = BookDictionaryQuery()
-
-        # Check if we have data to query
-        if not query_system.vocabulary:
-            print(
-                "❌ No vocabulary loaded. Please build the graph first with: python script.py build [book_file]"
-            )
-            return
-
-        # Start interactive mode
-        await query_system.interactive_query()
+            print(f"\n❌ {result['message']}")
 
     elif command == "search":
-        # Search mode - search across chunks
-        if len(sys.argv) < 3:
-            print("❌ Please specify a search query")
+        # Two modes: dict or query
+        if len(sys.argv) < 4:
+            print("Usage:")
+            print("  python script.py search dict <term> [n_hops] [max_results]")
+            print("  python script.py search query <query> [n_hops] [max_results]")
+            print("Examples:")
+            print("  python script.py search dict impedance 2 10")
+            print("  python script.py search query 'electrical properties' 2 10")
             return
 
-        query = " ".join(sys.argv[2:])
-        print(f"🔍 Searching for: '{query}'")
+        search_mode = sys.argv[2].lower()
+        search_term = sys.argv[3]
+        n_hops = int(sys.argv[4]) if len(sys.argv) > 4 else 2
+        max_results = int(sys.argv[5]) if len(sys.argv) > 5 else 10
 
-        # Initialize query system
         query_system = BookDictionaryQuery()
 
-        # Check if we have data to query
-        if not query_system.vocabulary:
-            print(
-                "❌ No vocabulary loaded. Please build the graph first with: python script.py build [book_file]"
+        if search_mode == "dict":
+            print(f"📚 Dictionary-based {n_hops}-hop search for: '{search_term}'")
+            result = await query_system.search_dict_n_hop(
+                search_term, n_hops, max_results
             )
+        elif search_mode == "query":
+            print(f"🕸️ GraphRAG-based {n_hops}-hop search for: '{search_term}'")
+            result = await query_system.search_graphrag_n_hop(
+                search_term, n_hops, max_results
+            )
+        else:
+            print(f"❌ Invalid search mode: {search_mode}")
+            print("Use 'dict' or 'query'")
             return
 
-        # Search in chunks
-        results = query_system.search_in_chunks(query)
-
         # Display results
-        print(f"\n🔍 **SEARCH RESULTS for '{query}'** ({len(results)} matches)")
-        for result in results:
-            chunk_id = result["chunk_id"]
-            print(f"\n📄 **Chunk {chunk_id}** (relevance: {result['relevance_score']})")
-            if result["matching_terms"]:
-                print(f"  🏷️ Terms: {', '.join(result['matching_terms'])}")
-            if result["matching_definitions"]:
-                for def_match in result["matching_definitions"][:2]:
-                    print(
-                        f"  💡 {def_match['term']}: {def_match['definition'][:100]}..."
-                    )
+        print("\n" + "=" * 60)
+        if "error" in result:
+            print(f"❌ Error: {result['error']}")
+            return
+
+        print(f"Start method: {result['start_method']}")
+        print(f"Start term: {result['start_term']}")
+        print(f"Total entities visited: {result['total_visited']}")
+
+        for hop_data in result["hops"]:
+            print(f"\n🔷 HOP {hop_data['hop']}:")
+            if hop_data.get("entities"):
+                for entity in hop_data["entities"]:
+                    print(f"  • {entity['name']}")
+                    if entity.get("description"):
+                        print(f"    {entity['description'][:100]}...")
+
+            if hop_data.get("relationships"):
+                print(f"  Relationships: {len(hop_data['relationships'])}")
 
     else:
         print(f"❌ Unknown command: {command}")
-        print("Usage:")
-        print("  python script.py build [book_file] - Build GraphRAG from book")
-        print("  python script.py query [term] - Query term from built GraphRAG")
-        print("  python script.py interactive - Interactive query mode")
-        print("  python script.py search [query] - Search across chunks")
 
 
 if __name__ == "__main__":

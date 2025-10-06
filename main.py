@@ -1,47 +1,56 @@
+#!/usr/bin/env python3
+"""
+Adaptive Technical Dictionary Builder with GraphRAG
+For Japanese Power System Technical Terms
+"""
+
 import asyncio
 import json
-import logging
 import os
 import re
 import sys
-import time
+from abc import ABC, abstractmethod
 from collections import defaultdict
-from difflib import SequenceMatcher
-from typing import Any, Dict, List, Optional
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Set, Tuple
 
-import json_repair
 import numpy as np
 from nano_graphrag import GraphRAG, QueryParam
 from nano_graphrag._utils import wrap_embedding_func_with_attrs
 from openai import AsyncOpenAI
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 from sentence_transformers import SentenceTransformer
 
-# Configuration
-MAX_CONCURRENT_DEFINITIONS = 15
+# ============================================================================
+# CONFIGURATION
+# ============================================================================
+TOKENIZER_NAME = "sudachi"  # Options: "sudachi", "mecab"
+TERM_FOLDER = "./term_folder"
 WORKING_DIR = "./graph_rag_cache"
+MAX_CONCURRENT_DEFINITIONS = 15
 VLLM_HOST = "http://localhost:8000"
 VLLM_MODEL = "Qwen3-0.6B-Q8_0.gguf"
 MAX_TOKEN = 2000
-DEFINITION_SIMILARITY_THRESHOLD = 0.7  # For semantic similarity in graph
+SEMANTIC_SIMILARITY_THRESHOLD = 0.75
+CHUNK_SIZE = 1000  # tokens/words
+CHUNK_OVERLAP = 200
 
-# Initialize embedding model
+# ============================================================================
+# EMBEDDING MODEL
+# ============================================================================
 try:
     EMBED_MODEL = SentenceTransformer("models/embeddings", local_files_only=True)
-    print("Local embedding model loaded")
+    print("✓ Local embedding model loaded")
 except:
     try:
         EMBED_MODEL = SentenceTransformer("Qwen/Qwen3-Embedding-0.6B")
-        print("Fallback embedding model loaded")
+        print("✓ Fallback embedding model loaded")
     except Exception as e:
-        print(f"Failed to load embedding model: {e}")
+        print(f"✗ Failed to load embedding model: {e}")
         sys.exit(1)
 
 # vLLM client
-vllm_client = AsyncOpenAI(
-    api_key="EMPTY",
-    base_url=VLLM_HOST + "/v1",
-)
+vllm_client = AsyncOpenAI(api_key="EMPTY", base_url=VLLM_HOST + "/v1")
 
 
 @wrap_embedding_func_with_attrs(
@@ -52,249 +61,400 @@ async def local_embedding(texts: list[str]) -> np.ndarray:
     return EMBED_MODEL.encode(texts, normalize_embeddings=True)
 
 
-async def vllm_complete(prompt, system_prompt=None, **kwargs) -> str:
-    """General vLLM completion function"""
-    if system_prompt is None:
-        system_prompt = "You are a helpful assistant that provides clear, concise responses. Respond directly without any reasoning, explanations, or extra text. Output only the requested information in the exact format specified."
+# ============================================================================
+# PYDANTIC MODELS
+# ============================================================================
+class FilteredTerms(BaseModel):
+    """Pass 1: LLM filters which terms are actually technical"""
+
+    terms: List[str]
+
+
+class TermDefinition(BaseModel):
+    """Pass 2: LLM generates definition for a term"""
+
+    term: str
+    definition: str
+
+
+# ============================================================================
+# TOKENIZERS
+# ============================================================================
+class BaseTokenizer(ABC):
+    """Base tokenizer interface - returns only surface and pos"""
+
+    @abstractmethod
+    def tokenize(self, text: str) -> List[Dict[str, str]]:
+        """
+        Returns list of tokens with:
+        - surface: original text
+        - pos: normalized POS tag (名詞, 動詞, etc.)
+        """
+        pass
+
+
+class SudachiTokenizer(BaseTokenizer):
+    """SudachiPy tokenizer wrapper"""
+
+    def __init__(self):
+        try:
+            from sudachipy import dictionary
+            from sudachipy import tokenizer as sudachi_tokenizer
+
+            self.tokenizer_obj = dictionary.Dictionary(dict="full").create()
+            self.mode = sudachi_tokenizer.Tokenizer.SplitMode.C
+            print("✓ SudachiPy tokenizer initialized")
+        except ImportError:
+            raise ImportError("SudachiPy not available. Install: pip install sudachipy")
+        except TypeError:
+            self.tokenizer_obj = dictionary.Dictionary(dict_type="full").create()
+            self.mode = sudachi_tokenizer.Tokenizer.SplitMode.C
+
+    def tokenize(self, text: str) -> List[Dict[str, str]]:
+        """Tokenize text and return surface + pos only"""
+        tokens = self.tokenizer_obj.tokenize(text, self.mode)
+        results = []
+
+        for token in tokens:
+            surface = token.surface()
+            pos = token.part_of_speech()
+            main_pos = pos[0] if pos else "UNKNOWN"
+
+            results.append({"surface": surface, "pos": main_pos})
+
+        return results
+
+
+class MeCabTokenizer(BaseTokenizer):
+    """MeCab tokenizer wrapper"""
+
+    def __init__(self):
+        try:
+            import MeCab
+
+            self.mecab = MeCab.Tagger("")
+            print("✓ MeCab tokenizer initialized")
+        except ImportError:
+            raise ImportError("MeCab not available. Install: pip install mecab-python3")
+
+    def tokenize(self, text: str) -> List[Dict[str, str]]:
+        """Tokenize text and return surface + pos only"""
+        result = self.mecab.parse(text)
+        lines = result.strip().split("\n")[:-1]  # Remove EOS
+        results = []
+
+        for line in lines:
+            if "\t" not in line:
+                continue
+
+            surface, features = line.split("\t", 1)
+            feature_parts = features.split(",")
+            pos = feature_parts[0] if feature_parts else "UNKNOWN"
+
+            results.append({"surface": surface, "pos": pos})
+
+        return results
+
+
+def get_tokenizer(tokenizer_name: str) -> BaseTokenizer:
+    """Factory function to get tokenizer by name"""
+    if tokenizer_name.lower() == "sudachi":
+        return SudachiTokenizer()
+    elif tokenizer_name.lower() == "mecab":
+        return MeCabTokenizer()
     else:
-        system_prompt += " Respond directly without any reasoning, explanations, or extra text. Output only the requested information in the exact format specified."
-    messages = [
-        {"role": "system", "content": system_prompt},
-        {"role": "user", "content": prompt},
-    ]
-    try:
-        response = await vllm_client.chat.completions.create(
-            model=VLLM_MODEL,
-            messages=messages,
-            max_tokens=MAX_TOKEN,
-            temperature=0.1,
-            extra_body={
-                "repetition_penalty": 1.1,
-                "top_p": 0.9,
-            },
-        )
-        return response.choices[0].message.content.strip()
-    except Exception as e:
-        print(f"vLLM request failed: {e}")
-        return ""
+        raise ValueError(f"Unknown tokenizer: {tokenizer_name}")
 
 
 # ============================================================================
-# TERM EXTRACTOR - PLACEHOLDER
+# ANALYTICS LOADER
 # ============================================================================
-def extract_technical_terms(text: str, **kwargs) -> Dict[str, str]:
-    """
-    Placeholder function to extract technical terms.
-    CRITICAL: Later this will be replaced with a hardcoded list of terms.
-    For now, it returns a dictionary of terms with empty definitions.
-    """
-    terms = {}
-    patterns = [
-        r"\b[A-Za-z]+(?:-[A-Za-z]+)+\b",  # hyphenated terms
-        r"\b[A-Z][a-z]+ [A-Z][a-z]+\b",  # proper noun phrases
-        r"\b[a-z]+[A-Z][a-z]*\b",  # camelCase terms
-        r"\b[A-Z]{2,}\b",  # acronyms
-    ]
+class AnalyticsLoader:
+    """Load pre-filtered technical terms from analytics JSON"""
 
-    for pattern in patterns:
-        matches = re.findall(pattern, text)
-        for match in matches:
-            term = match.lower().strip()
-            if len(term) > 3:
-                terms[term] = ""
+    def __init__(self, term_folder: str, tokenizer_name: str):
+        self.term_folder = Path(term_folder)
+        self.tokenizer_name = tokenizer_name
+        self.terms: Set[str] = set()
 
-    print(f"Extracted {len(terms)} placeholder technical terms")
-    return terms
+    def load_terms(self) -> Set[str]:
+        """Load terms from analytics_<tokenizer>.json"""
+        analytics_file = self.term_folder / f"analytics_{self.tokenizer_name}.json"
+
+        if not analytics_file.exists():
+            raise FileNotFoundError(
+                f"Analytics file not found: {analytics_file}\n"
+                f"Expected path: {analytics_file.absolute()}"
+            )
+
+        print(f"Loading terms from: {analytics_file}")
+
+        with open(analytics_file, "r", encoding="utf-8") as f:
+            data = json.load(f)
+
+        # Extract only the "word" field from "unknown_words" list
+        unknown_words = data.get("unknown_words", [])
+        self.terms = {item["word"] for item in unknown_words if "word" in item}
+
+        print(f"✓ Loaded {len(self.terms)} technical terms")
+        return self.terms
 
 
 # ============================================================================
 # BOOK CHUNKER
 # ============================================================================
 class BookChunker:
-    """Split book into manageable chunks for processing"""
+    """Split book into chunks using selected tokenizer"""
 
-    def __init__(self, chunk_size: int = 1000, overlap: int = 200):
+    def __init__(self, tokenizer: BaseTokenizer, chunk_size: int, overlap: int):
+        self.tokenizer = tokenizer
         self.chunk_size = chunk_size
         self.overlap = overlap
-        try:
-            import tiktoken
-
-            self.tokenizer = tiktoken.get_encoding("cl100k_base")
-            self.use_tiktoken = True
-        except:
-            self.tokenizer = None
-            self.use_tiktoken = False
-            print("tiktoken not available, using approximate word-based chunking")
 
     def create_chunks(self, text: str) -> List[Dict[str, Any]]:
-        """Create overlapping chunks from the book text"""
+        """Create overlapping chunks based on tokens"""
         print(f"Creating chunks from book ({len(text)} characters)...")
-        if self.use_tiktoken:
-            return self._create_token_chunks(text)
-        else:
-            return self._create_word_chunks(text)
 
-    def _create_token_chunks(self, text: str) -> List[Dict[str, Any]]:
-        """Create chunks based on token count"""
-        tokens = self.tokenizer.encode(text)
+        # Tokenize entire text
+        all_tokens = self.tokenizer.tokenize(text)
         chunks = []
-        for i in range(0, len(tokens), self.chunk_size - self.overlap):
-            chunk_tokens = tokens[i : i + self.chunk_size]
-            chunk_text = self.tokenizer.decode(chunk_tokens)
+
+        for i in range(0, len(all_tokens), self.chunk_size - self.overlap):
+            chunk_tokens = all_tokens[i : i + self.chunk_size]
+
+            # Reconstruct text from tokens
+            chunk_text = "".join([t["surface"] for t in chunk_tokens])
+
             chunks.append(
                 {
                     "id": len(chunks),
                     "text": chunk_text,
+                    "tokens": chunk_tokens,
                     "start_token": i,
                     "end_token": i + len(chunk_tokens),
-                    "token_count": len(chunk_tokens),
                 }
             )
-        print(f"Created {len(chunks)} token-based chunks")
+
+        print(f"✓ Created {len(chunks)} chunks")
         return chunks
 
-    def _create_word_chunks(self, text: str) -> List[Dict[str, Any]]:
-        """Create chunks based on word count (fallback)"""
-        words = text.split()
-        chunks = []
-        for i in range(0, len(words), self.chunk_size - self.overlap):
-            chunk_words = words[i : i + self.chunk_size]
-            chunk_text = " ".join(chunk_words)
-            chunks.append(
-                {
-                    "id": len(chunks),
-                    "text": chunk_text,
-                    "start_word": i,
-                    "end_word": i + len(chunk_words),
-                    "word_count": len(chunk_words),
-                }
-            )
-        print(f"Created {len(chunks)} word-based chunks")
-        return chunks
+
+# ============================================================================
+# TERM MATCHER
+# ============================================================================
+class TermMatcher:
+    """Match tokens against pre-filtered technical terms"""
+
+    def __init__(self, technical_terms: Set[str]):
+        self.technical_terms = technical_terms
+
+    def match_terms(
+        self, tokens: List[Dict[str, str]]
+    ) -> Tuple[List[str], Dict[str, List[str]]]:
+        """
+        Match tokens against technical terms.
+
+        Returns:
+        - full_matches: List of exact matches
+        - partial_matches: Dict[partial_term -> List[compounds it's part of]]
+        """
+        full_matches = []
+        partial_matches = defaultdict(list)
+
+        for token in tokens:
+            surface = token["surface"]
+            pos = token["pos"]
+
+            # FULL MATCH: exact term found
+            if surface in self.technical_terms:
+                full_matches.append(surface)
+
+            # PARTIAL MATCH: token is substring of a compound term (only nouns)
+            elif "名詞" in pos:
+                for term in self.technical_terms:
+                    if surface in term and surface != term:
+                        partial_matches[surface].append(term)
+
+        # Deduplicate
+        full_matches = list(set(full_matches))
+
+        # Convert defaultdict to regular dict
+        partial_matches = {k: list(set(v)) for k, v in partial_matches.items()}
+
+        return full_matches, partial_matches
+
+
+# ============================================================================
+# LLM FUNCTIONS
+# ============================================================================
+async def vllm_complete(prompt: str, system_prompt: str = None) -> str:
+    """General vLLM completion"""
+    if system_prompt is None:
+        system_prompt = "You are a helpful assistant. Respond only with the requested information in the exact format specified."
+
+    messages = [
+        {"role": "system", "content": system_prompt},
+        {"role": "user", "content": prompt},
+    ]
+
+    try:
+        response = await vllm_client.chat.completions.create(
+            model=VLLM_MODEL,
+            messages=messages,
+            max_tokens=MAX_TOKEN,
+            temperature=0.1,
+            extra_body={"repetition_penalty": 1.1, "top_p": 0.9},
+        )
+        return response.choices[0].message.content.strip()
+    except Exception as e:
+        print(f"✗ vLLM request failed: {e}")
+        return ""
+
+
+async def filter_technical_terms(
+    chunk_text: str, candidate_terms: List[str]
+) -> List[str]:
+    """Pass 1: LLM filters which terms are actually technical in this context"""
+    prompt = f"""Given this text chunk, identify which of the following candidate terms are actually technical terms in this context.
+
+Text chunk:
+{chunk_text[:1000]}...
+
+Candidate terms:
+{', '.join(candidate_terms)}
+
+Return ONLY a JSON object with a "terms" field containing a list of technical terms.
+Example: {{"terms": ["term1", "term2"]}}
+
+Do not include explanations or any other text."""
+
+    system_prompt = "You are an expert at identifying technical terms in Japanese power system documents. Return only valid JSON."
+
+    response = await vllm_complete(prompt, system_prompt)
+
+    try:
+        # Parse JSON response
+        result = json.loads(response)
+        validated = FilteredTerms(**result)
+        return validated.terms
+    except Exception as e:
+        print(f"  ✗ Failed to parse LLM response: {e}")
+        print(f"  Response was: {response[:200]}")
+        return []
+
+
+async def generate_definition(term: str, context: str) -> Optional[TermDefinition]:
+    """Pass 2: LLM generates definition for a term"""
+    prompt = f"""Based on the following context, provide a clear, concise definition for this technical term.
+
+Term: {term}
+
+Context:
+{context[:1500]}
+
+Return ONLY a JSON object with "term" and "definition" fields.
+Example: {{"term": "{term}", "definition": "A technical device that..."}}
+
+Keep the definition to 1-2 sentences. Do not include explanations or any other text."""
+
+    system_prompt = "You are an expert at defining technical terms in Japanese power systems. Return only valid JSON with term and definition."
+
+    response = await vllm_complete(prompt, system_prompt)
+
+    try:
+        result = json.loads(response)
+        validated = TermDefinition(**result)
+        return validated
+    except Exception as e:
+        print(f"  ✗ Failed to parse definition for '{term}': {e}")
+        return None
 
 
 # ============================================================================
 # CHUNK PROCESSOR
 # ============================================================================
 class ChunkProcessor:
-    """Process individual chunks to find terms and generate definitions"""
+    """Two-pass chunk processor"""
 
-    def __init__(self):
-        self.chunk_terms = {}
-        self.chunk_definitions = {}
-        self.global_terms = set()
+    def __init__(self, matcher: TermMatcher):
+        self.matcher = matcher
 
-    async def process_chunk(
-        self, chunk: Dict[str, Any], given_terms: Dict[str, str]
-    ) -> Dict[str, Any]:
-        """Process a single chunk to find terms and generate definitions"""
+    async def process_chunk(self, chunk: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Process a chunk in two passes:
+        1. Match terms and filter with LLM
+        2. Generate definitions for filtered terms
+        """
         chunk_id = chunk["id"]
         chunk_text = chunk["text"]
-        print(f"Processing chunk {chunk_id}")
+        tokens = chunk["tokens"]
 
-        # Find which given terms are present in this chunk
-        present_terms = []
-        for term in given_terms.keys():
-            if term.lower() in chunk_text.lower():
-                present_terms.append(term)
+        print(f"\n{'='*60}")
+        print(f"Processing Chunk {chunk_id}")
+        print(f"{'='*60}")
 
-        print(f"  Found {len(present_terms)} given terms in chunk")
+        # PASS 1: Match and filter
+        full_matches, partial_matches = self.matcher.match_terms(tokens)
 
-        # Generate definitions for terms in this chunk
-        definitions = {}
-        if present_terms:
-            definitions = await self._generate_chunk_definitions(
-                chunk_text, present_terms, chunk_id
-            )
+        all_candidates = full_matches + list(partial_matches.keys())
+        print(f"  Found {len(full_matches)} full matches")
+        print(f"  Found {len(partial_matches)} partial matches")
 
-        self.chunk_terms[chunk_id] = present_terms
-        self.chunk_definitions[chunk_id] = definitions
-        self.global_terms.update(present_terms)
+        if not all_candidates:
+            print("  ✓ No terms to process in this chunk")
+            return {
+                "chunk_id": chunk_id,
+                "terms": [],
+                "definitions": {},
+                "partial_info": {},
+            }
+
+        # Filter with LLM
+        print(f"  → Filtering {len(all_candidates)} candidates with LLM...")
+        filtered_terms = await filter_technical_terms(chunk_text, all_candidates)
+        print(f"  ✓ LLM confirmed {len(filtered_terms)} technical terms")
+
+        # PASS 2: Generate definitions (concurrent)
+        print(
+            f"  → Generating definitions (max {MAX_CONCURRENT_DEFINITIONS} concurrent)..."
+        )
+        definitions = await self._generate_definitions_concurrent(
+            filtered_terms, chunk_text
+        )
+        print(f"  ✓ Generated {len(definitions)} definitions")
+
+        # Prepare partial match info
+        partial_info = {
+            term: partial_matches[term]
+            for term in filtered_terms
+            if term in partial_matches
+        }
 
         return {
             "chunk_id": chunk_id,
-            "terms_found": len(present_terms),
-            "definitions_generated": len(definitions),
-            "terms": present_terms,
+            "terms": filtered_terms,
             "definitions": definitions,
+            "partial_info": partial_info,
         }
 
-    async def _generate_chunk_definitions(
-        self, chunk_text: str, terms: List[str], chunk_id: int
+    async def _generate_definitions_concurrent(
+        self, terms: List[str], context: str
     ) -> Dict[str, str]:
-        """Generate definitions for terms found in a specific chunk"""
-        definitions = {}
-        batch_size = 5
-        for i in range(0, len(terms), batch_size):
-            batch_terms = terms[i : i + batch_size]
-            prompt = self._create_definition_prompt(chunk_text, batch_terms)
-            try:
-                response = await vllm_complete(
-                    prompt, self._get_definition_system_prompt()
-                )
-                batch_definitions = self._parse_definitions_response(
-                    response, batch_terms
-                )
-                definitions.update(batch_definitions)
-                print(
-                    f"    Chunk {chunk_id}: Generated definitions for batch {i//batch_size + 1}"
-                )
-            except Exception as e:
-                print(
-                    f"    Failed to generate definitions for chunk {chunk_id}, batch {i//batch_size + 1}: {e}"
-                )
-                for term in batch_terms:
-                    definitions[term] = (
-                        f"Term from chunk {chunk_id} context: {chunk_text[:200]}..."
-                    )
-        return definitions
+        """Generate definitions concurrently with semaphore"""
+        semaphore = asyncio.Semaphore(MAX_CONCURRENT_DEFINITIONS)
 
-    def _create_definition_prompt(self, chunk_text: str, terms: List[str]) -> str:
-        """Create prompt for generating definitions from chunk context"""
-        term_list = ", ".join(terms)
-        return f"""Based on the following text chunk, provide clear, concise definitions for these technical terms:
-Terms to define: {term_list}
-Text chunk context:
-{chunk_text}
-For each term, provide a definition in this exact format:
-TERM: [term name]
-DEFINITION: [1-2 sentence definition based on the context]
-Only define terms that actually appear in the context. If a term doesn't appear, skip it.
-Do not include any reasoning, explanations, or text outside the format."""
+        async def generate_with_semaphore(term: str) -> Tuple[str, Optional[str]]:
+            async with semaphore:
+                result = await generate_definition(term, context)
+                if result:
+                    return result.term, result.definition
+                return term, None
 
-    def _get_definition_system_prompt(self) -> str:
-        """Get system prompt for definition generation"""
-        return """You are an expert at creating clear, contextual definitions for technical terms found in books. 
-Based on the provided text chunk, create precise definitions for the requested terms. 
-Use ONLY the context provided. Keep definitions to 1-2 sentences.
-Follow the exact format requested: TERM: [name] followed by DEFINITION: [definition].
-Do not include any reasoning, explanations, or additional text outside the format."""
+        tasks = [generate_with_semaphore(term) for term in terms]
+        results = await asyncio.gather(*tasks)
 
-    def _parse_definitions_response(
-        self, response: str, expected_terms: List[str]
-    ) -> Dict[str, str]:
-        """Parse the LLM response to extract definitions"""
-        definitions = {}
-        sections = re.split(r"\n(?=TERM:)", response)
-        for section in sections:
-            term_match = re.search(r"TERM:\s*(.+?)(?:\n|$)", section, re.IGNORECASE)
-            def_match = re.search(
-                r"DEFINITION:\s*(.+?)(?=\nTERM:|\n|$)",
-                section,
-                re.IGNORECASE | re.DOTALL,
-            )
-            if term_match and def_match:
-                term = term_match.group(1).strip().lower()
-                definition = def_match.group(1).strip()
-                definition = re.sub(r"\s+", " ", definition)
-                if definition and not definition.endswith((".", "!", "?")):
-                    definition += "."
-                definitions[term] = definition
-
-        missing_terms = [t for t in expected_terms if t.lower() not in definitions]
-        if missing_terms:
-            print(f"    Missing definitions for: {missing_terms}")
-
+        # Filter out None results
+        definitions = {term: defn for term, defn in results if defn is not None}
         return definitions
 
 
@@ -302,655 +462,704 @@ Do not include any reasoning, explanations, or additional text outside the forma
 # DICTIONARY MANAGER
 # ============================================================================
 class DictionaryManager:
-    """Manages the term dictionary with character-based lookup"""
+    """Simple dictionary for fast exact/fuzzy lookup"""
 
-    def __init__(self, working_dir: str = WORKING_DIR):
-        self.working_dir = working_dir
-        self.dictionary = {}  # term -> definition
-        os.makedirs(working_dir, exist_ok=True)
+    def __init__(self, working_dir: str):
+        self.working_dir = Path(working_dir)
+        self.dictionary: Dict[str, str] = {}
+        self.working_dir.mkdir(parents=True, exist_ok=True)
 
     def add_terms(self, terms_with_definitions: Dict[str, str]) -> None:
         """Add or update terms in dictionary"""
-        print(f"Adding {len(terms_with_definitions)} terms to dictionary...")
         for term, definition in terms_with_definitions.items():
-            if term in self.dictionary:
-                # Term exists - merge definitions if different
-                existing_def = self.dictionary[term]
-                similarity = SequenceMatcher(
-                    None, definition.lower(), existing_def.lower()
-                ).ratio()
-                if similarity < 0.7:
-                    # Definitions are different, merge them
-                    self.dictionary[term] = f"{existing_def} {definition}"
-            else:
-                # New term
-                self.dictionary[term] = definition
-        print(f"Dictionary now contains {len(self.dictionary)} terms")
+            self.dictionary[term] = definition
 
     def lookup_exact(self, term: str) -> Optional[str]:
-        """Exact character match lookup"""
-        term_normalized = term.lower().strip()
-        return self.dictionary.get(term_normalized)
+        """Exact lookup"""
+        return self.dictionary.get(term.lower())
 
-    def lookup_similar(self, term: str, top_n: int = 5) -> List[Dict[str, Any]]:
-        """Character similarity based lookup using fuzzy matching"""
-        term_normalized = term.lower().strip()
+    def lookup_fuzzy(self, term: str, top_n: int = 10) -> List[Dict[str, Any]]:
+        """Fuzzy lookup using character similarity"""
+        from difflib import SequenceMatcher
 
-        # Calculate similarity for all terms
+        term_normalized = term.lower()
         similarities = []
-        for dict_term in self.dictionary.keys():
+
+        for dict_term, definition in self.dictionary.items():
             similarity = SequenceMatcher(None, term_normalized, dict_term).ratio()
             similarities.append(
-                {
-                    "term": dict_term,
-                    "similarity": similarity,
-                    "definition": self.dictionary[dict_term],
-                }
+                {"term": dict_term, "definition": definition, "similarity": similarity}
             )
 
-        # Sort by similarity
         similarities.sort(key=lambda x: x["similarity"], reverse=True)
         return similarities[:top_n]
 
     def save(self) -> None:
         """Save dictionary to disk"""
-        dict_path = os.path.join(self.working_dir, "dictionary.json")
+        dict_path = self.working_dir / "dictionary.json"
         with open(dict_path, "w", encoding="utf-8") as f:
             json.dump(self.dictionary, f, indent=2, ensure_ascii=False)
-        print(f"Dictionary saved to {dict_path}")
+        print(f"✓ Dictionary saved: {len(self.dictionary)} terms")
 
     def load(self) -> bool:
         """Load dictionary from disk"""
-        dict_path = os.path.join(self.working_dir, "dictionary.json")
-        if os.path.exists(dict_path):
+        dict_path = self.working_dir / "dictionary.json"
+        if dict_path.exists():
             with open(dict_path, "r", encoding="utf-8") as f:
                 self.dictionary = json.load(f)
-            print(f"Loaded {len(self.dictionary)} terms from dictionary")
+            print(f"✓ Loaded {len(self.dictionary)} terms from dictionary")
             return True
         return False
 
 
 # ============================================================================
-# GRAPH MANAGER
+# GRAPH MANAGER WITH RELATIONSHIPS
 # ============================================================================
 class GraphManager:
-    """Manages the GraphRAG knowledge graph for semantic similarity"""
+    """Manages GraphRAG with explicit relationships"""
 
-    def __init__(self, working_dir: str = WORKING_DIR):
-        self.working_dir = working_dir
-        self.terms_definitions = {}  # term -> definition
-        self.term_embeddings = {}  # term -> embedding vector
-        os.makedirs(working_dir, exist_ok=True)
+    def __init__(self, working_dir: str):
+        self.working_dir = Path(working_dir)
+        self.nodes: Dict[str, Dict[str, str]] = {}  # term -> {definition, ...}
+        self.edges: Dict[str, List[Dict[str, Any]]] = defaultdict(
+            list
+        )  # term -> [{target, type, weight}]
+        self.embeddings: Dict[str, np.ndarray] = {}
+        self.working_dir.mkdir(parents=True, exist_ok=True)
 
     def add_terms(self, terms_with_definitions: Dict[str, str]) -> None:
-        """Add terms to graph - definitions will be used for semantic similarity"""
-        print(f"Adding {len(terms_with_definitions)} terms to graph...")
-        self.terms_definitions.update(terms_with_definitions)
-        print(f"Graph now contains {len(self.terms_definitions)} terms")
+        """Add terms as graph nodes"""
+        for term, definition in terms_with_definitions.items():
+            self.nodes[term] = {"definition": definition}
 
-    def create_graph_chunks(self) -> List[str]:
-        """
-        Create chunks for GraphRAG where:
-        - Each chunk is: TERM + DEFINITION
-        - GraphRAG will create nodes from these
-        - Relationships will be based on:
-          1. Terms appearing in other term definitions
-          2. Semantic similarity between definitions
-        """
-        chunks = []
-        for term, definition in self.terms_definitions.items():
-            # Format: Just term and definition, nothing else
-            chunk_text = f"{term}: {definition}"
-            chunks.append(chunk_text)
-
-        print(f"Created {len(chunks)} graph chunks")
-        return chunks
+    def add_compound_relationships(self, partial_info: Dict[str, List[str]]) -> None:
+        """Add COMPOUND_OF edges"""
+        for partial_term, compound_terms in partial_info.items():
+            for compound in compound_terms:
+                if compound in self.nodes:
+                    # compound ←COMPOUND_OF― partial
+                    self.edges[compound].append(
+                        {"target": partial_term, "type": "COMPOUND_OF", "weight": 1.0}
+                    )
 
     def compute_embeddings(self) -> None:
-        """Pre-compute embeddings for all definitions"""
-        print("Computing definition embeddings...")
-        terms = list(self.terms_definitions.keys())
-        definitions = [self.terms_definitions[t] for t in terms]
+        """Compute embeddings for all definitions"""
+        print("Computing embeddings for graph nodes...")
+        terms = list(self.nodes.keys())
+        definitions = [self.nodes[t]["definition"] for t in terms]
 
         embeddings = EMBED_MODEL.encode(definitions, normalize_embeddings=True)
 
         for term, embedding in zip(terms, embeddings):
-            self.term_embeddings[term] = embedding
+            self.embeddings[term] = embedding
 
-        print(f"Computed embeddings for {len(self.term_embeddings)} terms")
+        print(f"✓ Computed embeddings for {len(self.embeddings)} terms")
 
-    def find_semantically_similar(
-        self, term: str, top_n: int = 10
-    ) -> List[Dict[str, Any]]:
-        """Find terms with semantically similar definitions"""
-        if term not in self.term_embeddings:
-            return []
+    def build_relationships(self) -> None:
+        """Build all relationship types"""
+        print("Building graph relationships...")
 
-        query_embedding = self.term_embeddings[term]
-        similarities = []
+        # 1. SIMILAR_MEANING (semantic similarity)
+        self._build_similar_meaning_edges()
 
-        for other_term, other_embedding in self.term_embeddings.items():
-            if other_term == term:
-                continue
+        # 2. PARENT_TERM (term appears in definition)
+        self._build_parent_term_edges()
 
-            # Cosine similarity (embeddings are already normalized)
-            similarity = float(np.dot(query_embedding, other_embedding))
+        # 3. CATEGORY (taxonomy patterns)
+        self._build_category_edges()
 
-            similarities.append(
-                {
-                    "term": other_term,
-                    "definition": self.terms_definitions[other_term],
-                    "similarity": similarity,
-                }
-            )
+        print(f"✓ Built relationships for {len(self.nodes)} nodes")
 
-        similarities.sort(key=lambda x: x["similarity"], reverse=True)
-        return similarities[:top_n]
+    def _build_similar_meaning_edges(self) -> None:
+        """Add SIMILAR_MEANING edges based on embedding similarity"""
+        terms = list(self.embeddings.keys())
 
-    def find_related_by_definition(self, term: str) -> List[str]:
-        """Find terms that appear in this term's definition or vice versa"""
-        if term not in self.terms_definitions:
-            return []
+        for i, term1 in enumerate(terms):
+            emb1 = self.embeddings[term1]
 
-        definition = self.terms_definitions[term].lower()
-        related = []
+            for term2 in terms[i + 1 :]:
+                emb2 = self.embeddings[term2]
+                similarity = float(np.dot(emb1, emb2))
 
-        for other_term in self.terms_definitions.keys():
-            if other_term == term:
-                continue
+                if similarity >= SEMANTIC_SIMILARITY_THRESHOLD:
+                    self.edges[term1].append(
+                        {
+                            "target": term2,
+                            "type": "SIMILAR_MEANING",
+                            "weight": similarity,
+                        }
+                    )
+                    self.edges[term2].append(
+                        {
+                            "target": term1,
+                            "type": "SIMILAR_MEANING",
+                            "weight": similarity,
+                        }
+                    )
 
-            # Check if other_term appears in this definition
-            if other_term in definition:
-                related.append(other_term)
-                continue
+    def _build_parent_term_edges(self) -> None:
+        """Add PARENT_TERM edges when term appears in another's definition"""
+        for term, node_data in self.nodes.items():
+            definition = node_data["definition"].lower()
 
-            # Check if this term appears in other's definition
-            other_def = self.terms_definitions[other_term].lower()
-            if term in other_def:
-                related.append(other_term)
+            for other_term in self.nodes.keys():
+                if other_term != term and other_term in definition:
+                    # term uses other_term in its definition
+                    self.edges[term].append(
+                        {"target": other_term, "type": "PARENT_TERM", "weight": 1.0}
+                    )
 
-        return related
+    def _build_category_edges(self) -> None:
+        """Add CATEGORY edges by detecting taxonomy patterns"""
+        category_patterns = [
+            r"(.+?)の一種",  # "X is a type of Y"
+            r"(.+?)に属する",  # "belongs to X"
+            r"(.+?)系",  # "X-system"
+        ]
 
-    def save(self) -> None:
-        """Save graph data"""
-        terms_path = os.path.join(self.working_dir, "graph_terms.json")
-        with open(terms_path, "w", encoding="utf-8") as f:
-            json.dump(self.terms_definitions, f, indent=2, ensure_ascii=False)
+        for term, node_data in self.nodes.items():
+            definition = node_data["definition"]
 
-        # Save embeddings as numpy array
-        if self.term_embeddings:
-            embeddings_path = os.path.join(self.working_dir, "term_embeddings.npz")
-            terms_list = list(self.term_embeddings.keys())
-            embeddings_array = np.array([self.term_embeddings[t] for t in terms_list])
-            np.savez(embeddings_path, terms=terms_list, embeddings=embeddings_array)
-            print(f"Graph data saved to {self.working_dir}")
+            for pattern in category_patterns:
+                matches = re.findall(pattern, definition)
+                for match in matches:
+                    category = match.strip()
+                    if category in self.nodes:
+                        self.edges[term].append(
+                            {"target": category, "type": "CATEGORY", "weight": 1.0}
+                        )
 
-    def load(self) -> bool:
-        """Load graph data"""
-        terms_path = os.path.join(self.working_dir, "graph_terms.json")
-        if os.path.exists(terms_path):
-            with open(terms_path, "r", encoding="utf-8") as f:
-                self.terms_definitions = json.load(f)
+    async def build_graphrag(self) -> bool:
+        """Build GraphRAG knowledge graph"""
+        print("Building GraphRAG knowledge graph...")
 
-            # Load embeddings
-            embeddings_path = os.path.join(self.working_dir, "term_embeddings.npz")
-            if os.path.exists(embeddings_path):
-                data = np.load(embeddings_path, allow_pickle=True)
-                terms_list = data["terms"]
-                embeddings_array = data["embeddings"]
-                self.term_embeddings = {
-                    term: embedding
-                    for term, embedding in zip(terms_list, embeddings_array)
-                }
+        # Create chunks: term + definition
+        chunks = [f"{term}: {data['definition']}" for term, data in self.nodes.items()]
 
-            print(f"Loaded {len(self.terms_definitions)} terms from graph")
-            return True
-        return False
-
-
-# ============================================================================
-# MAIN ORCHESTRATOR
-# ============================================================================
-class GraphRAGBuilder:
-    """Main class that builds the dictionary and GraphRAG"""
-
-    def __init__(self):
-        self.dictionary_manager = DictionaryManager()
-        self.graph_manager = GraphManager()
-        self.processed_chunks = []
-        self.terms_with_definitions = {}
-
-    async def build_graph(self, book_text: str, term_extractor=extract_technical_terms):
-        """Build the dictionary and GraphRAG from book text"""
-        print("Starting GraphRAG build process")
-        print("=" * 60)
-
-        # Step 1: Extract technical terms
-        print("\nSTEP 1: EXTRACTING TECHNICAL TERMS")
-        print("-" * 30)
-        technical_terms = term_extractor(book_text)
-        print(f"Extracted {len(technical_terms)} technical terms")
-
-        if not technical_terms:
-            print("No technical terms found. Cannot build graph without terms.")
-            return False
-
-        # Step 2: Create chunks from the book
-        print("\nSTEP 2: CREATING BOOK CHUNKS")
-        print("-" * 30)
-        chunker = BookChunker(chunk_size=1000, overlap=200)
-        chunks = chunker.create_chunks(book_text)
-
-        # Step 3: Process chunks to find terms and generate definitions
-        print("\nSTEP 3: PROCESSING CHUNKS")
-        print("-" * 30)
-        chunk_processor = ChunkProcessor()
-
-        if MAX_CONCURRENT_DEFINITIONS <= 1:
-            for i, chunk in enumerate(chunks):
-                print(f"\nChunk {i+1}/{len(chunks)}:")
-                result = await chunk_processor.process_chunk(chunk, technical_terms)
-                self.processed_chunks.append(result)
-        else:
-            semaphore = asyncio.Semaphore(MAX_CONCURRENT_DEFINITIONS)
-
-            async def process_chunk_with_semaphore(chunk, idx):
-                async with semaphore:
-                    print(f"\nChunk {idx+1}/{len(chunks)}:")
-                    result = await chunk_processor.process_chunk(chunk, technical_terms)
-                    return result
-
-            tasks = [
-                process_chunk_with_semaphore(chunk, i) for i, chunk in enumerate(chunks)
-            ]
-            self.processed_chunks = await asyncio.gather(*tasks)
-
-        # Step 4: Merge definitions from all chunks
-        print("\nSTEP 4: MERGING DEFINITIONS")
-        print("-" * 30)
-        self._merge_definitions(chunk_processor)
-
-        # Step 5: Add to dictionary
-        print("\nSTEP 5: ADDING TO DICTIONARY")
-        print("-" * 30)
-        self.dictionary_manager.add_terms(self.terms_with_definitions)
-
-        # Step 6: Add to graph and compute embeddings
-        print("\nSTEP 6: BUILDING GRAPH")
-        print("-" * 30)
-        self.graph_manager.add_terms(self.terms_with_definitions)
-        self.graph_manager.compute_embeddings()
-
-        # Step 7: Create GraphRAG (optional - for advanced graph features)
-        print("\nSTEP 7: CREATING GRAPHRAG (optional)")
-        print("-" * 30)
-        graph_chunks = self.graph_manager.create_graph_chunks()
-        await self._build_graphrag(graph_chunks)
-
-        return True
-
-    def _merge_definitions(self, chunk_processor: ChunkProcessor) -> None:
-        """Merge definitions from different chunks"""
-        print(f"Merging definitions from {len(self.processed_chunks)} chunks...")
-
-        term_definitions = defaultdict(list)
-        for chunk_id, definitions in chunk_processor.chunk_definitions.items():
-            for term, definition in definitions.items():
-                term_definitions[term].append(definition)
-
-        for term, definitions in term_definitions.items():
-            if len(definitions) == 1:
-                self.terms_with_definitions[term] = definitions[0]
-            else:
-                # Use first definition (could use most common or merge)
-                self.terms_with_definitions[term] = definitions[0]
-
-        print(f"Merged {len(self.terms_with_definitions)} definitions")
-
-    async def _build_graphrag(self, graph_chunks: List[str]) -> bool:
-        """Build the GraphRAG knowledge graph (optional for advanced features)"""
         try:
             rag = GraphRAG(
-                working_dir=WORKING_DIR,
+                working_dir=str(self.working_dir),
                 embedding_func=local_embedding,
                 best_model_func=vllm_complete,
                 cheap_model_func=vllm_complete,
                 best_model_max_token_size=MAX_TOKEN,
                 cheap_model_max_token_size=MAX_TOKEN,
-                convert_response_to_json_func=lambda x: (
-                    json_repair.loads(x) if x else {}
-                ),
                 embedding_func_max_async=3,
                 embedding_batch_num=4,
             )
-            await rag.ainsert(graph_chunks)
-            print("GraphRAG knowledge graph built successfully")
+            await rag.ainsert(chunks)
+            print("✓ GraphRAG built successfully")
             return True
         except Exception as e:
-            print(f"GraphRAG build failed (non-critical): {e}")
+            print(f"✗ GraphRAG build failed: {e}")
             return False
 
-    def save_results(self) -> None:
-        """Save the built dictionary and graph"""
-        self.dictionary_manager.save()
-        self.graph_manager.save()
+    def query_graph(self, term: str, max_depth: int = 2) -> Dict[str, Any]:
+        """Query graph for related terms (BFS traversal)"""
+        if term not in self.nodes:
+            return {"found": False, "term": term}
 
-        # Save processing stats
-        stats_path = os.path.join(WORKING_DIR, "processing_stats.json")
-        stats = {
-            "total_chunks": len(self.processed_chunks),
-            "total_terms": len(self.terms_with_definitions),
+        visited = set()
+        queue = [(term, 0)]  # (term, depth)
+        related_nodes = {}
+        related_edges = []
+
+        while queue:
+            current_term, depth = queue.pop(0)
+
+            if current_term in visited or depth > max_depth:
+                continue
+
+            visited.add(current_term)
+            related_nodes[current_term] = self.nodes[current_term]
+
+            # Get edges from this node
+            for edge in self.edges.get(current_term, []):
+                target = edge["target"]
+                related_edges.append(
+                    {
+                        "source": current_term,
+                        "target": target,
+                        "type": edge["type"],
+                        "weight": edge["weight"],
+                    }
+                )
+
+                if target not in visited and depth + 1 <= max_depth:
+                    queue.append((target, depth + 1))
+
+        return {
+            "found": True,
+            "query_term": term,
+            "nodes": related_nodes,
+            "edges": related_edges,
+            "total_nodes": len(related_nodes),
+            "total_edges": len(related_edges),
         }
-        with open(stats_path, "w", encoding="utf-8") as f:
-            json.dump(stats, f, indent=2, ensure_ascii=False)
 
-        print(f"Results saved to {WORKING_DIR}")
+    def save(self) -> None:
+        """Save graph data"""
+        # Save nodes
+        nodes_path = self.working_dir / "graph_nodes.json"
+        with open(nodes_path, "w", encoding="utf-8") as f:
+            json.dump(self.nodes, f, indent=2, ensure_ascii=False)
+
+        # Save edges
+        edges_path = self.working_dir / "graph_edges.json"
+        with open(edges_path, "w", encoding="utf-8") as f:
+            json.dump(dict(self.edges), f, indent=2, ensure_ascii=False)
+
+        # Save embeddings
+        if self.embeddings:
+            embeddings_path = self.working_dir / "graph_embeddings.npz"
+            terms_list = list(self.embeddings.keys())
+            embeddings_array = np.array([self.embeddings[t] for t in terms_list])
+            np.savez(embeddings_path, terms=terms_list, embeddings=embeddings_array)
+
+        print(
+            f"✓ Graph saved: {len(self.nodes)} nodes, {sum(len(e) for e in self.edges.values())} edges"
+        )
+
+    def load(self) -> bool:
+        """Load graph data"""
+        nodes_path = self.working_dir / "graph_nodes.json"
+        edges_path = self.working_dir / "graph_edges.json"
+
+        if not nodes_path.exists():
+            return False
+
+        with open(nodes_path, "r", encoding="utf-8") as f:
+            self.nodes = json.load(f)
+
+        if edges_path.exists():
+            with open(edges_path, "r", encoding="utf-8") as f:
+                edges_data = json.load(f)
+                self.edges = defaultdict(list, edges_data)
+
+        # Load embeddings
+        embeddings_path = self.working_dir / "graph_embeddings.npz"
+        if embeddings_path.exists():
+            data = np.load(embeddings_path, allow_pickle=True)
+            terms_list = data["terms"]
+            embeddings_array = data["embeddings"]
+            self.embeddings = {
+                term: embedding for term, embedding in zip(terms_list, embeddings_array)
+            }
+
+        print(f"✓ Loaded graph: {len(self.nodes)} nodes")
+        return True
+
+
+# ============================================================================
+# MAIN ORCHESTRATOR
+# ============================================================================
+class AdaptiveDictionaryBuilder:
+    """Main builder class"""
+
+    def __init__(self, tokenizer_name: str):
+        self.tokenizer_name = tokenizer_name
+        self.tokenizer = get_tokenizer(tokenizer_name)
+        self.analytics_loader = AnalyticsLoader(TERM_FOLDER, tokenizer_name)
+        self.dictionary = DictionaryManager(WORKING_DIR)
+        self.graph = GraphManager(WORKING_DIR)
+        self.technical_terms: Set[str] = set()
+
+    async def build(self, book_path: str) -> bool:
+        """Build dictionary and graph from book"""
+        print(f"\n{'='*60}")
+        print("ADAPTIVE DICTIONARY BUILDER")
+        print(f"{'='*60}")
+        print(f"Tokenizer: {self.tokenizer_name}")
+        print(f"Book: {book_path}")
+        print(f"{'='*60}\n")
+
+        # Step 1: Load book
+        if not Path(book_path).exists():
+            print(f"✗ Book file not found: {book_path}")
+            return False
+
+        with open(book_path, "r", encoding="utf-8") as f:
+            book_text = f.read()
+        print(f"✓ Loaded book: {len(book_text)} characters\n")
+
+        # Step 2: Load technical terms
+        self.technical_terms = self.analytics_loader.load_terms()
+
+        # Step 3: Create chunks
+        chunker = BookChunker(self.tokenizer, CHUNK_SIZE, CHUNK_OVERLAP)
+        chunks = chunker.create_chunks(book_text)
+
+        # Step 4: Process chunks
+        matcher = TermMatcher(self.technical_terms)
+        processor = ChunkProcessor(matcher)
+
+        all_definitions = {}
+        all_partial_info = {}
+
+        if MAX_CONCURRENT_DEFINITIONS <= 1:
+            # Sequential processing
+            for chunk in chunks:
+                result = await processor.process_chunk(chunk)
+                all_definitions.update(result["definitions"])
+                all_partial_info.update(result["partial_info"])
+        else:
+            # Parallel processing
+            tasks = [processor.process_chunk(chunk) for chunk in chunks]
+            results = await asyncio.gather(*tasks)
+
+            for result in results:
+                all_definitions.update(result["definitions"])
+                all_partial_info.update(result["partial_info"])
+
+        print(f"\n{'='*60}")
+        print(f"PROCESSING COMPLETE")
+        print(f"{'='*60}")
+        print(f"Total definitions generated: {len(all_definitions)}")
+        print(f"Partial match relationships: {len(all_partial_info)}")
+
+        # Step 5: Add to dictionary
+        print(f"\n{'='*60}")
+        print("BUILDING DICTIONARY")
+        print(f"{'='*60}")
+        self.dictionary.add_terms(all_definitions)
+
+        # Step 6: Build graph
+        print(f"\n{'='*60}")
+        print("BUILDING GRAPH")
+        print(f"{'='*60}")
+        self.graph.add_terms(all_definitions)
+        self.graph.add_compound_relationships(all_partial_info)
+        self.graph.compute_embeddings()
+        self.graph.build_relationships()
+
+        # Step 7: Build GraphRAG (optional)
+        print(f"\n{'='*60}")
+        print("BUILDING GRAPHRAG")
+        print(f"{'='*60}")
+        await self.graph.build_graphrag()
+
+        return True
+
+    def save(self) -> None:
+        """Save all data"""
+        print(f"\n{'='*60}")
+        print("SAVING DATA")
+        print(f"{'='*60}")
+        self.dictionary.save()
+        self.graph.save()
+
+        # Save metadata
+        metadata_path = Path(WORKING_DIR) / "metadata.json"
+        with open(metadata_path, "w", encoding="utf-8") as f:
+            json.dump(
+                {
+                    "tokenizer": self.tokenizer_name,
+                    "total_terms": len(self.dictionary.dictionary),
+                    "technical_terms_loaded": len(self.technical_terms),
+                },
+                f,
+                indent=2,
+            )
+        print("✓ All data saved")
 
 
 # ============================================================================
 # QUERY SYSTEM
 # ============================================================================
-class BookDictionaryQuery:
-    """Query interface for dictionary and GraphRAG"""
+class QuerySystem:
+    """Query interface for dictionary and graph"""
 
-    def __init__(self, working_dir: str = WORKING_DIR):
-        self.working_dir = working_dir
-        self.dictionary = DictionaryManager(working_dir)
-        self.graph = GraphManager(working_dir)
-        self.load_all_data()
+    def __init__(self):
+        self.dictionary = DictionaryManager(WORKING_DIR)
+        self.graph = GraphManager(WORKING_DIR)
+        self.graphrag: Optional[GraphRAG] = None
 
-    def load_all_data(self):
+    def load_data(self) -> bool:
         """Load dictionary and graph data"""
-        print(f"Loading data from {self.working_dir}...")
+        print(f"Loading data from {WORKING_DIR}...")
 
         dict_loaded = self.dictionary.load()
         graph_loaded = self.graph.load()
 
         if not dict_loaded:
-            print("No dictionary data found")
+            print("✗ No dictionary data found")
+            return False
+
         if not graph_loaded:
-            print("No graph data found")
+            print("⚠ No graph data found")
 
-    def dict_lookup(self, term: str, show_similar: bool = True) -> Dict[str, Any]:
-        """
-        Dictionary lookup with character-based similarity
+        # Try to load GraphRAG
+        try:
+            self.graphrag = GraphRAG(
+                working_dir=WORKING_DIR,
+                embedding_func=local_embedding,
+                best_model_func=vllm_complete,
+                cheap_model_func=vllm_complete,
+            )
+            print("✓ GraphRAG loaded")
+        except Exception as e:
+            print(f"⚠ GraphRAG not available: {e}")
 
-        Args:
-            term: Term to look up
-            show_similar: If exact match not found, show similar terms
-        """
-        # Try exact match first
-        exact_match = self.dictionary.lookup_exact(term)
+        return True
 
-        if exact_match:
+    def dict_lookup(self, term: str) -> Dict[str, Any]:
+        """Dictionary lookup only (exact or fuzzy)"""
+        # Try exact match
+        exact = self.dictionary.lookup_exact(term)
+
+        if exact:
             return {
                 "found": True,
                 "exact_match": True,
-                "term": term.lower(),
-                "definition": exact_match,
-            }
-
-        # No exact match, find similar
-        if show_similar:
-            similar_terms = self.dictionary.lookup_similar(term, top_n=5)
-            return {
-                "found": False,
-                "exact_match": False,
-                "query": term,
-                "similar_terms": similar_terms,
-                "message": f"No exact match for '{term}'. Did you mean one of these?",
-            }
-        else:
-            return {
-                "found": False,
-                "exact_match": False,
-                "query": term,
-                "message": f"Term '{term}' not found in dictionary",
-            }
-
-    def graph_query(self, term: str, top_n: int = 10) -> Dict[str, Any]:
-        """
-        Graph query with semantic similarity
-
-        Args:
-            term: Term to query
-            top_n: Number of similar terms to return
-        """
-        # First check if term exists
-        if term.lower() not in self.graph.terms_definitions:
-            return {
-                "found": False,
                 "term": term,
-                "message": f"Term '{term}' not found in graph",
+                "definition": exact,
             }
 
-        term_normalized = term.lower()
-
-        # Get semantically similar terms (based on definition similarity)
-        semantic_similar = self.graph.find_semantically_similar(term_normalized, top_n)
-
-        # Get related terms (terms that appear in definitions)
-        related_terms = self.graph.find_related_by_definition(term_normalized)
+        # Fuzzy search
+        fuzzy_results = self.dictionary.lookup_fuzzy(term, top_n=10)
 
         return {
-            "found": True,
-            "term": term_normalized,
-            "definition": self.graph.terms_definitions[term_normalized],
-            "semantically_similar": semantic_similar,
-            "related_by_definition": related_terms,
+            "found": False,
+            "exact_match": False,
+            "query": term,
+            "fuzzy_matches": fuzzy_results,
+            "message": f"No exact match for '{term}'. Showing similar terms:",
         }
 
-    def combined_query(self, query: str) -> Dict[str, Any]:
-        """
-        Combined query: dictionary lookup + graph relationships
-        """
-        # Step 1: Dictionary lookup
-        dict_result = self.dict_lookup(query, show_similar=True)
+    async def full_query(self, term: str) -> Dict[str, Any]:
+        """Full query: dict → graph (Pipeline C)"""
+        # Step 1: Try dictionary
+        dict_result = self.dict_lookup(term)
 
-        # Step 2: If exact match, also get graph data
-        if dict_result.get("exact_match"):
-            graph_result = self.graph_query(dict_result["term"])
+        if dict_result["exact_match"]:
+            # Found in dictionary, also get graph context
+            graph_result = self.graph.query_graph(term, max_depth=2)
+
             return {
-                "method": "combined",
-                "dictionary": dict_result,
-                "graph": graph_result,
+                "method": "exact_match",
+                "term": term,
+                "definition": dict_result["definition"],
+                "graph_context": graph_result,
             }
-        else:
-            # No exact match, just return similar terms
-            return {"method": "dictionary_only", "dictionary": dict_result}
+
+        # Step 2: Not found - Pipeline C
+        print(f"\n{'='*60}")
+        print("PIPELINE C: ADVANCED SEMANTIC SEARCH")
+        print(f"{'='*60}")
+
+        # Get fuzzy matches
+        fuzzy_matches = dict_result["fuzzy_matches"][:5]
+        print(f"Found {len(fuzzy_matches)} fuzzy matches")
+
+        # Query graph for each fuzzy match
+        graph_results = []
+        for match in fuzzy_matches:
+            graph_data = self.graph.query_graph(match["term"], max_depth=2)
+            if graph_data["found"]:
+                graph_results.append(
+                    {
+                        "fuzzy_term": match["term"],
+                        "similarity": match["similarity"],
+                        "graph_data": graph_data,
+                    }
+                )
+
+        # Query GraphRAG if available
+        graphrag_result = None
+        if self.graphrag:
+            try:
+                print("Querying GraphRAG...")
+                graphrag_result = await self.graphrag.aquery(
+                    term, param=QueryParam(mode="local")
+                )
+            except Exception as e:
+                print(f"⚠ GraphRAG query failed: {e}")
+
+        return {
+            "method": "pipeline_c",
+            "query": term,
+            "found_exact": False,
+            "fuzzy_matches": fuzzy_matches,
+            "graph_results": graph_results,
+            "graphrag_result": graphrag_result,
+            "message": "No exact match found. Showing related context:",
+        }
 
 
 # ============================================================================
-# MAIN EXECUTION
+# MAIN CLI
 # ============================================================================
 async def main():
-    """Main execution function"""
+    """Main CLI entry point"""
     if len(sys.argv) < 2:
         print("Usage:")
-        print("  python script.py build [book_file] - Build dictionary and graph")
-        print(
-            "  python script.py dict [term] - Dictionary lookup (character similarity)"
-        )
-        print(
-            "  python script.py graph [term] [top_n] - Graph query (semantic similarity)"
-        )
-        print("  python script.py query [term] - Combined query")
+        print("  python main.py build <book_file> <tokenizer_name>")
+        print("  python main.py dict <term>")
+        print("  python main.py query <term>")
         print("\nExamples:")
-        print("  python script.py build book.txt")
-        print("  python script.py dict impedance")
-        print("  python script.py graph impedance 10")
-        print("  python script.py query impedance")
+        print("  python main.py build power_systems.txt sudachi")
+        print("  python main.py dict 高圧送電線")
+        print("  python main.py query 直流送電")
+        print("\nTokenizer options: sudachi, mecab")
         return
 
     command = sys.argv[1].lower()
 
+    # ========================================================================
+    # BUILD COMMAND
+    # ========================================================================
     if command == "build":
-        if len(sys.argv) < 3:
-            print("Please specify a book file")
+        if len(sys.argv) < 4:
+            print("Usage: python main.py build <book_file> <tokenizer_name>")
+            print("Example: python main.py build book.txt sudachi")
             return
 
         book_file = sys.argv[2]
-        if not os.path.exists(book_file):
-            print(f"Book file not found: {book_file}")
-            return
+        tokenizer_name = sys.argv[3]
 
-        try:
-            with open(book_file, encoding="utf-8") as f:
-                book_text = f.read()
-            print(f"Loaded book: {book_file} ({len(book_text)} characters)")
-        except Exception as e:
-            print(f"Error reading book: {e}")
-            return
-
-        builder = GraphRAGBuilder()
-        success = await builder.build_graph(book_text)
+        builder = AdaptiveDictionaryBuilder(tokenizer_name)
+        success = await builder.build(book_file)
 
         if success:
-            builder.save_results()
-            print("\nBuild completed successfully")
+            builder.save()
+            print(f"\n{'='*60}")
+            print("BUILD COMPLETED SUCCESSFULLY")
+            print(f"{'='*60}")
 
+    # ========================================================================
+    # DICT COMMAND
+    # ========================================================================
     elif command == "dict":
         if len(sys.argv) < 3:
-            print("Usage: python script.py dict <term>")
+            print("Usage: python main.py dict <term>")
             return
 
         term = sys.argv[2]
-        query_system = BookDictionaryQuery()
+        query_system = QuerySystem()
 
-        if not query_system.dictionary.dictionary:
-            print(
-                "No dictionary data. Build first with: python script.py build [book_file]"
-            )
+        if not query_system.load_data():
+            print("\n✗ No data found. Build first with:")
+            print("  python main.py build <book_file> <tokenizer_name>")
             return
 
         result = query_system.dict_lookup(term)
 
-        print("\n" + "=" * 60)
-        print("DICTIONARY LOOKUP (Character Similarity)")
-        print("=" * 60)
+        print(f"\n{'='*60}")
+        print("DICTIONARY LOOKUP")
+        print(f"{'='*60}")
 
         if result["exact_match"]:
-            print(f"Term: {result['term']}")
+            print(f"\n✓ EXACT MATCH FOUND")
+            print(f"\nTerm: {result['term']}")
             print(f"Definition: {result['definition']}")
         else:
-            print(f"Query: {result['query']}")
+            print(f"\nQuery: {result['query']}")
             print(f"{result['message']}\n")
 
-            if result.get("similar_terms"):
-                for i, similar in enumerate(result["similar_terms"], 1):
-                    print(
-                        f"{i}. {similar['term']} (similarity: {similar['similarity']:.2f})"
-                    )
-                    print(f"   {similar['definition']}\n")
+            for i, match in enumerate(result["fuzzy_matches"], 1):
+                print(f"{i}. {match['term']} (similarity: {match['similarity']:.3f})")
+                print(f"   {match['definition']}\n")
 
-    elif command == "graph":
-        if len(sys.argv) < 3:
-            print("Usage: python script.py graph <term> [top_n]")
-            return
-
-        term = sys.argv[2]
-        top_n = int(sys.argv[3]) if len(sys.argv) > 3 else 10
-
-        query_system = BookDictionaryQuery()
-
-        if not query_system.graph.terms_definitions:
-            print("No graph data. Build first with: python script.py build [book_file]")
-            return
-
-        result = query_system.graph_query(term, top_n)
-
-        print("\n" + "=" * 60)
-        print("GRAPH QUERY (Semantic Similarity)")
-        print("=" * 60)
-
-        if not result["found"]:
-            print(f"{result['message']}")
-            return
-
-        print(f"Term: {result['term']}")
-        print(f"Definition: {result['definition']}\n")
-
-        # Semantically similar terms
-        if result.get("semantically_similar"):
-            print(f"SEMANTICALLY SIMILAR TERMS (based on definition similarity):")
-            print("-" * 60)
-            for i, similar in enumerate(result["semantically_similar"], 1):
-                print(
-                    f"\n{i}. {similar['term']} (similarity: {similar['similarity']:.3f})"
-                )
-                print(f"   {similar['definition']}")
-
-        # Related by definition
-        if result.get("related_by_definition"):
-            print(f"\n\nRELATED TERMS (appearing in definitions):")
-            print("-" * 60)
-            for term in result["related_by_definition"]:
-                print(f"  - {term}")
-
+    # ========================================================================
+    # QUERY COMMAND
+    # ========================================================================
     elif command == "query":
         if len(sys.argv) < 3:
-            print("Usage: python script.py query <term>")
+            print("Usage: python main.py query <term>")
             return
 
         term = sys.argv[2]
-        query_system = BookDictionaryQuery()
+        query_system = QuerySystem()
 
-        if not query_system.dictionary.dictionary:
-            print("No data. Build first with: python script.py build [book_file]")
+        if not query_system.load_data():
+            print("\n✗ No data found. Build first with:")
+            print("  python main.py build <book_file> <tokenizer_name>")
             return
 
-        result = query_system.combined_query(term)
+        result = await query_system.full_query(term)
 
-        print("\n" + "=" * 60)
-        print("COMBINED QUERY")
-        print("=" * 60)
+        print(f"\n{'='*60}")
+        print("FULL QUERY RESULTS")
+        print(f"{'='*60}")
 
-        # Dictionary results
-        dict_result = result["dictionary"]
-        print("\nDICTIONARY LOOKUP:")
-        print("-" * 60)
+        if result["method"] == "exact_match":
+            # Exact match found
+            print(f"\n✓ EXACT MATCH FOUND")
+            print(f"\nTerm: {result['term']}")
+            print(f"Definition: {result['definition']}")
 
-        if dict_result["exact_match"]:
-            print(f"Term: {dict_result['term']}")
-            print(f"Definition: {dict_result['definition']}")
-        else:
-            print(f"Query: {dict_result['query']}")
-            print(f"{dict_result['message']}\n")
+            # Show graph context
+            graph_ctx = result["graph_context"]
+            if graph_ctx.get("found"):
+                print(f"\n{'─'*60}")
+                print("GRAPH CONTEXT")
+                print(f"{'─'*60}")
+                print(f"Related nodes: {graph_ctx['total_nodes']}")
+                print(f"Related edges: {graph_ctx['total_edges']}")
 
-            if dict_result.get("similar_terms"):
-                for i, similar in enumerate(dict_result["similar_terms"][:3], 1):
-                    print(
-                        f"{i}. {similar['term']} (similarity: {similar['similarity']:.2f})"
+                # Show relationships
+                print("\nRelationships:")
+                edge_types = defaultdict(list)
+                for edge in graph_ctx["edges"]:
+                    edge_types[edge["type"]].append(
+                        f"{edge['source']} → {edge['target']}"
                     )
-                    print(f"   {similar['definition']}\n")
 
-        # Graph results (if exact match found)
-        if result["method"] == "combined" and result.get("graph"):
-            graph_result = result["graph"]
+                for edge_type, edges in edge_types.items():
+                    print(f"\n  {edge_type}:")
+                    for edge in edges[:5]:  # Show first 5 of each type
+                        print(f"    - {edge}")
 
-            if graph_result["found"]:
-                print("\nGRAPH ANALYSIS:")
-                print("-" * 60)
+        else:
+            # Pipeline C results
+            print(f"\n⚠ NO EXACT MATCH")
+            print(f"Query: {result['query']}")
+            print(f"{result['message']}")
 
-                # Semantically similar
-                if graph_result.get("semantically_similar"):
-                    print("\nSemantically similar terms:")
-                    for i, similar in enumerate(
-                        graph_result["semantically_similar"][:5], 1
-                    ):
-                        print(
-                            f"  {i}. {similar['term']} (similarity: {similar['similarity']:.3f})"
-                        )
+            # Fuzzy matches
+            print(f"\n{'─'*60}")
+            print("FUZZY MATCHES")
+            print(f"{'─'*60}")
+            for i, match in enumerate(result["fuzzy_matches"], 1):
+                print(f"\n{i}. {match['term']} (similarity: {match['similarity']:.3f})")
+                print(f"   {match['definition']}")
 
-                # Related terms
-                if graph_result.get("related_by_definition"):
-                    print("\nRelated terms (in definitions):")
-                    for term in graph_result["related_by_definition"][:10]:
-                        print(f"  - {term}")
+            # Graph results
+            if result["graph_results"]:
+                print(f"\n{'─'*60}")
+                print("GRAPH ANALYSIS (RAW OUTPUT)")
+                print(f"{'─'*60}")
+
+                for graph_res in result["graph_results"]:
+                    print(f"\nBased on fuzzy match: {graph_res['fuzzy_term']}")
+                    graph_data = graph_res["graph_data"]
+
+                    print(f"  Nodes found: {graph_data['total_nodes']}")
+                    print(f"  Edges found: {graph_data['total_edges']}")
+
+                    # Show node details
+                    print("\n  Related terms:")
+                    for node_term, node_data in list(graph_data["nodes"].items())[:5]:
+                        print(f"    - {node_term}: {node_data['definition'][:80]}...")
+
+                    # Show edge details
+                    if graph_data["edges"]:
+                        print("\n  Relationships:")
+                        for edge in graph_data["edges"][:10]:
+                            print(
+                                f"    {edge['source']} --[{edge['type']}]--> {edge['target']}"
+                            )
+
+            # GraphRAG results
+            if result.get("graphrag_result"):
+                print(f"\n{'─'*60}")
+                print("GRAPHRAG SEMANTIC SEARCH")
+                print(f"{'─'*60}")
+                print(result["graphrag_result"])
 
     else:
-        print(f"Unknown command: {command}")
-        print("Use: build, dict, graph, or query")
+        print(f"✗ Unknown command: {command}")
+        print("Use: build, dict, or query")
 
 
 if __name__ == "__main__":
